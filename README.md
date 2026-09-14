@@ -6,6 +6,3 @@ Usando HTML, JavaScript, CSS para una plataforma de apoyo pedagógico orientada 
 
 El sistema implementa interfaces accesibles con perfiles sensoriales personalizables, estructuración de rutinas predecibles y seguimiento pedagógico para docentes, acudientes y estudiantes.
 
-Estado del Proyecto: Sprint 1 Finalizado
-
-Actualmente el sistema cuenta con el Sprint 1 implementado, probado, y verficado en su totalidad
