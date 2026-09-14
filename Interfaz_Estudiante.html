@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estudiante — Mi rutina de hoy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/opendyslexic" rel="stylesheet">
+<style>
+  /* ======================================================================
+     TOKENS — mismos valores que el panel de Acudiente (Preferencias
+     sensoriales). El color primario y el fondo se sobrescriben en tiempo
+     de ejecución con la paleta que el acudiente eligió para el estudiante.
+     ====================================================================== */
+  :root{
+    --bg: #F4F6F5;
+    --surface: #FFFFFF;
+    --text: #202623;
+    --text-muted: #58615C;
+    --border: #D6DDD9;
+    --primary: #2F6E5C;
+    --primary-hover: #255A4B;
+    --primary-soft: #E4EEEA;
+    --focus: #1E4E40;
+    --ok-bg: #E4EEEA;
+    --ok-text: #1E4E40;
+    --radius: 12px;
+    --font-scale: 1;
+    --letter-tracking: normal;
+    --font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+    --motion-duration: .15s;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-family);
+    font-size: calc(16px * var(--font-scale));
+    letter-spacing: var(--letter-tracking);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  h1,h2,p,button,input{ font-family: inherit; }
+ 
+  /* Enfoque de teclado visible en todo momento — WCAG 2.4.7 */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible{
+    outline: 3px solid var(--focus); outline-offset: 2px;
+  }
+ 
+  /* Respeta "Reducir animaciones" del acudiente Y la preferencia del
+     sistema operativo del estudiante — lo que sea más restrictivo gana. */
+  .motion-reduced *{ transition: none !important; animation: none !important; }
+  @media (prefers-reduced-motion: reduce){
+    *{ transition: none !important; animation: none !important; }
+  }
+ 
+  .app{ max-width: 760px; margin: 0 auto; padding: 20px 20px 64px; }
+ 
+  /* ---------- Encabezado: mínimo, sin navegación que distraiga ---------- */
+  header.top{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding: 6px 4px 18px;
+  }
+  .greeting{ display:flex; align-items:center; gap:12px; }
+  .avatar{ width:44px; height:44px; border-radius:50%; background:var(--primary); flex-shrink:0; }
+  .greeting-text h1{ font-size: calc(19px * var(--font-scale)); margin:0; }
+  .greeting-text .date{ font-size: calc(13.5px * var(--font-scale)); color:var(--text-muted); margin:0; }
+ 
+  .icon-btn{
+    width:42px; height:42px; border-radius:10px; border:1.5px solid var(--border);
+    background:var(--surface); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; color:var(--text);
+  }
+  .icon-btn[aria-pressed="false"]{ color: var(--text-muted); }
+  .icon-btn svg{ width:20px; height:20px; }
+  .top-actions{ display:flex; gap:8px; }
+ 
+  /* ---------- Progreso ---------- */
+  .progress-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding: 16px 18px; margin-bottom: 18px;
+  }
+  .progress-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
+  .progress-top .label{ font-size: calc(14px * var(--font-scale)); font-weight:700; }
+  .progress-top .count{ font-size: calc(13px * var(--font-scale)); color:var(--text-muted); }
+  .progress-track{ height:10px; border-radius:999px; background:var(--bg); border:1px solid var(--border); overflow:hidden; }
+  .progress-fill{ height:100%; background:var(--primary); border-radius:999px; width:0%; }
+  .motion-ok .progress-fill{ transition: width var(--motion-duration) ease-out; }
+ 
+  /* ---------- Lista secuencial de actividades ---------- */
+  ol.routine{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:0; }
+  .step{ position:relative; display:flex; gap:14px; padding: 4px 0 26px; }
+  .step:last-child{ padding-bottom:4px; }
+  .step-rail{ display:flex; flex-direction:column; align-items:center; width:36px; flex-shrink:0; }
+  .step-dot{
+    width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    border:2px solid var(--border); background:var(--surface); flex-shrink:0; color:var(--text-muted);
+  }
+  .step-dot svg{ width:18px; height:18px; }
+  .step-line{ flex:1; width:2px; background:var(--border); margin-top:2px; min-height:12px; }
+  .step[data-status="hecha"] .step-dot{ background:var(--primary); border-color:var(--primary); color:#fff; }
+  .step[data-status="hecha"] .step-line{ background:var(--primary); }
+  .step[data-status="actual"] .step-dot{ border-color:var(--primary); color:var(--primary); background:var(--primary-soft); }
+ 
+  .step-card{
+    flex:1; border:1.5px solid var(--border); border-radius:var(--radius); background:var(--surface);
+    padding: 14px 16px;
+  }
+  .step[data-status="pendiente"] .step-card{ opacity:.6; }
+  .step[data-status="actual"] .step-card{ border-color:var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+  .step-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .step-title{ font-size: calc(16px * var(--font-scale)); font-weight:700; margin:0 0 4px; }
+  .step-time{ font-size: calc(12.5px * var(--font-scale)); color:var(--text-muted); white-space:nowrap; }
+  .step-desc{ font-size: calc(14px * var(--font-scale)); color:var(--text-muted); margin: 4px 0 0; }
+  .step-tag{
+    display:inline-flex; align-items:center; gap:6px; font-size: calc(12px * var(--font-scale));
+    font-weight:700; color:var(--primary); background:var(--primary-soft); border-radius:999px;
+    padding:3px 10px; margin-top:10px;
+  }
+  .step-actions{ display:flex; gap:10px; align-items:center; margin-top:12px; flex-wrap:wrap; }
+ 
+  .btn{
+    font-family:inherit; font-size: calc(14.5px * var(--font-scale)); font-weight:700; border-radius:8px;
+    padding: 10px 16px; cursor:pointer; border:1.5px solid transparent; display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-primary{ background:var(--primary); color:#fff; }
+  .btn-primary:hover{ background:var(--primary-hover); }
+  .btn-primary:disabled{ opacity:.5; cursor:not-allowed; }
+  .btn-ghost{ background:var(--surface); color:var(--text); border-color:var(--border); }
+  .btn-ghost:hover{ background:var(--bg); }
+ 
+  .timer-note{ font-size: calc(12.5px * var(--font-scale)); color: var(--text-muted); display:flex; align-items:center; gap:6px; }
+  .timer-note.warn{ color:#7A3B10; font-weight:700; }
+  .timer-note svg{ width:14px; height:14px; flex-shrink:0; }
+ 
+  /* ---------- Estado: sin actividades ---------- */
+  .empty-state{
+    background:var(--surface); border:1.5px dashed var(--border); border-radius:var(--radius);
+    padding: 48px 24px; text-align:center;
+  }
+  .empty-state svg{ width:56px; height:56px; color:var(--text-muted); margin-bottom:14px; }
+  .empty-state h2{ font-size: calc(18px * var(--font-scale)); margin:0 0 8px; }
+  .empty-state p{ font-size: calc(14.5px * var(--font-scale)); color:var(--text-muted); margin:0; max-width:38ch; margin-inline:auto; }
+ 
+  /* ---------- Todo completo ---------- */
+  .done-state{
+    background: var(--ok-bg); border:1.5px solid var(--primary); border-radius:var(--radius);
+    padding: 32px 24px; text-align:center; color: var(--ok-text);
+  }
+  .done-state svg{ width:44px; height:44px; margin-bottom:10px; }
+  .done-state h2{ font-size: calc(17px * var(--font-scale)); margin:0 0 6px; }
+  .done-state p{ font-size: calc(14px * var(--font-scale)); margin:0; }
+ 
+  /* live region invisible pero anunciada por lectores de pantalla */
+  .sr-only{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+    clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+ 
+  details.dev-notes{ margin-top: 34px; font-size: 13px; color: var(--text-muted); }
+  details.dev-notes summary{ cursor:pointer; font-weight:700; }
+  details.dev-notes pre{ white-space:pre-wrap; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px; }
+</style>
+</head>
+<body>
+<div class="app">
+ 
+  <header class="top">
+    <div class="greeting">
+      <div class="avatar" aria-hidden="true"></div>
+      <div class="greeting-text">
+        <h1 id="greeting-h1">Hola</h1>
+        <p class="date" id="today-date"></p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button type="button" class="icon-btn" id="btn-sound" aria-pressed="true" aria-label="Sonidos activados">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.5 8.5a5 5 0 0 1 0 7"></path></svg>
+      </button>
+    </div>
+  </header>
+ 
+  <div class="progress-card" id="progress-card" hidden>
+    <div class="progress-top">
+      <span class="label" id="progress-label">Tu rutina de hoy</span>
+      <span class="count" id="progress-count">Paso 1 de 1</span>
+    </div>
+    <div class="progress-track" role="progressbar" aria-labelledby="progress-label" id="progress-track" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+ 
+  <p class="sr-only" id="live-region" aria-live="polite"></p>
+ 
+  <main id="main-content"></main>
+ 
+  <details class="dev-notes">
+    <summary>Notas técnicas (equipo de desarrollo)</summary>
+    <p><strong>Endpoint de consulta de actividades</strong></p>
+    <pre>GET /api/students/:studentId/activities?date=YYYY-MM-DD
+ 
+200 OK
+{
+  "studentId": 101,
+  "date": "2026-09-14",
+  "activities": [
+    {
+      "id": "act-1",
+      "time": "08:00",
+      "title": "Rutina de la mañana",
+      "description": "Lavado de manos y guardar la mochila.",
+      "type": "cuidado-personal",
+      "durationMinutes": 10,
+      "status": "pendiente"
+    }
+  ]
+}
+ 
+Si "activities" es un arreglo vacío, el tablero muestra el estado
+"Sin actividades asignadas aún." No es un error: es un estado válido
+(ej. día sin planeación docente todavía).</pre>
+    <p><strong>Checklist de validación de usabilidad (flujo predecible)</strong></p>
+    <pre>[ ] El estudiante siempre ve como máximo 1 paso "actual" resaltado
+[ ] Los pasos futuros están visualmente atenuados y no son interactuables
+[ ] No es posible saltar pasos sin completar el anterior (flujo lineal)
+[ ] El estado vacío no genera ansiedad (tono neutro, sin ícono de error)
+[ ] Con "Reducir animaciones" activo, no hay transiciones ni parpadeos
+[ ] El aviso de cambio de pantalla aparece con los segundos configurados
+    por el acudiente antes de que el temporizador termine
+[ ] Contraste de texto ≥ 4.5:1 en todas las paletas disponibles
+[ ] Toda la interfaz es operable solo con teclado (Tab / Enter)
+[ ] Los lectores de pantalla anuncian el cambio de paso (aria-live)</pre>
+  </details>
+ 
+</div>
+ 
+<script>
+  /* ========================================================================
+   * 1) PREFERENCIAS SENSORIALES — se obtienen del mismo backend que usa el
+   *    panel del Acudiente (GET /api/students/:id/sensory-preferences).
+   *    Aquí se simula la respuesta ya guardada para el estudiante 101.
+   * ==================================================================== */
+  const PALETTES = {
+    neutro:  { bg:'#F6F7F9', text:'#24272B', primary:'#4A6FA5', primaryHover:'#3A5A87', soft:'#E7ECF3', border:'#D7DBE0', focus:'#243A57', okBg:'#E7ECF3', okText:'#243A57' },
+    verde:   { bg:'#F4F6F5', text:'#202623', primary:'#2F6E5C', primaryHover:'#255A4B', soft:'#E4EEEA', border:'#D6DDD9', focus:'#1E4E40', okBg:'#E4EEEA', okText:'#1E4E40' },
+    lavanda: { bg:'#F5F3F7', text:'#26242C', primary:'#5B4E8C', primaryHover:'#4A3F73', soft:'#EAE7F1', border:'#DAD7E2', focus:'#3A3160', okBg:'#EAE7F1', okText:'#3A3160' },
+    arena:   { bg:'#FBF6EF', text:'#3B2F22', primary:'#9C7A4C', primaryHover:'#82643C', soft:'#F1E7D5', border:'#E7DCC9', focus:'#5C4A2E', okBg:'#F1E7D5', okText:'#5C4A2E' },
+  };
+  const FONT_SIZE_SCALE = { 'pequeno':0.9, 'normal':1, 'grande':1.15, 'muy-grande':1.35 };
+ 
+  async function fetchSensoryPreferences(studentId){
+    // Simulación de: GET /api/students/:id/sensory-preferences
+    return {
+      studentId,
+      palette: 'verde',
+      fontSize: 'grande',
+      letterSpacing: true,
+      dyslexiaFriendlyFont: false,
+      audio: { soundsEnabled: true, volume: 60, textToSpeech: true },
+      reduceMotion: false,
+      timers: { mode: 'tiempo-extendido', warningSeconds: 15 },
+    };
+  }
+ 
+  function applySensoryPreferences(prefs){
+    const p = PALETTES[prefs.palette] || PALETTES.verde;
+    const root = document.documentElement.style;
+    root.setProperty('--bg', p.bg);
+    root.setProperty('--text', p.text);
+    root.setProperty('--primary', p.primary);
+    root.setProperty('--primary-hover', p.primaryHover);
+    root.setProperty('--primary-soft', p.soft);
+    root.setProperty('--border', p.border);
+    root.setProperty('--focus', p.focus);
+    root.setProperty('--ok-bg', p.okBg);
+    root.setProperty('--ok-text', p.okText);
+    root.setProperty('--font-scale', FONT_SIZE_SCALE[prefs.fontSize] ?? 1);
+    root.setProperty('--letter-tracking', prefs.letterSpacing ? '0.03em' : 'normal');
+    root.setProperty('--font-family', prefs.dyslexiaFriendlyFont
+      ? "'OpenDyslexic', 'Atkinson Hyperlegible', Arial, sans-serif"
+      : "'Atkinson Hyperlegible', Arial, sans-serif");
+    document.body.classList.toggle('motion-reduced', !!prefs.reduceMotion);
+    document.body.classList.toggle('motion-ok', !prefs.reduceMotion);
+ 
+    const soundBtn = document.getElementById('btn-sound');
+    soundBtn.setAttribute('aria-pressed', String(prefs.audio.soundsEnabled));
+    soundBtn.setAttribute('aria-label', prefs.audio.soundsEnabled ? 'Sonidos activados' : 'Sonidos desactivados');
+  }
+ 
+  /* ========================================================================
+   * 2) CONSULTA DE ACTIVIDADES ASIGNADAS
+   * ==================================================================== */
+  const ICONS = {
+    'cuidado-personal': '<path d="M12 2v6M12 22v-6M4.9 4.9l4.2 4.2M14.9 14.9l4.2 4.2M2 12h6M16 12h6M4.9 19.1l4.2-4.2M14.9 9.1l4.2-4.2"/>',
+    'aprendizaje': '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+    'socioemocional': '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>',
+    'descanso': '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    'motriz': '<path d="M6 3v12"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/>',
+    'cierre': '<path d="M4 21V4a1 1 0 0 1 1-1h9l6 6v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M14 3v6h6"/>',
+  };
+  function iconSvg(type, extra){
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra||''}>${ICONS[type] || ICONS['aprendizaje']}</svg>`;
+  }
+ 
+  async function fetchStudentActivities(studentId){
+    // Simulación de: GET /api/students/:id/activities?date=YYYY-MM-DD
+    return {
+      studentId,
+      date: new Date().toISOString().slice(0,10),
+      activities: [
+        { id:'act-1', time:'08:00', title:'Llegada y saludo', description:'Guarda la mochila y saluda a tu maestra.', type:'cuidado-personal', durationMinutes:10 },
+        { id:'act-2', time:'08:15', title:'Reconocer emociones', description:'Observa la imagen y elige cómo se siente el personaje.', type:'socioemocional', durationMinutes:20 },
+        { id:'act-3', time:'08:40', title:'Lectura guiada', description:'Lee el cuento junto con tu maestra, página por página.', type:'aprendizaje', durationMinutes:25 },
+        { id:'act-4', time:'09:10', title:'Pausa activa', description:'Estírate y camina un momento antes de seguir.', type:'motriz', durationMinutes:10 },
+        { id:'act-5', time:'09:25', title:'Descanso', description:'Toma agua y descansa en tu espacio tranquilo.', type:'descanso', durationMinutes:15 },
+        { id:'act-6', time:'09:45', title:'Cierre del día', description:'Guarda tus materiales y revisa lo que aprendiste hoy.', type:'cierre', durationMinutes:10 },
+      ],
+    };
+  }
+ 
+  /* ========================================================================
+   * 3) ESTADO Y RENDERIZADO — flujo lineal, un solo paso activo a la vez
+   * ==================================================================== */
+  let activities = [];
+  let currentIndex = 0;
+  let prefs = null;
+  let warnTimeoutId = null;
+ 
+  function statusFor(i){
+    if(i < currentIndex) return 'hecha';
+    if(i === currentIndex) return 'actual';
+    return 'pendiente';
+  }
+ 
+  function announce(msg){
+    document.getElementById('live-region').textContent = msg;
+  }
+ 
+  function speak(text){
+    if(!prefs.audio.textToSpeech) return;
+    if(!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'es-CO';
+    window.speechSynthesis.speak(utter);
+  }
+ 
+  function renderProgress(){
+    const card = document.getElementById('progress-card');
+    if(activities.length === 0){ card.hidden = true; return; }
+    card.hidden = false;
+    const done = Math.min(currentIndex, activities.length);
+    const pct = Math.round((done / activities.length) * 100);
+    document.getElementById('progress-count').textContent = `Paso ${Math.min(currentIndex+1, activities.length)} de ${activities.length}`;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-track').setAttribute('aria-valuenow', String(pct));
+  }
+ 
+  function clearWarnTimer(){ if(warnTimeoutId){ clearTimeout(warnTimeoutId); warnTimeoutId = null; } }
+ 
+  function scheduleWarning(stepEl, durationMinutes){
+    clearWarnTimer();
+    if(prefs.timers.mode === 'sin-temporizador') return;
+    const multiplier = prefs.timers.mode === 'tiempo-extendido' ? 2 : 1;
+    const totalSeconds = durationMinutes * 60 * multiplier;
+    const warnAt = Math.max(totalSeconds - prefs.timers.warningSeconds, 0);
+    const note = stepEl.querySelector('.timer-note');
+    if(!note) return;
+    warnTimeoutId = setTimeout(() => {
+      note.classList.add('warn');
+      note.querySelector('span').textContent = `Esta actividad va a cambiar en ${prefs.timers.warningSeconds} segundos`;
+      speak(`Vamos a cambiar de actividad en ${prefs.timers.warningSeconds} segundos.`);
+    }, warnAt * 1000);
+  }
+ 
+  function renderMain(){
+    const main = document.getElementById('main-content');
+    clearWarnTimer();
+ 
+    if(activities.length === 0){
+      main.innerHTML = `
+        <div class="empty-state" role="status">
+          ${iconSvg('cierre', 'width="56" height="56"')}
+          <h2>Sin actividades asignadas aún</h2>
+          <p>Tu maestra o maestro todavía no ha agregado las actividades de hoy. Vuelve a revisar más tarde.</p>
+        </div>`;
+      renderProgress();
+      return;
+    }
+ 
+    if(currentIndex >= activities.length){
+      main.innerHTML = `
+        <div class="done-state" role="status">
+          ${iconSvg('cierre', 'width="44" height="44"')}
+          <h2>¡Completaste tu rutina de hoy!</h2>
+          <p>Buen trabajo. Puedes descansar hasta la próxima actividad.</p>
+        </div>`;
+      renderProgress();
+      announce('Completaste todas las actividades de hoy.');
+      return;
+    }
+ 
+    const items = activities.map((act, i) => {
+      const status = statusFor(i);
+      const isLast = i === activities.length - 1;
+      const durationLabel = prefs.timers.mode === 'sin-temporizador'
+        ? ''
+        : `<span class="timer-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>${act.durationMinutes * (prefs.timers.mode === 'tiempo-extendido' ? 2 : 1)} min para esta actividad</span></span>`;
+ 
+      const actionButton = status === 'actual'
+        ? `<button type="button" class="btn btn-primary" data-complete="${act.id}">
+             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>
+             Listo, siguiente
+           </button>`
+        : '';
+ 
+      const listenButton = (status === 'actual' && prefs.audio.textToSpeech)
+        ? `<button type="button" class="btn btn-ghost" data-listen="${act.id}" aria-label="Escuchar instrucciones de ${act.title}">
+             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="16" height="16"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.5 8.5a5 5 0 0 1 0 7"></path></svg>
+             Escuchar
+           </button>`
+        : '';
+ 
+      return `
+        <li class="step" data-status="${status}" ${status === 'actual' ? 'aria-current="step"' : ''}>
+          <div class="step-rail">
+            <div class="step-dot">${status === 'hecha' ? iconSvg('cierre').replace(ICONS['cierre'], '<polyline points="20 6 9 17 4 12"/>') : iconSvg(act.type)}</div>
+            ${!isLast ? '<div class="step-line"></div>' : ''}
+          </div>
+          <div class="step-card">
+            <div class="step-head">
+              <p class="step-title">${act.title}</p>
+              <span class="step-time">${act.time}</span>
+            </div>
+            <p class="step-desc">${act.description}</p>
+            ${status !== 'pendiente' ? `<span class="step-tag">${iconSvg(act.type)} ${act.type.replace('-', ' ')}</span>` : ''}
+            ${status === 'actual' ? `<div class="step-actions">${actionButton}${listenButton}${durationLabel}</div>` : ''}
+          </div>
+        </li>`;
+    }).join('');
+ 
+    main.innerHTML = `<ol class="routine" aria-label="Rutina de actividades de hoy">${items}</ol>`;
+    renderProgress();
+ 
+    const currentStepEl = main.querySelector('.step[data-status="actual"]');
+    const current = activities[currentIndex];
+    if(currentStepEl){
+      scheduleWarning(currentStepEl, current.durationMinutes);
+    }
+    announce(`Paso actual: ${current.title}, a las ${current.time}.`);
+ 
+    const completeBtn = main.querySelector('[data-complete]');
+    if(completeBtn){
+      completeBtn.addEventListener('click', () => {
+        currentIndex += 1;
+        renderMain();
+      });
+    }
+    const listenBtn = main.querySelector('[data-listen]');
+    if(listenBtn){
+      listenBtn.addEventListener('click', () => speak(`${current.title}. ${current.description}`));
+    }
+  }
+ 
+  document.getElementById('btn-sound').addEventListener('click', (e) => {
+    const btn = e.currentTarget;
+    const enabled = btn.getAttribute('aria-pressed') === 'true';
+    btn.setAttribute('aria-pressed', String(!enabled));
+    btn.setAttribute('aria-label', !enabled ? 'Sonidos activados' : 'Sonidos desactivados');
+  });
+ 
+  /* ========================================================================
+   * 4) INICIALIZACIÓN
+   * ==================================================================== */
+  async function init(){
+    const studentId = 101;
+    const studentName = 'Jorge';
+ 
+    prefs = await fetchSensoryPreferences(studentId);
+    applySensoryPreferences(prefs);
+ 
+    document.getElementById('greeting-h1').textContent = `Hola, ${studentName}`;
+    document.getElementById('today-date').textContent = new Date().toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long' });
+ 
+    const data = await fetchStudentActivities(studentId);
+    activities = data.activities;
+    currentIndex = 0;
+    renderMain();
+  }
+ 
+  init();
+</script>
+</body>
+</html>
