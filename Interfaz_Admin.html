@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Administración — Gestión de usuarios</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg: #F4F6F5;
@@ -29,7 +30,12 @@
     --radius: 12px;
   }
   *{ box-sizing: border-box; }
-  html,body{ margin:0; padding:0; }
+  html,body{
+    margin:0; padding:0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
   body{
     background: var(--bg);
     color: var(--text);
@@ -218,7 +224,7 @@
     <div class="page-header">
       <div>
         <h1>Gestión de usuarios</h1>
-        <p class="subtitle">Crea, edita, activa/inactiva o elimina las cuentas de la plataforma: Estudiantes, Acudientes, Profesores y otros administradores.</p>
+        <p class="subtitle">Crea, edita, activa/inactiva o elimina las cuentas de la plataforma: Estudiantes, Acudientes, Docentes y otros administradores.</p>
       </div>
       <button type="button" class="btn btn-primary" id="btn-new-user">+ Nuevo usuario</button>
     </div>
@@ -233,7 +239,7 @@
         <select id="filter-role">
           <option value="">Todos</option>
           <option value="Administrador">Administrador</option>
-          <option value="Profesor">Profesor</option>
+          <option value="Docente">Docente</option>
           <option value="Acudiente">Acudiente</option>
           <option value="Estudiante">Estudiante</option>
         </select>
@@ -297,10 +303,17 @@
         <label for="user-role">Rol</label>
         <select id="user-role">
           <option value="Administrador">Administrador</option>
-          <option value="Profesor">Profesor</option>
+          <option value="Docente">Docente</option>
           <option value="Acudiente">Acudiente</option>
           <option value="Estudiante" selected>Estudiante</option>
         </select>
+        <div class="field-error" id="error-role" role="alert"></div>
+      </div>
+
+      <div class="field" id="field-password">
+        <label for="user-password">Contraseña inicial</label>
+        <input type="password" id="user-password" value="Usuario123!*" autocomplete="off">
+        <div class="field-error" id="error-password" role="alert"></div>
       </div>
  
       <div class="field" id="field-status">
@@ -411,107 +424,167 @@
   const nameInput = document.getElementById('user-name');
   const emailInput = document.getElementById('user-email');
   const roleInput = document.getElementById('user-role');
+  const passwordInput = document.getElementById('user-password');
+  const passwordField = document.getElementById('field-password');
   const statusInput = document.getElementById('user-status');
- 
+
   function openUserModal(user){
     userForm.reset();
     clearFieldError('field-name', 'error-name');
     clearFieldError('field-email', 'error-email');
+    clearFieldError('field-password', 'error-password');
+    clearFieldError('field-role', 'error-role');
     if(user){
       userModalTitle.textContent = 'Editar usuario';
-      userModalSub.textContent = 'Actualiza los datos de la cuenta.';
+      userModalSub.textContent = 'Actualiza el rol de la cuenta.';
       userIdInput.value = user.id;
       nameInput.value = user.name;
+      nameInput.disabled = true;
       emailInput.value = user.email;
+      emailInput.disabled = true;
       roleInput.value = user.role;
       statusInput.value = user.status;
+      passwordField.style.display = 'none';
     } else {
       userModalTitle.textContent = 'Nuevo usuario';
-      userModalSub.textContent = 'Completa los datos para crear la cuenta.';
+      userModalSub.textContent = 'Completa los datos para crear la cuenta en la plataforma.';
       userIdInput.value = '';
-      roleInput.value = 'Usuario';
+      nameInput.value = '';
+      nameInput.disabled = false;
+      emailInput.value = '';
+      emailInput.disabled = false;
+      roleInput.value = 'Docente';
+      passwordInput.value = 'Usuario123!*';
       statusInput.value = 'Activo';
+      passwordField.style.display = 'block';
     }
     userOverlay.classList.add('open');
-    nameInput.focus();
+    if(!user) nameInput.focus();
   }
- 
+
   function closeUserModal(){
     userOverlay.classList.remove('open');
   }
- 
+
   document.getElementById('btn-new-user').addEventListener('click', () => openUserModal(null));
   document.getElementById('btn-cancel-user').addEventListener('click', closeUserModal);
   userOverlay.addEventListener('click', (e) => { if(e.target === userOverlay) closeUserModal(); });
- 
+
   function setFieldError(fieldId, errorId, message){
     document.getElementById(fieldId).classList.add('invalid');
     const el = document.getElementById(errorId);
-    el.textContent = message;
-    el.classList.add('show');
+    if(el){
+      el.textContent = message;
+      el.classList.add('show');
+    }
   }
   function clearFieldError(fieldId, errorId){
     document.getElementById(fieldId).classList.remove('invalid');
     const el = document.getElementById(errorId);
-    el.textContent = '';
-    el.classList.remove('show');
+    if(el){
+      el.textContent = '';
+      el.classList.remove('show');
+    }
   }
- 
-  userForm.addEventListener('submit', (e) => {
+
+  userForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     let valid = true;
- 
-    if(nameInput.value.trim() === ''){
-      setFieldError('field-name', 'error-name', 'El nombre completo es obligatorio.');
-      valid = false;
-    } else {
-      clearFieldError('field-name', 'error-name');
-    }
- 
-    if(emailInput.value.trim() === '' || !emailInput.value.includes('@')){
-      setFieldError('field-email', 'error-email', 'Escribe un correo electrónico válido, con el símbolo @.');
-      valid = false;
-    } else {
-      const duplicate = users.find(u => u.email.toLowerCase() === emailInput.value.trim().toLowerCase() && String(u.id) !== userIdInput.value);
-      if(duplicate){
-        setFieldError('field-email', 'error-email', 'Ya existe un usuario registrado con este correo.');
+
+    if(!userIdInput.value){
+      if(nameInput.value.trim() === ''){
+        setFieldError('field-name', 'error-name', 'El nombre completo es obligatorio.');
         valid = false;
       } else {
-        clearFieldError('field-email', 'error-email');
+        clearFieldError('field-name', 'error-name');
+      }
+
+      if(emailInput.value.trim() === '' || !emailInput.value.includes('@')){
+        setFieldError('field-email', 'error-email', 'Escribe un correo electrónico válido, con el símbolo @.');
+        valid = false;
+      } else {
+        const duplicate = users.find(u => u.email.toLowerCase() === emailInput.value.trim().toLowerCase());
+        if(duplicate){
+          setFieldError('field-email', 'error-email', 'Ya existe un usuario registrado con este correo.');
+          valid = false;
+        } else {
+          clearFieldError('field-email', 'error-email');
+        }
+      }
+
+      if(!passwordInput.value || passwordInput.value.length < 6){
+        setFieldError('field-password', 'error-password', 'La contraseña debe tener al menos 6 caracteres.');
+        valid = false;
+      } else {
+        clearFieldError('field-password', 'error-password');
       }
     }
- 
+
     if(!valid) return;
- 
+
     if(userIdInput.value){
-      const id = Number(userIdInput.value);
-      const u = users.find(x => x.id === id);
-      u.name = nameInput.value.trim();
-      u.email = emailInput.value.trim();
-      u.role = roleInput.value;
-      u.status = statusInput.value;
-      setStatus(`Usuario "${u.name}" actualizado correctamente.`, 'ok');
+      try {
+        setStatus('Actualizando rol del usuario...', '');
+        const res = await ApiClient.request(`/users/${userIdInput.value}/roles`, {
+          method: 'PUT',
+          body: { roles: [roleInput.value] }
+        });
+        if(res.ok && res.data && res.data.success){
+          setStatus(`Rol de usuario actualizado correctamente.`, 'ok');
+          closeUserModal();
+          await loadUsersFromBackend();
+        } else {
+          const msg = (res.data && res.data.message) || 'Error al actualizar roles';
+          setFieldError('field-role', 'error-role', msg);
+          setStatus(msg, 'error');
+        }
+      } catch(err){
+        console.error('Error al actualizar roles:', err);
+        setStatus('Error de conexión al actualizar roles.', 'error');
+      }
     } else {
-      users.push({
-        id: nextId++,
-        name: nameInput.value.trim(),
-        email: emailInput.value.trim(),
-        role: roleInput.value,
-        status: statusInput.value,
-        lastActivity: 'Sin actividad aún'
-      });
-      setStatus(`Usuario "${nameInput.value.trim()}" creado correctamente.`, 'ok');
+      // Registrar nuevo usuario en backend SQL Server (Sprint 1 HU-001)
+      const rawName = nameInput.value.trim();
+      const parts = rawName.split(/\s+/);
+      const nombres = parts.length > 1 ? parts.slice(0, -1).join(' ') : parts[0];
+      const apellidos = parts.length > 1 ? parts.slice(-1).join(' ') : parts[0];
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      const rol = roleInput.value;
+
+      try {
+        setStatus('Creando usuario en la base de datos SQL Server...', '');
+        const res = await ApiClient.request('/auth/register', {
+          method: 'POST',
+          body: {
+            nombres,
+            apellidos,
+            email,
+            password,
+            rol
+          }
+        });
+        if(res.ok && res.data && res.data.success){
+          setStatus(`Usuario "${rawName}" creado exitosamente en la base de datos.`, 'ok');
+          closeUserModal();
+          await loadUsersFromBackend();
+        } else {
+          const errMsg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al registrar el usuario en el backend.';
+          setFieldError('field-email', 'error-email', errMsg);
+          setStatus(errMsg, 'error');
+        }
+      } catch(err){
+        console.error('Error al registrar usuario:', err);
+        setStatus('Error de conexión con el servidor al registrar usuario.', 'error');
+      }
     }
- 
-    closeUserModal();
-    render();
   });
- 
+
   // ---------- Modal eliminar ----------
   const deleteOverlay = document.getElementById('delete-overlay');
   const deleteTargetName = document.getElementById('delete-target-name');
   let pendingDeleteId = null;
- 
+
   function openDeleteModal(user){
     pendingDeleteId = user.id;
     deleteTargetName.textContent = user.name;
@@ -524,26 +597,26 @@
   }
   document.getElementById('btn-cancel-delete').addEventListener('click', closeDeleteModal);
   deleteOverlay.addEventListener('click', (e) => { if(e.target === deleteOverlay) closeDeleteModal(); });
- 
+
   document.getElementById('btn-confirm-delete').addEventListener('click', () => {
-    const u = users.find(x => x.id === pendingDeleteId);
-    users = users.filter(x => x.id !== pendingDeleteId);
+    const u = users.find(x => String(x.id) === String(pendingDeleteId));
+    users = users.filter(x => String(x.id) !== String(pendingDeleteId));
     closeDeleteModal();
     render();
-    if(u) setStatus(`Usuario "${u.name}" eliminado.`, 'error');
+    if(u) setStatus(`Usuario "${u.name}" eliminado de la lista.`, 'error');
   });
- 
+
   // ---------- Delegación de acciones de la tabla ----------
   tableBody.addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-action]');
     if(!btn) return;
-    const id = Number(btn.dataset.id);
-    const user = users.find(u => u.id === id);
+    const id = btn.dataset.id;
+    const user = users.find(u => String(u.id) === String(id));
     if(!user) return;
     if(btn.dataset.action === 'edit') openUserModal(user);
     if(btn.dataset.action === 'delete') openDeleteModal(user);
   });
- 
+
   // ---------- Cerrar modales con Escape ----------
   document.addEventListener('keydown', (e) => {
     if(e.key === 'Escape'){
@@ -551,7 +624,7 @@
       if(deleteOverlay.classList.contains('open')) closeDeleteModal();
     }
   });
- 
+
   function setStatus(message, kind){
     status.textContent = message;
     status.className = 'status-region ' + (kind || '');
@@ -561,15 +634,24 @@
     setStatus('Cargando usuarios desde el backend de .NET 9...');
     try {
       const res = await ApiClient.request('/users');
-      if (res.ok && res.data.success) {
-        users = res.data.data.map(u => ({
-          id: u.id,
-          name: u.nombreCompleto || `${u.nombres} ${u.apellidos}`.trim(),
-          email: u.email,
-          role: (u.roles && u.roles.length > 0) ? u.roles[0] : 'Sin rol',
-          status: u.isActive ? 'Activo' : 'Inactivo',
-          lastActivity: new Date(u.createdAt).toLocaleDateString('es-CO')
-        }));
+      if (res.ok && res.data && res.data.success) {
+        users = res.data.data.map(u => {
+          let activityStr = 'Sin actividad aún';
+          if (u.ultimaActividadAt) {
+            const actDate = new Date(u.ultimaActividadAt);
+            activityStr = actDate.toLocaleDateString('es-CO') + ' ' + actDate.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+          } else if (u.createdAt) {
+            activityStr = new Date(u.createdAt).toLocaleDateString('es-CO');
+          }
+          return {
+            id: u.id,
+            name: u.nombreCompleto || `${u.nombres} ${u.apellidos}`.trim(),
+            email: u.email,
+            role: (u.roles && u.roles.length > 0) ? u.roles[0] : 'Sin rol',
+            status: u.isActive ? 'Activo' : 'Inactivo',
+            lastActivity: activityStr
+          };
+        });
         setStatus(`Se cargaron ${users.length} usuarios desde la base de datos SQL Server.`, 'ok');
       } else {
         setStatus('No se pudieron obtener usuarios del backend.', 'error');

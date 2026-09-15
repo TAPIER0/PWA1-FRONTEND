@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Estudiante — Mi rutina de hoy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 <link href="https://fonts.cdnfonts.com/css/opendyslexic" rel="stylesheet">
 <style>
   /* ======================================================================
@@ -32,7 +33,12 @@
     --motion-duration: .15s;
   }
   *{ box-sizing:border-box; }
-  html,body{ margin:0; padding:0; }
+  html,body{
+    margin:0; padding:0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
   body{
     background: var(--bg);
     color: var(--text);
@@ -259,8 +265,8 @@ Si "activities" es un arreglo vacío, el tablero muestra el estado
     return {
       studentId,
       palette: 'verde',
-      fontSize: 'grande',
-      letterSpacing: true,
+      fontSize: 'normal',
+      letterSpacing: false,
       dyslexiaFriendlyFont: false,
       audio: { soundsEnabled: true, volume: 60, textToSpeech: true },
       reduceMotion: false,
@@ -516,7 +522,7 @@ Si "activities" es un arreglo vacío, el tablero muestra el estado
               studentId,
               palette: paletteMap[sp.paletaColor] || 'verde',
               fontSize: sp.nivelEscalaFuente === 1 ? 'pequeno' : sp.nivelEscalaFuente === 3 ? 'grande' : sp.nivelEscalaFuente === 4 ? 'muy-grande' : 'normal',
-              letterSpacing: true,
+              letterSpacing: Boolean(sp.mayorEspacioEntreLetras),
               dyslexiaFriendlyFont: (sp.tipografia || '').toLowerCase().includes('dyslexic'),
               audio: { soundsEnabled: sp.audioActivo, volume: 60, textToSpeech: true },
               reduceMotion: sp.animacionesReducidas,

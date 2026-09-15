@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Acudiente — Preferencias sensoriales del estudiante</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/opendyslexic" rel="stylesheet">
 <style>
   :root{
     --bg: #F4F6F5;
@@ -26,7 +28,12 @@
     --radius: 12px;
   }
   *{ box-sizing: border-box; }
-  html,body{ margin:0; padding:0; }
+  html,body{
+    margin:0; padding:0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
   body{
     background: var(--bg);
     color: var(--text);
@@ -240,7 +247,14 @@
  
         <div class="card">
           <h2>Tipografía</h2>
-          <p class="card-desc">Ajusta el tamaño del texto y el espacio entre letras para facilitar la lectura.</p>
+          <p class="card-desc">Ajusta el estilo visual, tamaño del texto y el espacio entre letras para facilitar la lectura.</p>
+          <div class="field-row">
+            <span class="label">Estilo de fuente</span>
+            <div class="chip-group" id="fontfamily-group" role="radiogroup" aria-label="Estilo de fuente">
+              <button type="button" class="chip-btn" data-value="Atkinson Hyperlegible">Alta definición (Atkinson)</button>
+              <button type="button" class="chip-btn" data-value="OpenDyslexic">Lectura Dislexia (OpenDyslexic)</button>
+            </div>
+          </div>
           <div class="field-row">
             <span class="label">Tamaño del texto</span>
             <div class="chip-group" id="fontsize-group" role="radiogroup" aria-label="Tamaño del texto">
@@ -412,6 +426,7 @@
     return {
       studentId,
       palette: 'verde',
+      tipografia: 'Atkinson Hyperlegible',
       fontSize: 'normal',
       letterSpacing: false,
       audio: { soundsEnabled: true, volume: 50, textToSpeech: false },
@@ -498,6 +513,7 @@
       btn.setAttribute('aria-pressed', String(btn.dataset.value === prefGetter()));
     });
   }
+  wireChipGroup('fontfamily-group', () => currentPrefs.tipografia, (v) => currentPrefs.tipografia = v);
   wireChipGroup('fontsize-group', () => currentPrefs.fontSize, (v) => currentPrefs.fontSize = v);
   wireChipGroup('timer-mode-group', () => currentPrefs.timers.mode, (v) => currentPrefs.timers.mode = v);
  
@@ -531,9 +547,10 @@
   // ---------- Cargar formulario a partir de currentPrefs ----------
   function loadFormFromPrefs(){
     refreshPaletteSelection();
+    refreshChipGroup('fontfamily-group', () => currentPrefs.tipografia);
     refreshChipGroup('fontsize-group', () => currentPrefs.fontSize);
     refreshChipGroup('timer-mode-group', () => currentPrefs.timers.mode);
-    letterSpacingInput.checked = currentPrefs.letterSpacing;
+    letterSpacingInput.checked = Boolean(currentPrefs.letterSpacing);
     soundsEnabledInput.checked = currentPrefs.audio.soundsEnabled;
     ttsInput.checked = currentPrefs.audio.textToSpeech;
     reduceMotionInput.checked = currentPrefs.reduceMotion;
@@ -550,18 +567,25 @@
   const previewTags = document.getElementById('preview-tags');
  
   function updatePreview(){
-    const p = PALETTES[currentPrefs.palette];
+    const p = PALETTES[currentPrefs.palette] || PALETTES.verde;
     previewFrame.style.background = p.bg;
     previewFrame.style.color = p.text;
     previewFrame.style.borderColor = p.border;
     pfBtn.style.background = p.primary;
     pfBtn.style.color = '#fff';
- 
-    const scale = FONT_SIZE_SCALE[currentPrefs.fontSize];
+
+    const isDyslexic = (currentPrefs.tipografia || '').toLowerCase().includes('dyslexic');
+    previewFrame.style.fontFamily = isDyslexic 
+      ? "'OpenDyslexic', 'Atkinson Hyperlegible', Arial, sans-serif" 
+      : "'Atkinson Hyperlegible', Arial, sans-serif";
+
+    const scale = FONT_SIZE_SCALE[currentPrefs.fontSize] || 1;
     previewFrame.style.setProperty('--pf-scale', scale);
     previewFrame.style.setProperty('--pf-tracking', currentPrefs.letterSpacing ? '0.03em' : 'normal');
- 
+
     const tags = [];
+    tags.push(isDyslexic ? '📖 OpenDyslexic' : '✨ Atkinson');
+    tags.push(currentPrefs.letterSpacing ? '↔ Espaciado amplio' : '↔ Espaciado estándar');
     tags.push(currentPrefs.reduceMotion ? '🌙 Animaciones reducidas' : '▶ Animaciones normales');
     tags.push(currentPrefs.audio.soundsEnabled ? `🔊 Sonidos (${currentPrefs.audio.volume}%)` : '🔇 Sonidos desactivados');
     if(currentPrefs.audio.textToSpeech) tags.push('🗣 Texto a voz activo');
@@ -572,7 +596,7 @@
     }
     previewTags.innerHTML = tags.map(t => `<span class="preview-tag">${t}</span>`).join('');
   }
- 
+
   // ---------- Selección y Carga de Estudiante ----------
   async function loadStudent(studentId){
     setStatus('Cargando preferencias sensoriales del estudiante...');
@@ -586,8 +610,9 @@
         currentPrefs = {
           studentId,
           palette: paletteBackendToFront[sp.paletaColor] || 'verde',
+          tipografia: sp.tipografia || 'Atkinson Hyperlegible',
           fontSize: fontScaleBackendToFront[sp.nivelEscalaFuente] || 'normal',
-          letterSpacing: true,
+          letterSpacing: Boolean(sp.mayorEspacioEntreLetras),
           dyslexiaFriendlyFont: (sp.tipografia || '').toLowerCase().includes('dyslexic'),
           audio: {
             soundsEnabled: sp.audioActivo,
@@ -642,7 +667,8 @@
 
     const payload = {
       paletaColor: paletteFrontToBackend[currentPrefs.palette] || 'PastelSuave',
-      tipografia: 'OpenDyslexic',
+      tipografia: currentPrefs.tipografia || 'Atkinson Hyperlegible',
+      mayorEspacioEntreLetras: Boolean(currentPrefs.letterSpacing),
       audioActivo: Boolean(currentPrefs.audio.soundsEnabled),
       animacionesReducidas: Boolean(currentPrefs.reduceMotion),
       nivelEscalaFuente: fontScaleFrontToBackend[currentPrefs.fontSize] || 2,

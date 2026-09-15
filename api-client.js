@@ -84,11 +84,17 @@ const ApiClient = {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
+    const fetchOptions = {
+      ...options,
+      headers
+    };
+
+    if (fetchOptions.body && typeof fetchOptions.body === 'object' && !(fetchOptions.body instanceof FormData)) {
+      fetchOptions.body = JSON.stringify(fetchOptions.body);
+    }
+
     try {
-      const response = await fetch(url, {
-        ...options,
-        headers
-      });
+      const response = await fetch(url, fetchOptions);
 
       if (response.status === 401) {
         this.clearSession();
