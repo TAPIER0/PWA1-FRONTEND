@@ -208,6 +208,7 @@
           <div class="role">Rol: Acudiente</div>
         </div>
       </div>
+      <button type="button" id="btn-logout" class="btn btn-ghost" style="margin-top: 10px; width: 100%; justify-content: center; font-size: 13.5px;">Cerrar sesión</button>
     </div>
   </aside>
  
@@ -364,6 +365,7 @@
   </main>
 </div>
  
+<script src="api-client.js"></script>
 <script>
   /**
    * ---------------------------------------------------------------------
@@ -420,19 +422,22 @@
     };
   }
  
-  // Acudiente y estudiantes a cargo (mock: el backend aún no está listo)
-  const currentGuardianName = 'Luisa Gómez';
+  if (!ApiClient.requireAuth(['Acudiente', 'Administrador'])) {
+    throw new Error('No autorizado');
+  }
+
+  const user = ApiClient.getUser();
+  const currentGuardianName = user ? `${user.nombres} ${user.apellidos}`.trim() : 'Carlos Pérez';
   const students = [
-    { id: 101, name: 'Jorge Iván Salas' },
-    { id: 102, name: 'Sofía Martínez' },
+    { id: 'd8442234-630f-4339-a26f-25a1aecff7db', name: 'Mateo Pérez (EST-TEA-001)' }
   ];
- 
-  // "Base de datos" en memoria: preferencias guardadas por estudiante
+
+  // "Base de datos" en memoria para respaldo
   const savedPrefsByStudent = {};
- 
+
   document.getElementById('welcome-name').textContent = 'Bienvenido(a), ' + currentGuardianName;
   document.getElementById('guardian-chip-name').textContent = currentGuardianName;
- 
+
   const studentSelect = document.getElementById('student-select');
   students.forEach(s => {
     const opt = document.createElement('option');
@@ -440,7 +445,7 @@
     opt.textContent = s.name;
     studentSelect.appendChild(opt);
   });
- 
+
   let currentPrefs = defaultPrefs(students[0].id);
  
   // ---------- Construir grid de paletas ----------
@@ -568,46 +573,117 @@
     previewTags.innerHTML = tags.map(t => `<span class="preview-tag">${t}</span>`).join('');
   }
  
-  // ---------- Selección de estudiante ----------
-  function loadStudent(studentId){
-    currentPrefs = savedPrefsByStudent[studentId]
-      ? JSON.parse(JSON.stringify(savedPrefsByStudent[studentId]))
-      : defaultPrefs(studentId);
+  // ---------- Selección y Carga de Estudiante ----------
+  async function loadStudent(studentId){
+    setStatus('Cargando preferencias sensoriales del estudiante...');
+    try {
+      const res = await ApiClient.request(`/students/${studentId}/sensory-preferences`);
+      if (res.ok && res.data.success) {
+        const sp = res.data.data;
+        const paletteBackendToFront = { 'PastelSuave': 'verde', 'NeutroCalmante': 'neutro', 'Lavanda': 'lavanda', 'Arena': 'arena' };
+        const fontScaleBackendToFront = { 1: 'pequeno', 2: 'normal', 3: 'grande', 4: 'muy-grande' };
+
+        currentPrefs = {
+          studentId,
+          palette: paletteBackendToFront[sp.paletaColor] || 'verde',
+          fontSize: fontScaleBackendToFront[sp.nivelEscalaFuente] || 'normal',
+          letterSpacing: true,
+          dyslexiaFriendlyFont: (sp.tipografia || '').toLowerCase().includes('dyslexic'),
+          audio: {
+            soundsEnabled: sp.audioActivo,
+            volume: 60,
+            textToSpeech: false
+          },
+          reduceMotion: sp.animacionesReducidas,
+          timers: {
+            mode: sp.ocultarTemporizadores ? 'sin-temporizador' : 'tiempo-extendido',
+            warningSeconds: 15
+          },
+          updatedAt: new Date().toISOString()
+        };
+        setStatus('Preferencias cargadas desde el servidor.', 'ok');
+      } else {
+        currentPrefs = defaultPrefs(studentId);
+        setStatus('Preferencias por defecto cargadas.');
+      }
+    } catch (err) {
+      console.warn('Error al cargar preferencias del backend:', err);
+      currentPrefs = defaultPrefs(studentId);
+      setStatus('No se pudo conectar al servidor. Usando valores predeterminados.');
+    }
+
     loadFormFromPrefs();
     updateSaveMeta();
-    setStatus('');
   }
-  studentSelect.addEventListener('change', () => loadStudent(Number(studentSelect.value)));
- 
+
+  studentSelect.addEventListener('change', () => loadStudent(studentSelect.value));
+
   function updateSaveMeta(){
     const meta = document.getElementById('save-meta');
     meta.textContent = currentPrefs.updatedAt
-      ? `Última actualización: ${new Date(currentPrefs.updatedAt).toLocaleString('es-CO')}`
+      ? `Última actualización: ${new Date(currentPrefs.updatedAt).toLocaleTimeString('es-CO')}`
       : 'Sin cambios guardados aún para este estudiante.';
   }
- 
+
   function setStatus(message, kind){
     const status = document.getElementById('status');
     status.textContent = message;
     status.className = 'status-region ' + (kind || '');
   }
- 
-  // ---------- Guardar / restablecer ----------
-  document.getElementById('btn-save').addEventListener('click', () => {
-    currentPrefs.updatedAt = new Date().toISOString();
-    currentPrefs.updatedBy = 9001; // id de ejemplo del acudiente en sesión
-    savedPrefsByStudent[currentPrefs.studentId] = JSON.parse(JSON.stringify(currentPrefs));
-    updateSaveMeta();
-    const studentName = students.find(s => s.id === currentPrefs.studentId).name;
-    setStatus(`Preferencias guardadas para ${studentName}. Se aplicarán automáticamente la próxima vez que inicie sesión.`, 'ok');
+
+  // ---------- Guardar en .NET 9 ----------
+  document.getElementById('btn-save').addEventListener('click', async () => {
+    const saveBtn = document.getElementById('btn-save');
+    saveBtn.disabled = true;
+    setStatus('Guardando cambios en el servidor...');
+
+    const paletteFrontToBackend = { 'verde': 'PastelSuave', 'neutro': 'NeutroCalmante', 'lavanda': 'Lavanda', 'arena': 'Arena' };
+    const fontScaleFrontToBackend = { 'pequeno': 1, 'normal': 2, 'grande': 3, 'muy-grande': 4 };
+
+    const payload = {
+      paletaColor: paletteFrontToBackend[currentPrefs.palette] || 'PastelSuave',
+      tipografia: 'OpenDyslexic',
+      audioActivo: Boolean(currentPrefs.audio.soundsEnabled),
+      animacionesReducidas: Boolean(currentPrefs.reduceMotion),
+      nivelEscalaFuente: fontScaleFrontToBackend[currentPrefs.fontSize] || 2,
+      modoContraste: 1,
+      ocultarTemporizadores: currentPrefs.timers.mode === 'sin-temporizador'
+    };
+
+    try {
+      const res = await ApiClient.request(`/students/${currentPrefs.studentId}/sensory-preferences`, {
+        method: 'PUT',
+        body: JSON.stringify(payload)
+      });
+
+      saveBtn.disabled = false;
+      if (res.ok && res.data.success) {
+        currentPrefs.updatedAt = new Date().toISOString();
+        updateSaveMeta();
+        const student = students.find(s => s.id === currentPrefs.studentId);
+        const sName = student ? student.name : 'el estudiante';
+        setStatus(`¡Preferencias guardadas exitosamente en el backend! Se aplicarán en el panel de ${sName}.`, 'ok');
+      } else {
+        setStatus(res.data?.message || 'Error al guardar los datos.', 'error');
+      }
+    } catch (err) {
+      saveBtn.disabled = false;
+      console.error('Error al guardar en el servidor:', err);
+      setStatus('Error de conexión con el backend (http://localhost:5264).', 'error');
+    }
   });
- 
+
   document.getElementById('btn-reset').addEventListener('click', () => {
     currentPrefs = defaultPrefs(currentPrefs.studentId);
     loadFormFromPrefs();
-    setStatus('Se restablecieron los valores por defecto. Recuerda guardar para aplicar el cambio.');
+    setStatus('Se restablecieron los valores locales. Guarda para enviarlos al servidor.');
   });
- 
+
+  const logoutBtn = document.getElementById('btn-logout');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => ApiClient.logout());
+  }
+
   // ---------- Inicializar ----------
   loadStudent(students[0].id);
 </script>

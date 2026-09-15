@@ -216,6 +216,7 @@
   </main>
 </div>
 
+<script src="api-client.js"></script>
 <script>
   const root = document.getElementById('root');
   const settingsToggle = document.getElementById('settings-toggle');
@@ -292,7 +293,9 @@
     }
   });
 
-  form.addEventListener('submit', (e) => {
+  const submitBtn = form.querySelector('button[type="submit"]');
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     let valid = true;
     if(email.value.trim() === '' || !email.value.includes('@')){
@@ -303,9 +306,43 @@
       valid = false;
       password.dispatchEvent(new Event('blur'));
     }
-    status.textContent = valid
-      ? 'Datos correctos. Este es un mockup, no se envía información real.'
-      : 'Hay campos por corregir. Revisa los mensajes junto a cada campo.';
+
+    if (!valid) {
+      status.textContent = 'Hay campos por corregir. Revisa los mensajes junto a cada campo.';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    status.textContent = 'Conectando con el servidor...';
+
+    try {
+      const response = await fetch(`${ApiClient.baseUrl}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.value.trim(),
+          password: password.value
+        })
+      });
+
+      const resData = await response.json();
+
+      if (response.ok && resData.success) {
+        status.textContent = '¡Inicio de sesión exitoso! Redirigiendo...';
+        ApiClient.saveSession(resData.data);
+        setTimeout(() => {
+          ApiClient.redirectToRoleHome(resData.data.user);
+        }, 500);
+      } else {
+        submitBtn.disabled = false;
+        const msg = resData.message || (resData.errors && resData.errors.join('. ')) || 'Credenciales incorrectas.';
+        status.textContent = msg;
+      }
+    } catch (err) {
+      submitBtn.disabled = false;
+      console.error('Error al conectar:', err);
+      status.textContent = 'No se pudo conectar con el servidor (http://localhost:5264). Asegúrate de que el backend esté ejecutándose.';
+    }
   });
 </script>
 </body>

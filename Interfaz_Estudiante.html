@@ -179,6 +179,9 @@
       <button type="button" class="icon-btn" id="btn-sound" aria-pressed="true" aria-label="Sonidos activados">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.5 8.5a5 5 0 0 1 0 7"></path></svg>
       </button>
+      <button type="button" class="btn btn-ghost" id="btn-logout" title="Cerrar sesión" style="padding: 6px 14px; font-size: 13.5px;">
+        Salir
+      </button>
     </div>
   </header>
  
@@ -236,6 +239,7 @@ Si "activities" es un arreglo vacío, el tablero muestra el estado
  
 </div>
  
+<script src="api-client.js"></script>
 <script>
   /* ========================================================================
    * 1) PREFERENCIAS SENSORIALES — se obtienen del mismo backend que usa el
@@ -470,26 +474,94 @@ Si "activities" es un arreglo vacío, el tablero muestra el estado
     btn.setAttribute('aria-pressed', String(!enabled));
     btn.setAttribute('aria-label', !enabled ? 'Sonidos activados' : 'Sonidos desactivados');
   });
- 
+
+  const logoutBtn = document.getElementById('btn-logout');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => ApiClient.logout());
+  }
+
   /* ========================================================================
-   * 4) INICIALIZACIÓN
+   * 4) INICIALIZACIÓN CONECTADA A .NET 9
    * ==================================================================== */
   async function init(){
-    const studentId = 101;
-    const studentName = 'Jorge';
- 
-    prefs = await fetchSensoryPreferences(studentId);
-    applySensoryPreferences(prefs);
- 
-    document.getElementById('greeting-h1').textContent = `Hola, ${studentName}`;
-    document.getElementById('today-date').textContent = new Date().toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long' });
- 
-    const data = await fetchStudentActivities(studentId);
-    activities = data.activities;
-    currentIndex = 0;
-    renderMain();
+    if (!ApiClient.requireAuth(['Estudiante'])) return;
+
+    try {
+      const user = ApiClient.getUser();
+      let studentName = user ? (user.nombres || 'Estudiante') : 'Estudiante';
+      let studentId = null;
+
+      // 1. Obtener perfil de estudiante desde la API
+      try {
+        const profileRes = await ApiClient.request('/students/me/profile');
+        if (profileRes.ok && profileRes.data.success) {
+          studentName = profileRes.data.data.nombreCompleto || studentName;
+          studentId = profileRes.data.data.id;
+        }
+      } catch (err) {
+        console.warn('No se pudo obtener el perfil remoto:', err);
+      }
+
+      document.getElementById('greeting-h1').textContent = `Hola, ${studentName}`;
+      document.getElementById('today-date').textContent = new Date().toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long' });
+
+      // 2. Obtener preferencias sensoriales adaptativas
+      if (studentId) {
+        try {
+          const prefRes = await ApiClient.request(`/students/${studentId}/sensory-preferences`);
+          if (prefRes.ok && prefRes.data.success) {
+            const sp = prefRes.data.data;
+            const paletteMap = { 'PastelSuave': 'verde', 'NeutroCalmante': 'neutro', 'Lavanda': 'lavanda', 'Arena': 'arena' };
+            prefs = {
+              studentId,
+              palette: paletteMap[sp.paletaColor] || 'verde',
+              fontSize: sp.nivelEscalaFuente === 1 ? 'pequeno' : sp.nivelEscalaFuente === 3 ? 'grande' : sp.nivelEscalaFuente === 4 ? 'muy-grande' : 'normal',
+              letterSpacing: true,
+              dyslexiaFriendlyFont: (sp.tipografia || '').toLowerCase().includes('dyslexic'),
+              audio: { soundsEnabled: sp.audioActivo, volume: 60, textToSpeech: true },
+              reduceMotion: sp.animacionesReducidas,
+              timers: { mode: sp.ocultarTemporizadores ? 'sin-temporizador' : 'tiempo-extendido', warningSeconds: 15 }
+            };
+          }
+        } catch (err) {
+          console.warn('Error al cargar preferencias sensoriales, usando por defecto:', err);
+        }
+      }
+
+      if (!prefs) {
+        prefs = await fetchSensoryPreferences(studentId || 101);
+      }
+      applySensoryPreferences(prefs);
+
+      // 3. Obtener rutina visual de actividades asignadas
+      try {
+        const routineRes = await ApiClient.request('/students/me/daily-routine');
+        if (routineRes.ok && routineRes.data.success && routineRes.data.data.length > 0) {
+          activities = routineRes.data.data.map((item, idx) => ({
+            id: item.assignmentId,
+            time: `Actividad ${item.ordenSecuencial || idx + 1}`,
+            title: item.titulo,
+            description: item.descripcion || item.objetivoPedagogico,
+            type: item.tipoActividad === 'EmparejamientoVisual' ? 'aprendizaje' : item.tipoActividad === 'SecuenciaLogica' ? 'socioemocional' : 'aprendizaje',
+            durationMinutes: 15
+          }));
+        } else {
+          const fallbackData = await fetchStudentActivities(studentId || 101);
+          activities = fallbackData.activities;
+        }
+      } catch (err) {
+        console.warn('Error al cargar rutina del backend, usando datos de contingencia:', err);
+        const fallbackData = await fetchStudentActivities(studentId || 101);
+        activities = fallbackData.activities;
+      }
+
+      currentIndex = 0;
+      renderMain();
+    } catch (err) {
+      console.error('Error durante la inicialización de la pantalla:', err);
+    }
   }
- 
+
   init();
 </script>
 </body>

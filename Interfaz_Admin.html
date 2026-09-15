@@ -210,6 +210,7 @@
           <div class="role">Sesión activa</div>
         </div>
       </div>
+      <button type="button" id="btn-logout" class="btn btn-ghost" style="margin-top: 10px; width: 100%; justify-content: center; font-size: 13.5px;">Cerrar sesión</button>
     </div>
   </aside>
  
@@ -330,23 +331,21 @@
   </div>
 </div>
  
+<script src="api-client.js"></script>
 <script>
-  // ---------- Datos de ejemplo (en memoria; el backend aún no está listo) ----------
-  let users = [
-    { id: 1, name: 'María Fernanda Ríos', email: 'maria.rios@correo.com', role: 'Estudiante', status: 'Activo', lastActivity: '13 sep 2026' },
-    { id: 2, name: 'Carlos Andrés Peña', email: 'carlos.pena@correo.com', role: 'Profesor', status: 'Activo', lastActivity: '12 sep 2026' },
-    { id: 3, name: 'Luisa Gómez', email: 'luisa.gomez@correo.com', role: 'Acudiente', status: 'Activo', lastActivity: '10 sep 2026' },
-    { id: 4, name: 'Jorge Iván Salas', email: 'jorge.salas@correo.com', role: 'Estudiante', status: 'Inactivo', lastActivity: '02 ago 2026' },
-    { id: 5, name: 'Daniela Torres', email: 'daniela.torres@correo.com', role: 'Administrador', status: 'Activo', lastActivity: '14 sep 2026' },
-    { id: 6, name: 'Pedro Ramírez', email: 'pedro.ramirez@correo.com', role: 'Estudiante', status: 'Activo', lastActivity: '09 sep 2026' },
-  ];
-  let nextId = 7;
- 
-  // Nombre del administrador con la sesión activa (mockup: reemplazar con el dato real de sesión/backend)
-  const currentAdminName = 'Daniela Torres';
+  if (!ApiClient.requireAuth(['Administrador'])) {
+    throw new Error('No autorizado');
+  }
+
+  // ---------- Datos de ejemplo como respaldo si no hay conexión ----------
+  let users = [];
+  let nextId = 100;
+
+  const user = ApiClient.getUser();
+  const currentAdminName = user ? (user.nombreCompleto || `${user.nombres} ${user.apellidos}`.trim()) : 'Administrador Sistema';
   document.getElementById('welcome-name').textContent = 'Bienvenido(a), ' + currentAdminName;
   document.getElementById('admin-chip-name').textContent = currentAdminName;
- 
+
   const tableBody = document.getElementById('table-body');
   const emptyState = document.getElementById('empty-state');
   const resultCount = document.getElementById('result-count');
@@ -557,8 +556,37 @@
     status.textContent = message;
     status.className = 'status-region ' + (kind || '');
   }
- 
-  render();
+
+  async function loadUsersFromBackend() {
+    setStatus('Cargando usuarios desde el backend de .NET 9...');
+    try {
+      const res = await ApiClient.request('/users');
+      if (res.ok && res.data.success) {
+        users = res.data.data.map(u => ({
+          id: u.id,
+          name: u.nombreCompleto || `${u.nombres} ${u.apellidos}`.trim(),
+          email: u.email,
+          role: (u.roles && u.roles.length > 0) ? u.roles[0] : 'Sin rol',
+          status: u.isActive ? 'Activo' : 'Inactivo',
+          lastActivity: new Date(u.createdAt).toLocaleDateString('es-CO')
+        }));
+        setStatus(`Se cargaron ${users.length} usuarios desde la base de datos SQL Server.`, 'ok');
+      } else {
+        setStatus('No se pudieron obtener usuarios del backend.', 'error');
+      }
+    } catch (err) {
+      console.warn('Error al cargar usuarios de la API:', err);
+      setStatus('No se pudo conectar con http://localhost:5264/api/users', 'error');
+    }
+    render();
+  }
+
+  const logoutBtn = document.getElementById('btn-logout');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => ApiClient.logout());
+  }
+
+  loadUsersFromBackend();
 </script>
 </body>
 </html>
