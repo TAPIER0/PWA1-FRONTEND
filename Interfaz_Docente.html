@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docente — Actividades interactivas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F4F6F5;
+    --surface: #FFFFFF;
+    --text: #202623;
+    --text-muted: #58615C;
+    --border: #D6DDD9;
+    --primary: #2F6E5C;
+    --primary-hover: #255A4B;
+    --primary-soft: #E4EEEA;
+    --focus: #1E4E40;
+    --accent: #9C7A4C;
+    --danger: #B3261E;
+    --danger-hover: #8F1E18;
+    --danger-soft: #FBECEA;
+    --warn-bg: #FBF1E9;
+    --warn-text: #7A3B10;
+    --warn-border: #D98E4A;
+    --ok-bg: #E4EEEA;
+    --ok-text: #1E4E40;
+    --radius: 12px;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{ background: var(--bg); color: var(--text); font-family: 'Atkinson Hyperlegible', Arial, sans-serif; line-height: 1.5; min-height: 100vh; }
+ 
+  /* ---------- Layout general (mismo patrón de Administrador / Acudiente) ---------- */
+  .app{ display:flex; min-height:100vh; }
+  .sidebar{ width: 232px; flex-shrink:0; background: var(--surface); border-right: 1px solid var(--border); padding: 24px 16px; display:flex; flex-direction:column; gap: 24px; }
+  .brand{ display:flex; align-items:center; gap:10px; padding: 0 8px; }
+  .brand-mark{ width:32px; height:32px; border-radius:8px; background:var(--primary); flex-shrink:0; }
+  .brand-name{ font-weight:700; font-size:16px; line-height:1.25; }
+  nav.nav-list{ display:flex; flex-direction:column; gap:4px; }
+  .nav-item{ display:flex; align-items:center; gap:10px; padding: 10px 12px; border-radius: 8px; font-size: 14.5px; font-weight:700; color: var(--text-muted); text-decoration:none; cursor:default; }
+  .nav-item .dot{ width:6px; height:6px; border-radius:50%; background:transparent; }
+  .nav-item.active{ background: var(--primary-soft); color: var(--primary); }
+  .nav-item.active .dot{ background: var(--primary); }
+  .nav-item.disabled{ color:#A7AEA9; cursor:not-allowed; }
+  .nav-item.disabled .badge-soon{ margin-left:auto; font-size:10.5px; font-weight:700; background:var(--bg); border:1px solid var(--border); color:var(--text-muted); padding:2px 6px; border-radius:999px; }
+  .sidebar-footer{ margin-top:auto; padding: 12px 8px; border-top:1px solid var(--border); }
+  .admin-chip{ display:flex; align-items:center; gap:10px; }
+  .admin-avatar{ width:32px; height:32px; border-radius:50%; background:var(--accent); flex-shrink:0; }
+  .admin-info .name{ font-size:13.5px; font-weight:700; }
+  .admin-info .role{ font-size:12px; color:var(--text-muted); }
+ 
+  .main{ flex:1; padding: 28px 32px; max-width: 1240px; }
+  .page-header{ display:flex; justify-content:space-between; align-items:flex-start; gap: 20px; margin-bottom: 20px; flex-wrap:wrap; }
+  h1{ font-size: 23px; font-weight:700; margin:0 0 6px 0; }
+  .subtitle{ font-size: 14.5px; color: var(--text-muted); margin:0; max-width: 58ch; }
+ 
+  .btn{ font-family:inherit; font-size:14.5px; font-weight:700; border-radius:8px; padding: 11px 18px; cursor:pointer; border:1.5px solid transparent; display:inline-flex; align-items:center; gap:8px; }
+  .btn:focus{ outline:3px solid var(--focus); outline-offset:2px; }
+  .btn-primary{ background:var(--primary); color:#fff; }
+  .btn-primary:hover{ background:var(--primary-hover); }
+  .btn-ghost{ background:var(--surface); color:var(--text); border-color:var(--border); }
+  .btn-ghost:hover{ background:var(--bg); }
+  .btn-danger{ background:var(--danger); color:#fff; }
+  .btn-danger:hover{ background:var(--danger-hover); }
+  .btn-sm{ padding:7px 12px; font-size:13px; }
+  .btn[disabled]{ opacity:.5; cursor:not-allowed; }
+ 
+  /* ---------- Toolbar ---------- */
+  .toolbar{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding: 16px 18px; display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; margin-bottom:18px; }
+  .field{ display:flex; flex-direction:column; gap:6px; }
+  .field label{ font-size:13px; font-weight:700; color:var(--text-muted); }
+  .field input, .field select{ font-family:inherit; font-size:14.5px; padding:9px 12px; border:1.5px solid var(--border); border-radius:8px; background:var(--surface); color:var(--text); min-width: 190px; }
+  .field input:focus, .field select:focus{ outline:3px solid var(--focus); outline-offset:1px; border-color:var(--focus); }
+  .search-field{ flex:1; min-width: 220px; }
+  .search-field input{ width:100%; min-width: 0; }
+  .toolbar .spacer{ flex:1; }
+  .result-count{ font-size:13px; color:var(--text-muted); align-self:center; }
+ 
+  /* ---------- Tabla ---------- */
+  .table-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+  table{ width:100%; border-collapse:collapse; }
+  thead th{ text-align:left; font-size:12.5px; text-transform:uppercase; letter-spacing:.02em; color: var(--text-muted); background: var(--bg); padding: 13px 18px; border-bottom:1px solid var(--border); }
+  tbody td{ padding: 14px 18px; border-bottom:1px solid var(--border); font-size:14.5px; vertical-align:middle; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background: #FAFBFA; }
+  .act-title{ font-weight:700; }
+  .act-instruction{ color:var(--text-muted); font-size:13px; margin-top:2px; max-width: 320px; }
+ 
+  .badge{ display:inline-flex; align-items:center; gap:5px; font-size:12.5px; font-weight:700; padding:4px 10px; border-radius:999px; }
+  .badge-secuencia{ background:var(--primary-soft); color:var(--primary); }
+  .badge-emparejamiento{ background:#F2E9DA; color:var(--accent); }
+  .badge-activa{ background:var(--ok-bg); color:var(--ok-text); }
+  .badge-inactiva{ background:var(--warn-bg); color:var(--warn-text); border:1px solid var(--warn-border); }
+ 
+  .row-actions{ display:flex; gap:8px; }
+  .icon-btn{ font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; background:transparent; border:1.5px solid var(--border); border-radius:8px; padding:7px 11px; color:var(--text); }
+  .icon-btn:hover{ background:var(--bg); }
+  .icon-btn.danger{ color:var(--danger); border-color:var(--danger-soft); }
+  .icon-btn.danger:hover{ background:var(--danger-soft); }
+  .icon-btn:focus{ outline:3px solid var(--focus); outline-offset:1px; }
+ 
+  .empty-state{ padding: 48px 20px; text-align:center; color:var(--text-muted); }
+  .empty-state strong{ display:block; color:var(--text); font-size:15px; margin-bottom:6px; }
+ 
+  .status-region{ margin-top:16px; font-size:13.5px; }
+  .status-region.ok{ color:var(--ok-text); }
+  .status-region.error{ color:var(--warn-text); }
+ 
+  /* ---------- Chips (tipo de actividad) ---------- */
+  .chip-group{ display:flex; gap:8px; flex-wrap:wrap; }
+  .chip-btn{ font-family:inherit; font-size:14px; padding:9px 14px; border:1.5px solid var(--border); background:var(--surface); color:var(--text); border-radius:999px; cursor:pointer; }
+  .chip-btn[aria-pressed="true"]{ background:var(--primary); color:#fff; border-color:var(--primary); }
+  .chip-btn:focus{ outline:3px solid var(--focus); outline-offset:2px; }
+ 
+  /* ---------- Switch ---------- */
+  .switch-row{ display:flex; align-items:center; justify-content:space-between; gap:16px; }
+  .switch-row .switch-text .label{ font-size:14px; font-weight:700; }
+  .switch-row .switch-text .help{ font-size:13px; color:var(--text-muted); }
+  .switch{ position:relative; width:46px; height:26px; flex-shrink:0; }
+  .switch input{ position:absolute; opacity:0; width:100%; height:100%; margin:0; cursor:pointer; }
+  .switch .track{ position:absolute; inset:0; background:#C9D1CC; border-radius:999px; }
+  .switch .thumb{ position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:#fff; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+  .switch input:checked + .track{ background: var(--primary); }
+  .switch input:checked + .track + .thumb{ left:23px; }
+  .switch input:focus-visible + .track{ outline:3px solid var(--focus); outline-offset:2px; }
+  @media (prefers-reduced-motion: no-preference){ .switch .thumb{ transition: left .12s ease-out; } }
+ 
+  /* ---------- Modal ---------- */
+  .overlay{ display:none; position:fixed; inset:0; background: rgba(32,38,35,0.45); align-items:flex-start; justify-content:center; padding: 24px 16px; z-index: 50; overflow-y:auto; }
+  .overlay.open{ display:flex; }
+  .modal{ background:var(--surface); border-radius:var(--radius); border:1px solid var(--border); width:100%; max-width: 880px; padding: 28px 26px; margin: 20px 0 40px; }
+  .modal h2{ font-size:19px; margin:0 0 6px 0; }
+  .modal .modal-sub{ font-size:13.5px; color:var(--text-muted); margin:0 0 20px 0; }
+ 
+  .modal-grid{ display:grid; grid-template-columns: 1.3fr 1fr; gap:22px; align-items:flex-start; }
+  @media (max-width: 760px){ .modal-grid{ grid-template-columns:1fr; } }
+ 
+  .field-row{ display:flex; flex-direction:column; gap:8px; margin-bottom: 18px; }
+  .field-row > .label{ font-size:14px; font-weight:700; }
+  .field-row > .help{ font-size:13px; color:var(--text-muted); margin-top:-4px; }
+  .field-row input[type="text"], .field-row textarea{
+    font-family:inherit; font-size:15px; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; width:100%; color:var(--text);
+  }
+  .field-row input:focus, .field-row textarea:focus{ outline:3px solid var(--focus); outline-offset:1px; border-color:var(--focus); }
+  .field-row textarea{ resize:vertical; min-height: 64px; }
+  .field-error{ display:none; font-size:13px; background:var(--warn-bg); color:var(--warn-text); border:1px solid var(--warn-border); border-radius:8px; padding:8px 10px; }
+  .field-error.show{ display:block; }
+  .field-row.invalid input, .field-row.invalid textarea{ border-color: var(--warn-border); }
+  .figurative-hint{ display:none; font-size:13px; background:var(--warn-bg); color:var(--warn-text); border:1px solid var(--warn-border); border-radius:8px; padding:8px 10px; }
+  .figurative-hint.show{ display:block; }
+ 
+  /* Editor de pasos / parejas */
+  .editor-list{ display:flex; flex-direction:column; gap:10px; }
+  .editor-item{ display:flex; align-items:center; gap:10px; border:1.5px solid var(--border); border-radius:10px; padding:10px 12px; }
+  .editor-item .order-num{ width:26px; height:26px; border-radius:50%; background:var(--bg); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:700; color:var(--text-muted); flex-shrink:0; }
+  .editor-item select{ font-family:inherit; font-size:13.5px; padding:7px 8px; border:1.5px solid var(--border); border-radius:6px; width: 92px; flex-shrink:0; }
+  .editor-item input[type="text"]{ font-family:inherit; font-size:14px; padding:8px 10px; border:1.5px solid var(--border); border-radius:6px; flex:1; min-width:0; }
+  .editor-item .icon-preview{ width:22px; height:22px; color:var(--primary); flex-shrink:0; }
+  .editor-item .item-actions{ display:flex; gap:4px; flex-shrink:0; }
+  .mini-btn{ font-family:inherit; font-size:12px; font-weight:700; background:var(--surface); border:1.5px solid var(--border); border-radius:6px; padding:5px 7px; cursor:pointer; color:var(--text); }
+  .mini-btn:hover{ background:var(--bg); }
+  .mini-btn:focus{ outline:3px solid var(--focus); outline-offset:1px; }
+  .mini-btn.danger{ color:var(--danger); }
+ 
+  .pair-row{ display:flex; align-items:center; gap:10px; border:1.5px solid var(--border); border-radius:10px; padding:10px 12px; }
+  .pair-side{ flex:1; display:flex; align-items:center; gap:8px; min-width:0; }
+  .pair-link{ color:var(--text-muted); font-size:13px; flex-shrink:0; }
+ 
+  .assign-grid{ display:flex; flex-direction:column; gap:8px; }
+  .assign-option{ display:flex; align-items:center; gap:10px; font-size:14.5px; padding:8px 4px; }
+  .assign-option input{ width:18px; height:18px; }
+ 
+  .modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:6px; }
+ 
+  .confirm-modal p{ font-size:14.5px; color:var(--text-muted); }
+  .confirm-modal .target-name{ color:var(--text); font-weight:700; }
+ 
+  /* ---------- Vista previa ---------- */
+  .preview-card{ background:var(--bg); border:1.5px solid var(--border); border-radius:10px; padding:18px; position:sticky; top:0; }
+  .preview-card h3{ font-size:14.5px; margin:0 0 4px 0; }
+  .preview-card .preview-help{ font-size:12.5px; color:var(--text-muted); margin:0 0 14px 0; }
+  .preview-instruction{ font-size:13.5px; font-weight:700; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-bottom:14px; }
+  .preview-sequence{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .preview-chip{ display:flex; flex-direction:column; align-items:center; gap:4px; background:var(--surface); border:1.5px solid var(--border); border-radius:10px; padding:10px 12px; width:78px; text-align:center; }
+  .preview-chip svg{ width:22px; height:22px; color:var(--primary); }
+  .preview-chip span{ font-size:11.5px; font-weight:700; line-height:1.2; }
+  .preview-arrow{ color:var(--text-muted); font-size:16px; flex-shrink:0; }
+  .preview-matching{ display:flex; gap:16px; }
+  .preview-col{ flex:1; display:flex; flex-direction:column; gap:8px; }
+  .preview-col .col-label{ font-size:12px; font-weight:700; color:var(--text-muted); text-align:center; margin-bottom:2px; }
+  .preview-empty{ font-size:13px; color:var(--text-muted); text-align:center; padding: 20px 0; }
+</style>
+</head>
+<body>
+<div class="app">
+ 
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true"></div>
+      <span class="brand-name" id="welcome-name">Bienvenido(a)</span>
+    </div>
+ 
+    <nav class="nav-list" aria-label="Navegación principal">
+      <a class="nav-item active" href="#"><span class="dot"></span> Actividades</a>
+      <a class="nav-item disabled" href="#" aria-disabled="true"><span class="dot"></span> Estudiantes <span class="badge-soon">Próx.</span></a>
+      <a class="nav-item disabled" href="#" aria-disabled="true"><span class="dot"></span> Reportes <span class="badge-soon">Próx.</span></a>
+    </nav>
+ 
+    <div class="sidebar-footer">
+      <div class="admin-chip">
+        <div class="admin-avatar" aria-hidden="true"></div>
+        <div class="admin-info">
+          <div class="name" id="teacher-chip-name">Profesor</div>
+          <div class="role">Rol: Profesor</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+ 
+  <main class="main">
+    <div class="page-header">
+      <div>
+        <h1>Actividades interactivas</h1>
+        <p class="subtitle">Crea y asigna actividades de secuencia lógica y emparejamiento visual, con instrucciones literales y elementos visuales simples, sin distractores.</p>
+      </div>
+      <button type="button" class="btn btn-primary" id="btn-new-activity">+ Nueva actividad</button>
+    </div>
+ 
+    <div class="toolbar">
+      <div class="field search-field">
+        <label for="search">Buscar por nombre</label>
+        <input type="text" id="search" placeholder="Ej. Rutina de la mañana">
+      </div>
+      <div class="field">
+        <label for="filter-type">Tipo</label>
+        <select id="filter-type">
+          <option value="">Todos</option>
+          <option value="secuencia">Secuencia lógica</option>
+          <option value="emparejamiento">Emparejamiento visual</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="filter-status">Estado</label>
+        <select id="filter-status">
+          <option value="">Todos</option>
+          <option value="Activa">Activa</option>
+          <option value="Inactiva">Inactiva</option>
+        </select>
+      </div>
+      <div class="spacer"></div>
+      <span class="result-count" id="result-count"></span>
+    </div>
+ 
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Actividad</th>
+            <th>Tipo</th>
+            <th>Asignada a</th>
+            <th>Estado</th>
+            <th>Última edición</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+      <div class="empty-state" id="empty-state" style="display:none;">
+        <strong>No se encontraron actividades</strong>
+        Ajusta la búsqueda o los filtros, o crea una nueva actividad.
+      </div>
+    </div>
+ 
+    <p class="status-region" id="status" aria-live="polite"></p>
+  </main>
+</div>
+ 
+<!-- Modal: crear / editar actividad -->
+<div class="overlay" id="activity-overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="activity-modal-title">
+    <h2 id="activity-modal-title">Nueva actividad</h2>
+    <p class="modal-sub" id="activity-modal-sub">Completa los datos de la actividad. La vista previa se actualiza mientras escribes.</p>
+ 
+    <form id="activity-form" novalidate>
+      <input type="hidden" id="act-id">
+      <div class="modal-grid">
+        <div>
+          <div class="field-row" id="field-title">
+            <label class="label" for="act-title">Nombre de la actividad</label>
+            <input type="text" id="act-title" placeholder="Ej. Ordena tu rutina de la mañana">
+            <div class="field-error" id="error-title" role="alert"></div>
+          </div>
+ 
+          <div class="field-row">
+            <span class="label">Tipo de actividad</span>
+            <div class="chip-group" id="type-group" role="radiogroup" aria-label="Tipo de actividad">
+              <button type="button" class="chip-btn" data-value="secuencia">Secuencia lógica</button>
+              <button type="button" class="chip-btn" data-value="emparejamiento">Emparejamiento visual</button>
+            </div>
+          </div>
+ 
+          <div class="field-row" id="field-instruction">
+            <label class="label" for="act-instruction">Instrucción literal para el estudiante</label>
+            <span class="help">Usa frases cortas y directas. Evita metáforas, sarcasmo o dobles sentidos. Ejemplo: "Toca las imágenes en el orden correcto."</span>
+            <textarea id="act-instruction" placeholder="Escribe la instrucción tal como la leerá el estudiante…"></textarea>
+            <div class="field-error" id="error-instruction" role="alert"></div>
+            <div class="figurative-hint" id="figurative-hint" role="alert"></div>
+          </div>
+ 
+          <!-- Editor dinámico: pasos de secuencia o parejas de emparejamiento -->
+          <div class="field-row">
+            <span class="label" id="editor-label">Pasos de la secuencia</span>
+            <span class="help" id="editor-help">Ordena los pasos con las flechas. El estudiante los verá siempre en este orden.</span>
+            <div class="editor-list" id="editor-list"></div>
+            <div>
+              <button type="button" class="btn btn-ghost btn-sm" id="btn-add-item">+ Agregar paso</button>
+            </div>
+          </div>
+ 
+          <div class="field-row">
+            <span class="label">Asignar a</span>
+            <div class="assign-grid" id="assign-grid"></div>
+          </div>
+ 
+          <div class="field-row">
+            <div class="switch-row">
+              <div class="switch-text">
+                <div class="label">Actividad activa</div>
+                <div class="help">Si está inactiva, no aparecerá en la rutina del estudiante aunque esté asignada.</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="act-status">
+                <span class="track"></span>
+                <span class="thumb"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+ 
+        <div class="preview-card">
+          <h3>Vista previa</h3>
+          <p class="preview-help">Así vería el estudiante esta actividad: pocos elementos, iconos claros, sin adornos de fondo.</p>
+          <div class="preview-instruction" id="preview-instruction">Escribe una instrucción para verla aquí.</div>
+          <div id="preview-body"></div>
+        </div>
+      </div>
+ 
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="btn-cancel-activity">Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="btn-save-activity">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+ 
+<!-- Modal: confirmar eliminación -->
+<div class="overlay" id="delete-overlay">
+  <div class="modal confirm-modal" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title" style="max-width:460px;">
+    <h2 id="delete-modal-title">Eliminar actividad</h2>
+    <p>¿Deseas eliminar <span class="target-name" id="delete-target-name">—</span>? Esta acción no se puede deshacer y se quitará de la rutina de los estudiantes asignados.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="btn-cancel-delete">Cancelar</button>
+      <button type="button" class="btn btn-danger" id="btn-confirm-delete">Eliminar</button>
+    </div>
+  </div>
+</div>
+ 
+<script>
+  /* ---------------------------------------------------------------------
+   * MODELO DE DATOS: actividad interactiva (tabla `interactive_activities`)
+   * {
+   *   id, teacherId, title, type: 'secuencia' | 'emparejamiento',
+   *   instruction: string,               // texto literal mostrado al estudiante
+   *   status: 'Activa' | 'Inactiva',
+   *   assignedStudentIds: number[],      // FK -> students.id (relación N:N)
+   *   content: {
+   *     // si type === 'secuencia':
+   *     steps: [{ id, order, label, icon }],
+   *     // si type === 'emparejamiento':
+   *     pairs: [{ id, leftLabel, leftIcon, rightLabel, rightIcon }],
+   *   },
+   *   updatedAt: string,
+   * }
+   *
+   * Endpoints sugeridos:
+   *   GET    /api/teachers/:id/activities
+   *   POST   /api/activities
+   *   PUT    /api/activities/:id
+   *   DELETE /api/activities/:id
+   *
+   * Nota: esta actividad es un elemento del catálogo del docente; para que
+   * aparezca en el tablero del estudiante (ver interfaz de Estudiante),
+   * el backend debe traducirla al formato de la rutina diaria
+   * (id, order, title, timeRange, icon, status) al momento de programarla.
+   * ------------------------------------------------------------------- */
+ 
+  const ICONS = {
+    circulo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/></svg>',
+    cuadrado: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>',
+    triangulo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4l8 16H4z" stroke-linejoin="round"/></svg>',
+    estrella: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l2.6 5.9 6.4.6-4.8 4.3 1.4 6.3-5.6-3.4-5.6 3.4 1.4-6.3-4.8-4.3 6.4-.6z" stroke-linejoin="round"/></svg>',
+    comida: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M9 8v4M9 8c-1.2 0-1.8 1-1.8 2s.6 2 1.8 2M15 8v8"/></svg>',
+    higiene: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3c3 4 5 6.5 5 9.5a5 5 0 0 1-10 0C7 9.5 9 7 12 3z"/></svg>',
+    estudio: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 9h16M9 13h6"/></svg>',
+    sensorial: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 13a8 8 0 0 1 16 0"/><rect x="3" y="13" width="4" height="6" rx="1.5"/><rect x="17" y="13" width="4" height="6" rx="1.5"/></svg>',
+    salida: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="12" height="18" rx="1.5"/><circle cx="14" cy="12" r="1"/></svg>',
+  };
+  const ICON_LABELS = {
+    circulo:'Círculo', cuadrado:'Cuadrado', triangulo:'Triángulo', estrella:'Estrella',
+    comida:'Comida', higiene:'Higiene', estudio:'Estudio', sensorial:'Sensorial', salida:'Salida',
+  };
+ 
+  // Frases con lenguaje figurado que solemos usar sin darnos cuenta.
+  // Chequeo simple e ilustrativo (no es NLP real) para alertar al docente.
+  const FIGURATIVE_HINTS = [
+    'como si fuera', 'échale ganas', 'ponte las pilas', 'a ojo de buen cubero',
+    'caído del cielo', 'quedó como', 'en un abrir y cerrar', 'metaforicamente',
+  ];
+ 
+  const currentTeacherName = 'Carlos Andrés Peña';
+  const students = [
+    { id: 101, name: 'Jorge Iván Salas' },
+    { id: 102, name: 'Sofía Martínez' },
+  ];
+ 
+  document.getElementById('welcome-name').textContent = 'Bienvenido(a), ' + currentTeacherName;
+  document.getElementById('teacher-chip-name').textContent = currentTeacherName;
+ 
+  let activities = [
+    {
+      id: 1, title: 'Ordena tu rutina de la mañana', type: 'secuencia',
+      instruction: 'Toca las imágenes en el orden en que haces cada cosa por la mañana.',
+      status: 'Activa', assignedStudentIds: [101],
+      content: { steps: [
+        { id: 1, order: 1, label: 'Despertar', icon: 'salida' },
+        { id: 2, order: 2, label: 'Higiene', icon: 'higiene' },
+        { id: 3, order: 3, label: 'Desayuno', icon: 'comida' },
+        { id: 4, order: 4, label: 'Estudio', icon: 'estudio' },
+      ]},
+      updatedAt: '2026-09-15T10:00:00.000Z',
+    },
+    {
+      id: 2, title: 'Empareja las figuras iguales', type: 'emparejamiento',
+      instruction: 'Une cada figura de la izquierda con la misma figura de la derecha.',
+      status: 'Activa', assignedStudentIds: [101, 102],
+      content: { pairs: [
+        { id: 1, leftLabel: 'Círculo', leftIcon: 'circulo', rightLabel: 'Círculo', rightIcon: 'circulo' },
+        { id: 2, leftLabel: 'Estrella', leftIcon: 'estrella', rightLabel: 'Estrella', rightIcon: 'estrella' },
+      ]},
+      updatedAt: '2026-09-14T15:30:00.000Z',
+    },
+  ];
+  let nextActivityId = 3;
+  let nextItemId = 1000;
+ 
+  const TYPE_LABEL = { secuencia: 'Secuencia lógica', emparejamiento: 'Emparejamiento visual' };
+ 
+  const tableBody = document.getElementById('table-body');
+  const emptyState = document.getElementById('empty-state');
+  const resultCount = document.getElementById('result-count');
+  const status = document.getElementById('status');
+  const search = document.getElementById('search');
+  const filterType = document.getElementById('filter-type');
+  const filterStatus = document.getElementById('filter-status');
+ 
+  function studentNames(ids){
+    if(!ids || ids.length === 0) return 'Sin asignar';
+    return ids.map(id => students.find(s => s.id === id)?.name).filter(Boolean).join(', ');
+  }
+ 
+  function getFiltered(){
+    const q = search.value.trim().toLowerCase();
+    return activities.filter(a => {
+      const matchesQuery = !q || a.title.toLowerCase().includes(q);
+      const matchesType = !filterType.value || a.type === filterType.value;
+      const matchesStatus = !filterStatus.value || a.status === filterStatus.value;
+      return matchesQuery && matchesType && matchesStatus;
+    });
+  }
+ 
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+ 
+  function render(){
+    const list = getFiltered();
+    tableBody.innerHTML = '';
+    emptyState.style.display = list.length === 0 ? 'block' : 'none';
+    resultCount.textContent = list.length + (list.length === 1 ? ' actividad encontrada' : ' actividades encontradas');
+ 
+    list.forEach(a => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>
+          <div class="act-title">${escapeHtml(a.title)}</div>
+          <div class="act-instruction">${escapeHtml(a.instruction)}</div>
+        </td>
+        <td><span class="badge badge-${a.type}">${TYPE_LABEL[a.type]}</span></td>
+        <td>${escapeHtml(studentNames(a.assignedStudentIds))}</td>
+        <td><span class="badge ${a.status === 'Activa' ? 'badge-activa' : 'badge-inactiva'}">${a.status}</span></td>
+        <td>${new Date(a.updatedAt).toLocaleDateString('es-CO', { day:'numeric', month:'short', year:'numeric' })}</td>
+        <td>
+          <div class="row-actions">
+            <button type="button" class="icon-btn" data-action="edit" data-id="${a.id}">Editar</button>
+            <button type="button" class="icon-btn danger" data-action="delete" data-id="${a.id}">Eliminar</button>
+          </div>
+        </td>
+      `;
+      tableBody.appendChild(tr);
+    });
+  }
+ 
+  search.addEventListener('input', render);
+  filterType.addEventListener('change', render);
+  filterStatus.addEventListener('change', render);
+ 
+  // ---------- Modal crear / editar ----------
+  const overlay = document.getElementById('activity-overlay');
+  const form = document.getElementById('activity-form');
+  const modalTitle = document.getElementById('activity-modal-title');
+  const idInput = document.getElementById('act-id');
+  const titleInput = document.getElementById('act-title');
+  const instructionInput = document.getElementById('act-instruction');
+  const statusInput = document.getElementById('act-status');
+  const editorList = document.getElementById('editor-list');
+  const editorLabel = document.getElementById('editor-label');
+  const editorHelp = document.getElementById('editor-help');
+  const assignGrid = document.getElementById('assign-grid');
+ 
+  let currentType = 'secuencia';
+  let currentSteps = [];
+  let currentPairs = [];
+  let currentAssigned = new Set();
+ 
+  function iconSelectHtml(selected, dataAttr){
+    return `<select ${dataAttr}>` + Object.keys(ICONS).map(key =>
+      `<option value="${key}" ${key === selected ? 'selected' : ''}>${ICON_LABELS[key]}</option>`
+    ).join('') + `</select>`;
+  }
+ 
+  function renderEditor(){
+    if(currentType === 'secuencia'){
+      editorLabel.textContent = 'Pasos de la secuencia';
+      editorHelp.textContent = 'Ordena los pasos con las flechas. El estudiante los verá siempre en este orden.';
+      document.getElementById('btn-add-item').textContent = '+ Agregar paso';
+      editorList.innerHTML = currentSteps.map((s, idx) => `
+        <div class="editor-item" data-item-id="${s.id}">
+          <div class="order-num">${idx + 1}</div>
+          <span class="icon-preview">${ICONS[s.icon]}</span>
+          ${iconSelectHtml(s.icon, `data-role="icon" data-id="${s.id}"`)}
+          <input type="text" data-role="label" data-id="${s.id}" value="${escapeHtml(s.label)}" placeholder="Nombre del paso">
+          <div class="item-actions">
+            <button type="button" class="mini-btn" data-action="up" data-id="${s.id}" ${idx === 0 ? 'disabled' : ''}>↑</button>
+            <button type="button" class="mini-btn" data-action="down" data-id="${s.id}" ${idx === currentSteps.length - 1 ? 'disabled' : ''}>↓</button>
+            <button type="button" class="mini-btn danger" data-action="remove" data-id="${s.id}">✕</button>
+          </div>
+        </div>
+      `).join('') || '<p class="help">Aún no has agregado pasos.</p>';
+    } else {
+      editorLabel.textContent = 'Parejas de emparejamiento';
+      editorHelp.textContent = 'Cada fila es una pareja: una imagen a la izquierda y su pareja correspondiente a la derecha.';
+      document.getElementById('btn-add-item').textContent = '+ Agregar pareja';
+      editorList.innerHTML = currentPairs.map((p) => `
+        <div class="pair-row" data-item-id="${p.id}">
+          <div class="pair-side">
+            <span class="icon-preview">${ICONS[p.leftIcon]}</span>
+            ${iconSelectHtml(p.leftIcon, `data-role="leftIcon" data-id="${p.id}"`)}
+            <input type="text" data-role="leftLabel" data-id="${p.id}" value="${escapeHtml(p.leftLabel)}" placeholder="Elemento A">
+          </div>
+          <span class="pair-link">↔</span>
+          <div class="pair-side">
+            <span class="icon-preview">${ICONS[p.rightIcon]}</span>
+            ${iconSelectHtml(p.rightIcon, `data-role="rightIcon" data-id="${p.id}"`)}
+            <input type="text" data-role="rightLabel" data-id="${p.id}" value="${escapeHtml(p.rightLabel)}" placeholder="Elemento B">
+          </div>
+          <button type="button" class="mini-btn danger" data-action="remove" data-id="${p.id}">✕</button>
+        </div>
+      `).join('') || '<p class="help">Aún no has agregado parejas.</p>';
+    }
+    wireEditorEvents();
+    updatePreview();
+  }
+ 
+  function wireEditorEvents(){
+    editorList.querySelectorAll('[data-role]').forEach(el => {
+      el.addEventListener('input', () => {
+        const id = Number(el.dataset.id);
+        const role = el.dataset.role;
+        if(currentType === 'secuencia'){
+          const item = currentSteps.find(s => s.id === id);
+          if(item) item[role] = el.value;
+        } else {
+          const item = currentPairs.find(p => p.id === id);
+          if(item) item[role] = el.value;
+        }
+        updatePreview();
+      });
+      if(el.tagName === 'SELECT'){
+        el.addEventListener('change', () => {
+          const id = Number(el.dataset.id);
+          const item = (currentType === 'secuencia' ? currentSteps : currentPairs).find(x => x.id === id);
+          renderEditor();
+        });
+      }
+    });
+    editorList.querySelectorAll('[data-action]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = Number(btn.dataset.id);
+        const list = currentType === 'secuencia' ? currentSteps : currentPairs;
+        const idx = list.findIndex(x => x.id === id);
+        if(btn.dataset.action === 'remove'){
+          list.splice(idx, 1);
+        } else if(btn.dataset.action === 'up' && idx > 0){
+          [list[idx - 1], list[idx]] = [list[idx], list[idx - 1]];
+        } else if(btn.dataset.action === 'down' && idx < list.length - 1){
+          [list[idx + 1], list[idx]] = [list[idx], list[idx + 1]];
+        }
+        renderEditor();
+      });
+    });
+  }
+ 
+  document.getElementById('btn-add-item').addEventListener('click', () => {
+    if(currentType === 'secuencia'){
+      currentSteps.push({ id: nextItemId++, order: currentSteps.length + 1, label: '', icon: 'circulo' });
+    } else {
+      currentPairs.push({ id: nextItemId++, leftLabel: '', leftIcon: 'circulo', rightLabel: '', rightIcon: 'circulo' });
+    }
+    renderEditor();
+  });
+ 
+  function wireTypeGroup(){
+    document.querySelectorAll('#type-group .chip-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentType = btn.dataset.value;
+        document.querySelectorAll('#type-group .chip-btn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.value === currentType)));
+        renderEditor();
+      });
+    });
+  }
+  wireTypeGroup();
+ 
+  function renderAssignGrid(){
+    assignGrid.innerHTML = students.map(s => `
+      <label class="assign-option">
+        <input type="checkbox" data-student-id="${s.id}" ${currentAssigned.has(s.id) ? 'checked' : ''}>
+        ${escapeHtml(s.name)}
+      </label>
+    `).join('');
+    assignGrid.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const id = Number(cb.dataset.studentId);
+        if(cb.checked) currentAssigned.add(id); else currentAssigned.delete(id);
+      });
+    });
+  }
+ 
+  instructionInput.addEventListener('input', () => {
+    const lower = instructionInput.value.toLowerCase();
+    const hint = document.getElementById('figurative-hint');
+    const found = FIGURATIVE_HINTS.find(phrase => lower.includes(phrase));
+    if(found){
+      hint.textContent = `Esta instrucción podría tener lenguaje figurado ("${found}"). Prueba con una frase directa, sin metáforas.`;
+      hint.classList.add('show');
+    } else {
+      hint.classList.remove('show');
+    }
+    updatePreview();
+  });
+  titleInput.addEventListener('input', updatePreview);
+ 
+  function updatePreview(){
+    const previewInstruction = document.getElementById('preview-instruction');
+    const previewBody = document.getElementById('preview-body');
+    previewInstruction.textContent = instructionInput.value.trim() || 'Escribe una instrucción para verla aquí.';
+ 
+    if(currentType === 'secuencia'){
+      const validSteps = currentSteps.filter(s => s.label.trim() !== '');
+      if(validSteps.length === 0){
+        previewBody.innerHTML = '<p class="preview-empty">Agrega pasos para ver la secuencia.</p>';
+        return;
+      }
+      previewBody.innerHTML = `<div class="preview-sequence">` + validSteps.map((s, i) => `
+        ${i > 0 ? '<span class="preview-arrow">→</span>' : ''}
+        <div class="preview-chip">${ICONS[s.icon]}<span>${escapeHtml(s.label)}</span></div>
+      `).join('') + `</div>`;
+    } else {
+      const validPairs = currentPairs.filter(p => p.leftLabel.trim() !== '' || p.rightLabel.trim() !== '');
+      if(validPairs.length === 0){
+        previewBody.innerHTML = '<p class="preview-empty">Agrega parejas para ver el ejercicio.</p>';
+        return;
+      }
+      previewBody.innerHTML = `
+        <div class="preview-matching">
+          <div class="preview-col">
+            <div class="col-label">Columna A</div>
+            ${validPairs.map(p => `<div class="preview-chip" style="width:auto;">${ICONS[p.leftIcon]}<span>${escapeHtml(p.leftLabel)}</span></div>`).join('')}
+          </div>
+          <div class="preview-col">
+            <div class="col-label">Columna B</div>
+            ${validPairs.map(p => `<div class="preview-chip" style="width:auto;">${ICONS[p.rightIcon]}<span>${escapeHtml(p.rightLabel)}</span></div>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+  }
+ 
+  function openModal(activity){
+    form.reset();
+    clearFieldError('field-title', 'error-title');
+    clearFieldError('field-instruction', 'error-instruction');
+    document.getElementById('figurative-hint').classList.remove('show');
+ 
+    if(activity){
+      modalTitle.textContent = 'Editar actividad';
+      idInput.value = activity.id;
+      titleInput.value = activity.title;
+      instructionInput.value = activity.instruction;
+      statusInput.checked = activity.status === 'Activa';
+      currentType = activity.type;
+      currentSteps = activity.type === 'secuencia' ? JSON.parse(JSON.stringify(activity.content.steps)) : [];
+      currentPairs = activity.type === 'emparejamiento' ? JSON.parse(JSON.stringify(activity.content.pairs)) : [];
+      currentAssigned = new Set(activity.assignedStudentIds);
+    } else {
+      modalTitle.textContent = 'Nueva actividad';
+      idInput.value = '';
+      currentType = 'secuencia';
+      currentSteps = [];
+      currentPairs = [];
+      currentAssigned = new Set();
+      statusInput.checked = true;
+    }
+    document.querySelectorAll('#type-group .chip-btn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.value === currentType)));
+    renderAssignGrid();
+    renderEditor();
+    overlay.classList.add('open');
+    titleInput.focus();
+  }
+  function closeModal(){ overlay.classList.remove('open'); }
+ 
+  document.getElementById('btn-new-activity').addEventListener('click', () => openModal(null));
+  document.getElementById('btn-cancel-activity').addEventListener('click', closeModal);
+  overlay.addEventListener('click', (e) => { if(e.target === overlay) closeModal(); });
+ 
+  function setFieldError(fieldId, errorId, message){
+    document.getElementById(fieldId).classList.add('invalid');
+    const el = document.getElementById(errorId);
+    el.textContent = message;
+    el.classList.add('show');
+  }
+  function clearFieldError(fieldId, errorId){
+    document.getElementById(fieldId).classList.remove('invalid');
+    const el = document.getElementById(errorId);
+    el.textContent = '';
+    el.classList.remove('show');
+  }
+ 
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let valid = true;
+ 
+    if(titleInput.value.trim() === ''){
+      setFieldError('field-title', 'error-title', 'El nombre de la actividad es obligatorio.');
+      valid = false;
+    } else {
+      clearFieldError('field-title', 'error-title');
+    }
+ 
+    if(instructionInput.value.trim() === ''){
+      setFieldError('field-instruction', 'error-instruction', 'Escribe la instrucción literal que leerá el estudiante.');
+      valid = false;
+    } else {
+      clearFieldError('field-instruction', 'error-instruction');
+    }
+ 
+    if(!valid) return;
+ 
+    const content = currentType === 'secuencia'
+      ? { steps: currentSteps.filter(s => s.label.trim() !== '').map((s, i) => ({ ...s, order: i + 1 })) }
+      : { pairs: currentPairs.filter(p => p.leftLabel.trim() !== '' || p.rightLabel.trim() !== '') };
+ 
+    if(idInput.value){
+      const a = activities.find(x => x.id === Number(idInput.value));
+      a.title = titleInput.value.trim();
+      a.type = currentType;
+      a.instruction = instructionInput.value.trim();
+      a.status = statusInput.checked ? 'Activa' : 'Inactiva';
+      a.assignedStudentIds = Array.from(currentAssigned);
+      a.content = content;
+      a.updatedAt = new Date().toISOString();
+      setStatus(`Actividad "${a.title}" actualizada correctamente.`, 'ok');
+    } else {
+      activities.push({
+        id: nextActivityId++,
+        title: titleInput.value.trim(),
+        type: currentType,
+        instruction: instructionInput.value.trim(),
+        status: statusInput.checked ? 'Activa' : 'Inactiva',
+        assignedStudentIds: Array.from(currentAssigned),
+        content,
+        updatedAt: new Date().toISOString(),
+      });
+      setStatus(`Actividad "${titleInput.value.trim()}" creada correctamente.`, 'ok');
+    }
+ 
+    closeModal();
+    render();
+  });
+ 
+  // ---------- Eliminar ----------
+  const deleteOverlay = document.getElementById('delete-overlay');
+  const deleteTargetName = document.getElementById('delete-target-name');
+  let pendingDeleteId = null;
+ 
+  function openDeleteModal(a){
+    pendingDeleteId = a.id;
+    deleteTargetName.textContent = a.title;
+    deleteOverlay.classList.add('open');
+    document.getElementById('btn-cancel-delete').focus();
+  }
+  function closeDeleteModal(){ deleteOverlay.classList.remove('open'); pendingDeleteId = null; }
+  document.getElementById('btn-cancel-delete').addEventListener('click', closeDeleteModal);
+  deleteOverlay.addEventListener('click', (e) => { if(e.target === deleteOverlay) closeDeleteModal(); });
+  document.getElementById('btn-confirm-delete').addEventListener('click', () => {
+    const a = activities.find(x => x.id === pendingDeleteId);
+    activities = activities.filter(x => x.id !== pendingDeleteId);
+    closeDeleteModal();
+    render();
+    if(a) setStatus(`Actividad "${a.title}" eliminada.`, 'error');
+  });
+ 
+  tableBody.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-action]');
+    if(!btn) return;
+    const id = Number(btn.dataset.id);
+    const a = activities.find(x => x.id === id);
+    if(!a) return;
+    if(btn.dataset.action === 'edit') openModal(a);
+    if(btn.dataset.action === 'delete') openDeleteModal(a);
+  });
+ 
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape'){
+      if(overlay.classList.contains('open')) closeModal();
+      if(deleteOverlay.classList.contains('open')) closeDeleteModal();
+    }
+  });
+ 
+  function setStatus(message, kind){
+    status.textContent = message;
+    status.className = 'status-region ' + (kind || '');
+  }
+ 
+  render();
+</script>
+</body>
+</html>
