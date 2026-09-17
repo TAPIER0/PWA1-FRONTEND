@@ -315,6 +315,13 @@
               </label>
             </div>
           </div>
+          <div class="field-row" style="margin-top: 10px; display: flex; align-items: center; gap: 12px;">
+            <button type="button" class="btn btn-ghost" id="btn-test-audio" style="display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; font-size: 13.5px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="16" height="16"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.5 8.5a5 5 0 0 1 0 7"></path></svg>
+              <span>Probar voz y volumen</span>
+            </button>
+            <span id="test-audio-status" style="font-size: 12.5px; color: var(--text-muted);" aria-live="polite"></span>
+          </div>
         </div>
  
         <div class="card">
@@ -615,9 +622,9 @@
           letterSpacing: Boolean(sp.mayorEspacioEntreLetras),
           dyslexiaFriendlyFont: (sp.tipografia || '').toLowerCase().includes('dyslexic'),
           audio: {
-            soundsEnabled: sp.audioActivo,
-            volume: 60,
-            textToSpeech: false
+            soundsEnabled: Boolean(sp.audioActivo),
+            volume: (sp.volumenAudio !== undefined && sp.volumenAudio !== null) ? sp.volumenAudio : 60,
+            textToSpeech: Boolean(sp.textoAVoz)
           },
           reduceMotion: sp.animacionesReducidas,
           timers: {
@@ -656,6 +663,30 @@
     status.className = 'status-region ' + (kind || '');
   }
 
+  // ---------- Probar Voz y Volumen ----------
+  const btnTestAudio = document.getElementById('btn-test-audio');
+  if (btnTestAudio) {
+    btnTestAudio.addEventListener('click', () => {
+      const statusEl = document.getElementById('test-audio-status');
+      if (!('speechSynthesis' in window)) {
+        if (statusEl) statusEl.textContent = 'El navegador no soporta síntesis de voz.';
+        return;
+      }
+      if (!currentPrefs.audio.soundsEnabled && !currentPrefs.audio.textToSpeech) {
+        if (statusEl) statusEl.textContent = 'Activa los sonidos o la lectura en voz alta para escuchar la prueba.';
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance('Esta es una prueba de lectura de instrucciones en voz alta con el volumen configurado.');
+      utter.lang = 'es-CO';
+      utter.volume = Math.max(0, Math.min(1, (currentPrefs.audio.volume ?? 60) / 100));
+      if (statusEl) statusEl.textContent = 'Reproduciendo audio de prueba...';
+      utter.onend = () => { if (statusEl) statusEl.textContent = ''; };
+      utter.onerror = () => { if (statusEl) statusEl.textContent = ''; };
+      window.speechSynthesis.speak(utter);
+    });
+  }
+
   // ---------- Guardar en .NET 9 ----------
   document.getElementById('btn-save').addEventListener('click', async () => {
     const saveBtn = document.getElementById('btn-save');
@@ -670,6 +701,8 @@
       tipografia: currentPrefs.tipografia || 'Atkinson Hyperlegible',
       mayorEspacioEntreLetras: Boolean(currentPrefs.letterSpacing),
       audioActivo: Boolean(currentPrefs.audio.soundsEnabled),
+      volumenAudio: Number(currentPrefs.audio.volume),
+      textoAVoz: Boolean(currentPrefs.audio.textToSpeech),
       animacionesReducidas: Boolean(currentPrefs.reduceMotion),
       nivelEscalaFuente: fontScaleFrontToBackend[currentPrefs.fontSize] || 2,
       modoContraste: 1,

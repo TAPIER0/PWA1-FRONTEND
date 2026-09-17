@@ -294,9 +294,20 @@ Si "activities" es un arreglo vacío, el tablero muestra el estado
     document.body.classList.toggle('motion-reduced', !!prefs.reduceMotion);
     document.body.classList.toggle('motion-ok', !prefs.reduceMotion);
  
+    updateSoundButtonUI(prefs.audio.soundsEnabled);
+  }
+
+  function updateSoundButtonUI(enabled){
     const soundBtn = document.getElementById('btn-sound');
-    soundBtn.setAttribute('aria-pressed', String(prefs.audio.soundsEnabled));
-    soundBtn.setAttribute('aria-label', prefs.audio.soundsEnabled ? 'Sonidos activados' : 'Sonidos desactivados');
+    if(!soundBtn) return;
+    soundBtn.setAttribute('aria-pressed', String(enabled));
+    soundBtn.setAttribute('aria-label', enabled ? 'Sonidos activados (clic para silenciar)' : 'Sonidos desactivados (clic para activar)');
+    soundBtn.title = enabled ? 'Silenciar sonidos' : 'Activar sonidos';
+    if(enabled){
+      soundBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="20" height="20"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M19 5a10 10 0 0 1 0 14"></path></svg>`;
+    } else {
+      soundBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="20" height="20"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
+    }
   }
  
   /* ========================================================================
@@ -349,11 +360,12 @@ Si "activities" es un arreglo vacío, el tablero muestra el estado
   }
  
   function speak(text){
-    if(!prefs.audio.textToSpeech) return;
+    if(!prefs || !prefs.audio || !prefs.audio.soundsEnabled || !prefs.audio.textToSpeech) return;
     if(!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'es-CO';
+    utter.volume = Math.max(0, Math.min(1, (prefs.audio.volume ?? 60) / 100));
     window.speechSynthesis.speak(utter);
   }
  
@@ -474,11 +486,17 @@ Si "activities" es un arreglo vacío, el tablero muestra el estado
     }
   }
  
-  document.getElementById('btn-sound').addEventListener('click', (e) => {
-    const btn = e.currentTarget;
-    const enabled = btn.getAttribute('aria-pressed') === 'true';
-    btn.setAttribute('aria-pressed', String(!enabled));
-    btn.setAttribute('aria-label', !enabled ? 'Sonidos activados' : 'Sonidos desactivados');
+  document.getElementById('btn-sound').addEventListener('click', () => {
+    const isCurrentlyEnabled = Boolean(prefs?.audio?.soundsEnabled);
+    const newEnabled = !isCurrentlyEnabled;
+    if(prefs && prefs.audio){
+      prefs.audio.soundsEnabled = newEnabled;
+    }
+    if(!newEnabled && ('speechSynthesis' in window)){
+      window.speechSynthesis.cancel();
+    }
+    updateSoundButtonUI(newEnabled);
+    announce(newEnabled ? 'Sonidos activados.' : 'Sonidos silenciados.');
   });
 
   const logoutBtn = document.getElementById('btn-logout');
@@ -524,7 +542,11 @@ Si "activities" es un arreglo vacío, el tablero muestra el estado
               fontSize: sp.nivelEscalaFuente === 1 ? 'pequeno' : sp.nivelEscalaFuente === 3 ? 'grande' : sp.nivelEscalaFuente === 4 ? 'muy-grande' : 'normal',
               letterSpacing: Boolean(sp.mayorEspacioEntreLetras),
               dyslexiaFriendlyFont: (sp.tipografia || '').toLowerCase().includes('dyslexic'),
-              audio: { soundsEnabled: sp.audioActivo, volume: 60, textToSpeech: true },
+              audio: { 
+                soundsEnabled: Boolean(sp.audioActivo), 
+                volume: (sp.volumenAudio !== undefined && sp.volumenAudio !== null) ? sp.volumenAudio : 60, 
+                textToSpeech: Boolean(sp.textoAVoz) 
+              },
               reduceMotion: sp.animacionesReducidas,
               timers: { mode: sp.ocultarTemporizadores ? 'sin-temporizador' : 'tiempo-extendido', warningSeconds: 15 }
             };

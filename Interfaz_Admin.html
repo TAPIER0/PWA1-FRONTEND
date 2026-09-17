@@ -179,6 +179,19 @@
   .field.invalid input, .field.invalid select{ border-color: var(--warn-border); }
   .modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:6px; }
  
+  .password-row{ position: relative; display: flex; align-items: center; width: 100%; }
+  .password-row input{ width: 100%; padding-right: 76px; }
+  .toggle-visibility{
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    background: var(--surface); border: 1px solid var(--border);
+    font-family: inherit; font-size: 12.5px;
+    font-weight: 700; color: var(--primary);
+    padding: 5px 9px; cursor: pointer; border-radius: 6px;
+    line-height: 1;
+  }
+  .toggle-visibility:hover{ background: var(--bg); }
+  .toggle-visibility:focus{ outline: 2px solid var(--focus); outline-offset: 1px; }
+
   .confirm-modal p{ font-size:14.5px; color:var(--text-muted); }
   .confirm-modal .target-name{ color:var(--text); font-weight:700; }
  
@@ -312,7 +325,10 @@
 
       <div class="field" id="field-password">
         <label for="user-password">Contraseña inicial</label>
-        <input type="password" id="user-password" value="Usuario123!*" autocomplete="off">
+        <div class="password-row">
+          <input type="password" id="user-password" value="Usuario123!*" autocomplete="off">
+          <button type="button" class="toggle-visibility" id="toggle-user-pw" aria-label="Mostrar contraseña" aria-pressed="false">Mostrar</button>
+        </div>
         <div class="field-error" id="error-password" role="alert"></div>
       </div>
  
@@ -427,6 +443,16 @@
   const passwordInput = document.getElementById('user-password');
   const passwordField = document.getElementById('field-password');
   const statusInput = document.getElementById('user-status');
+  const toggleUserPwBtn = document.getElementById('toggle-user-pw');
+
+  if(toggleUserPwBtn){
+    toggleUserPwBtn.addEventListener('click', () => {
+      const isHidden = passwordInput.type === 'password';
+      passwordInput.type = isHidden ? 'text' : 'password';
+      toggleUserPwBtn.textContent = isHidden ? 'Ocultar' : 'Mostrar';
+      toggleUserPwBtn.setAttribute('aria-pressed', String(isHidden));
+    });
+  }
 
   function openUserModal(user){
     userForm.reset();
@@ -434,12 +460,17 @@
     clearFieldError('field-email', 'error-email');
     clearFieldError('field-password', 'error-password');
     clearFieldError('field-role', 'error-role');
+    if(toggleUserPwBtn){
+      passwordInput.type = 'password';
+      toggleUserPwBtn.textContent = 'Mostrar';
+      toggleUserPwBtn.setAttribute('aria-pressed', 'false');
+    }
     if(user){
       userModalTitle.textContent = 'Editar usuario';
-      userModalSub.textContent = 'Actualiza el rol de la cuenta.';
+      userModalSub.textContent = 'Actualiza el nombre, rol o estado de la cuenta.';
       userIdInput.value = user.id;
       nameInput.value = user.name;
-      nameInput.disabled = true;
+      nameInput.disabled = false;
       emailInput.value = user.email;
       emailInput.disabled = true;
       roleInput.value = user.role;
@@ -518,29 +549,48 @@
       } else {
         clearFieldError('field-password', 'error-password');
       }
+    } else {
+      if(nameInput.value.trim() === ''){
+        setFieldError('field-name', 'error-name', 'El nombre completo es obligatorio.');
+        valid = false;
+      } else {
+        clearFieldError('field-name', 'error-name');
+      }
     }
 
     if(!valid) return;
 
     if(userIdInput.value){
+      // Actualizar usuario en backend SQL Server (.NET 9)
       try {
-        setStatus('Actualizando rol del usuario...', '');
-        const res = await ApiClient.request(`/users/${userIdInput.value}/roles`, {
+        setStatus('Actualizando datos del usuario en la base de datos SQL Server...', '');
+        const rawName = nameInput.value.trim();
+        const parts = rawName.split(/\s+/);
+        const nombres = parts.length > 1 ? parts.slice(0, -1).join(' ') : parts[0];
+        const apellidos = parts.length > 1 ? parts.slice(-1).join(' ') : parts[0];
+        const isActive = statusInput.value === 'Activo';
+
+        const res = await ApiClient.request(`/users/${userIdInput.value}`, {
           method: 'PUT',
-          body: { roles: [roleInput.value] }
+          body: {
+            nombres,
+            apellidos,
+            isActive,
+            roles: [roleInput.value]
+          }
         });
         if(res.ok && res.data && res.data.success){
-          setStatus(`Rol de usuario actualizado correctamente.`, 'ok');
+          setStatus(`Usuario "${rawName}" actualizado correctamente en la base de datos.`, 'ok');
           closeUserModal();
           await loadUsersFromBackend();
         } else {
-          const msg = (res.data && res.data.message) || 'Error al actualizar roles';
+          const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al actualizar usuario en la base de datos.';
           setFieldError('field-role', 'error-role', msg);
           setStatus(msg, 'error');
         }
       } catch(err){
-        console.error('Error al actualizar roles:', err);
-        setStatus('Error de conexión al actualizar roles.', 'error');
+        console.error('Error al actualizar usuario:', err);
+        setStatus('Error de conexión con el servidor al actualizar usuario.', 'error');
       }
     } else {
       // Registrar nuevo usuario en backend SQL Server (Sprint 1 HU-001)
@@ -598,12 +648,32 @@
   document.getElementById('btn-cancel-delete').addEventListener('click', closeDeleteModal);
   deleteOverlay.addEventListener('click', (e) => { if(e.target === deleteOverlay) closeDeleteModal(); });
 
-  document.getElementById('btn-confirm-delete').addEventListener('click', () => {
-    const u = users.find(x => String(x.id) === String(pendingDeleteId));
-    users = users.filter(x => String(x.id) !== String(pendingDeleteId));
-    closeDeleteModal();
-    render();
-    if(u) setStatus(`Usuario "${u.name}" eliminado de la lista.`, 'error');
+  document.getElementById('btn-confirm-delete').addEventListener('click', async () => {
+    const confirmBtn = document.getElementById('btn-confirm-delete');
+    confirmBtn.disabled = true;
+    setStatus('Eliminando usuario de la base de datos SQL Server...', '');
+
+    try {
+      const res = await ApiClient.request(`/users/${pendingDeleteId}`, {
+        method: 'DELETE'
+      });
+      confirmBtn.disabled = false;
+
+      if(res.ok && res.data && res.data.success){
+        setStatus('Usuario eliminado permanentemente de la base de datos.', 'ok');
+        closeDeleteModal();
+        await loadUsersFromBackend();
+      } else {
+        const errMsg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al eliminar usuario en el servidor.';
+        setStatus(errMsg, 'error');
+        closeDeleteModal();
+      }
+    } catch(err){
+      confirmBtn.disabled = false;
+      console.error('Error al eliminar usuario:', err);
+      setStatus('Error de conexión con el servidor al eliminar el usuario.', 'error');
+      closeDeleteModal();
+    }
   });
 
   // ---------- Delegación de acciones de la tabla ----------
