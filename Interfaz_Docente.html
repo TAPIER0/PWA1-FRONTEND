@@ -6,6 +6,7 @@
 <title>Docente — Actividades interactivas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script src="api-client.js"></script>
 <style>
   :root{
     --bg: #F4F6F5;
@@ -212,10 +213,11 @@
       <div class="admin-chip">
         <div class="admin-avatar" aria-hidden="true"></div>
         <div class="admin-info">
-          <div class="name" id="teacher-chip-name">Profesor</div>
-          <div class="role">Rol: Profesor</div>
+          <div class="name" id="teacher-chip-name">Docente</div>
+          <div class="role">Sesión activa</div>
         </div>
       </div>
+      <button type="button" class="btn btn-ghost" id="btn-logout" style="width:100%; margin-top:12px; font-size:13px; padding:7px 10px;">Cerrar sesión</button>
     </div>
   </aside>
  
@@ -291,6 +293,12 @@
             <label class="label" for="act-title">Nombre de la actividad</label>
             <input type="text" id="act-title" placeholder="Ej. Ordena tu rutina de la mañana">
             <div class="field-error" id="error-title" role="alert"></div>
+          </div>
+
+          <div class="field-row" id="field-modulo">
+            <label class="label" for="act-modulo">Módulo temático</label>
+            <select id="act-modulo" style="font-family:inherit; font-size:15px; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; width:100%; color:var(--text);"></select>
+            <div class="field-error" id="error-modulo" role="alert"></div>
           </div>
  
           <div class="field-row">
@@ -418,45 +426,30 @@
     'como si fuera', 'échale ganas', 'ponte las pilas', 'a ojo de buen cubero',
     'caído del cielo', 'quedó como', 'en un abrir y cerrar', 'metaforicamente',
   ];
- 
-  const currentTeacherName = 'Carlos Andrés Peña';
-  const students = [
-    { id: 101, name: 'Jorge Iván Salas' },
-    { id: 102, name: 'Sofía Martínez' },
-  ];
- 
+
+  // ---------- Control de Acceso y Sesión ----------
+  if (!ApiClient.requireAuth(['Docente', 'Administrador'])) {
+    throw new Error('Acceso no autorizado');
+  }
+
+  const currentUser = ApiClient.getUser();
+  const currentTeacherName = (currentUser && (currentUser.nombreCompleto || currentUser.nombres)) ? (currentUser.nombreCompleto || currentUser.nombres) : 'Docente';
   document.getElementById('welcome-name').textContent = 'Bienvenido(a), ' + currentTeacherName;
   document.getElementById('teacher-chip-name').textContent = currentTeacherName;
- 
-  let activities = [
-    {
-      id: 1, title: 'Ordena tu rutina de la mañana', type: 'secuencia',
-      instruction: 'Toca las imágenes en el orden en que haces cada cosa por la mañana.',
-      status: 'Activa', assignedStudentIds: [101],
-      content: { steps: [
-        { id: 1, order: 1, label: 'Despertar', icon: 'salida' },
-        { id: 2, order: 2, label: 'Higiene', icon: 'higiene' },
-        { id: 3, order: 3, label: 'Desayuno', icon: 'comida' },
-        { id: 4, order: 4, label: 'Estudio', icon: 'estudio' },
-      ]},
-      updatedAt: '2026-09-15T10:00:00.000Z',
-    },
-    {
-      id: 2, title: 'Empareja las figuras iguales', type: 'emparejamiento',
-      instruction: 'Une cada figura de la izquierda con la misma figura de la derecha.',
-      status: 'Activa', assignedStudentIds: [101, 102],
-      content: { pairs: [
-        { id: 1, leftLabel: 'Círculo', leftIcon: 'circulo', rightLabel: 'Círculo', rightIcon: 'circulo' },
-        { id: 2, leftLabel: 'Estrella', leftIcon: 'estrella', rightLabel: 'Estrella', rightIcon: 'estrella' },
-      ]},
-      updatedAt: '2026-09-14T15:30:00.000Z',
-    },
-  ];
-  let nextActivityId = 3;
+
+  const logoutBtn = document.getElementById('btn-logout');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => ApiClient.logout());
+  }
+
+  let modules = [];
+  let students = [];
+  let activities = [];
+  let assignments = [];
   let nextItemId = 1000;
- 
+
   const TYPE_LABEL = { secuencia: 'Secuencia lógica', emparejamiento: 'Emparejamiento visual' };
- 
+
   const tableBody = document.getElementById('table-body');
   const emptyState = document.getElementById('empty-state');
   const resultCount = document.getElementById('result-count');
@@ -464,10 +457,10 @@
   const search = document.getElementById('search');
   const filterType = document.getElementById('filter-type');
   const filterStatus = document.getElementById('filter-status');
- 
+
   function studentNames(ids){
     if(!ids || ids.length === 0) return 'Sin asignar';
-    return ids.map(id => students.find(s => s.id === id)?.name).filter(Boolean).join(', ');
+    return ids.map(id => students.find(s => String(s.id) === String(id))?.name).filter(Boolean).join(', ') || 'Sin asignar';
   }
  
   function getFiltered(){
@@ -709,22 +702,30 @@
     }
   }
  
+  const moduloSelect = document.getElementById('act-modulo');
+
   function openModal(activity){
     form.reset();
     clearFieldError('field-title', 'error-title');
     clearFieldError('field-instruction', 'error-instruction');
+    clearFieldError('field-modulo', 'error-modulo');
     document.getElementById('figurative-hint').classList.remove('show');
- 
+
+    if (moduloSelect && modules.length > 0) {
+      moduloSelect.innerHTML = modules.map(m => `<option value="${m.id}">${escapeHtml(m.titulo)}</option>`).join('');
+    }
+
     if(activity){
       modalTitle.textContent = 'Editar actividad';
       idInput.value = activity.id;
       titleInput.value = activity.title;
       instructionInput.value = activity.instruction;
+      if (moduloSelect && activity.moduloId) moduloSelect.value = activity.moduloId;
       statusInput.checked = activity.status === 'Activa';
       currentType = activity.type;
-      currentSteps = activity.type === 'secuencia' ? JSON.parse(JSON.stringify(activity.content.steps)) : [];
-      currentPairs = activity.type === 'emparejamiento' ? JSON.parse(JSON.stringify(activity.content.pairs)) : [];
-      currentAssigned = new Set(activity.assignedStudentIds);
+      currentSteps = activity.type === 'secuencia' ? JSON.parse(JSON.stringify(activity.content.steps || [])) : [];
+      currentPairs = activity.type === 'emparejamiento' ? JSON.parse(JSON.stringify(activity.content.pairs || [])) : [];
+      currentAssigned = new Set(activity.assignedStudentIds || []);
     } else {
       modalTitle.textContent = 'Nueva actividad';
       idInput.value = '';
@@ -741,81 +742,156 @@
     titleInput.focus();
   }
   function closeModal(){ overlay.classList.remove('open'); }
- 
+
   document.getElementById('btn-new-activity').addEventListener('click', () => openModal(null));
   document.getElementById('btn-cancel-activity').addEventListener('click', closeModal);
   overlay.addEventListener('click', (e) => { if(e.target === overlay) closeModal(); });
- 
+
   function setFieldError(fieldId, errorId, message){
-    document.getElementById(fieldId).classList.add('invalid');
+    const field = document.getElementById(fieldId);
+    if(field) field.classList.add('invalid');
     const el = document.getElementById(errorId);
-    el.textContent = message;
-    el.classList.add('show');
+    if(el){
+      el.textContent = message;
+      el.classList.add('show');
+    }
   }
   function clearFieldError(fieldId, errorId){
-    document.getElementById(fieldId).classList.remove('invalid');
+    const field = document.getElementById(fieldId);
+    if(field) field.classList.remove('invalid');
     const el = document.getElementById(errorId);
-    el.textContent = '';
-    el.classList.remove('show');
+    if(el){
+      el.textContent = '';
+      el.classList.remove('show');
+    }
   }
- 
-  form.addEventListener('submit', (e) => {
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     let valid = true;
- 
+
     if(titleInput.value.trim() === ''){
       setFieldError('field-title', 'error-title', 'El nombre de la actividad es obligatorio.');
       valid = false;
     } else {
       clearFieldError('field-title', 'error-title');
     }
- 
+
     if(instructionInput.value.trim() === ''){
       setFieldError('field-instruction', 'error-instruction', 'Escribe la instrucción literal que leerá el estudiante.');
       valid = false;
     } else {
       clearFieldError('field-instruction', 'error-instruction');
     }
- 
-    if(!valid) return;
- 
-    const content = currentType === 'secuencia'
-      ? { steps: currentSteps.filter(s => s.label.trim() !== '').map((s, i) => ({ ...s, order: i + 1 })) }
-      : { pairs: currentPairs.filter(p => p.leftLabel.trim() !== '' || p.rightLabel.trim() !== '') };
- 
-    if(idInput.value){
-      const a = activities.find(x => x.id === Number(idInput.value));
-      a.title = titleInput.value.trim();
-      a.type = currentType;
-      a.instruction = instructionInput.value.trim();
-      a.status = statusInput.checked ? 'Activa' : 'Inactiva';
-      a.assignedStudentIds = Array.from(currentAssigned);
-      a.content = content;
-      a.updatedAt = new Date().toISOString();
-      setStatus(`Actividad "${a.title}" actualizada correctamente.`, 'ok');
+
+    const moduloId = moduloSelect ? moduloSelect.value : null;
+    if(!moduloId){
+      setFieldError('field-modulo', 'error-modulo', 'Selecciona un módulo temático.');
+      valid = false;
     } else {
-      activities.push({
-        id: nextActivityId++,
-        title: titleInput.value.trim(),
-        type: currentType,
-        instruction: instructionInput.value.trim(),
-        status: statusInput.checked ? 'Activa' : 'Inactiva',
-        assignedStudentIds: Array.from(currentAssigned),
-        content,
-        updatedAt: new Date().toISOString(),
-      });
-      setStatus(`Actividad "${titleInput.value.trim()}" creada correctamente.`, 'ok');
+      clearFieldError('field-modulo', 'error-modulo');
     }
- 
-    closeModal();
-    render();
+
+    if(!valid) return;
+
+    const content = currentType === 'secuencia'
+      ? { steps: currentSteps.filter(s => s.label.trim() !== '').map((s, i) => ({ ...s, order: i + 1 })), pasos: currentSteps.filter(s => s.label.trim() !== '').map(s => s.label.trim()) }
+      : { pairs: currentPairs.filter(p => p.leftLabel.trim() !== '' || p.rightLabel.trim() !== ''), pares: currentPairs.filter(p => p.leftLabel.trim() !== '' || p.rightLabel.trim() !== '').map(p => ({ emocion: p.leftLabel.trim(), pareja: p.rightLabel.trim() })) };
+
+    const payload = {
+      titulo: titleInput.value.trim(),
+      descripcion: instructionInput.value.trim(),
+      tipoActividad: currentType === 'emparejamiento' ? 1 : 0,
+      objetivoPedagogico: instructionInput.value.trim(),
+      configJson: JSON.stringify(content),
+      moduloId: moduloId
+    };
+
+    const submitBtn = document.getElementById('btn-save-activity');
+    submitBtn.disabled = true;
+
+    if(idInput.value){
+      try {
+        setStatus('Actualizando actividad en el backend...', '');
+        const res = await ApiClient.request(`/activities/${idInput.value}`, {
+          method: 'PUT',
+          body: payload
+        });
+        if(res.ok && res.data && res.data.success){
+          const actId = idInput.value;
+          for (const studentId of currentAssigned) {
+            const alreadyAssigned = assignments.some(a => (a.activityId === actId || a.activityId === res.data.data.id) && String(a.studentProfileId) === String(studentId));
+            if (!alreadyAssigned) {
+              await ApiClient.request('/assignments', {
+                method: 'POST',
+                body: {
+                  activityId: actId,
+                  studentProfileId: studentId,
+                  fechaInicio: new Date().toISOString(),
+                  ordenSecuencial: 1,
+                  prioridad: 1
+                }
+              });
+            }
+          }
+          setStatus(`Actividad "${payload.titulo}" actualizada correctamente.`, 'ok');
+          closeModal();
+          await loadActivitiesFromBackend();
+        } else {
+          const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al actualizar actividad.';
+          setStatus(msg, 'error');
+        }
+      } catch(err){
+        console.error('Error al actualizar actividad:', err);
+        setStatus('Error de conexión al actualizar actividad.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+      }
+    } else {
+      try {
+        setStatus('Guardando y parametrizando actividad pedagógica (HU-004)...', '');
+        const res = await ApiClient.request('/activities', {
+          method: 'POST',
+          body: payload
+        });
+        if(res.ok && res.data && res.data.success){
+          const createdAct = res.data.data;
+          if(currentAssigned.size > 0){
+            setStatus('Asignando actividad a estudiantes seleccionados (HU-005)...', '');
+            for(const studentId of currentAssigned){
+              await ApiClient.request('/assignments', {
+                method: 'POST',
+                body: {
+                  activityId: createdAct.id,
+                  studentProfileId: studentId,
+                  fechaInicio: new Date().toISOString(),
+                  ordenSecuencial: 1,
+                  prioridad: 1
+                }
+              });
+            }
+          }
+          setStatus(`Actividad "${payload.titulo}" creada y asignada exitosamente.`, 'ok');
+          closeModal();
+          await loadActivitiesFromBackend();
+        } else {
+          const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al crear actividad.';
+          setStatus(msg, 'error');
+        }
+      } catch(err){
+        console.error('Error al crear actividad:', err);
+        setStatus('Error de conexión al crear actividad.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+      }
+    }
   });
- 
+
   // ---------- Eliminar ----------
   const deleteOverlay = document.getElementById('delete-overlay');
   const deleteTargetName = document.getElementById('delete-target-name');
   let pendingDeleteId = null;
- 
+
   function openDeleteModal(a){
     pendingDeleteId = a.id;
     deleteTargetName.textContent = a.title;
@@ -825,37 +901,134 @@
   function closeDeleteModal(){ deleteOverlay.classList.remove('open'); pendingDeleteId = null; }
   document.getElementById('btn-cancel-delete').addEventListener('click', closeDeleteModal);
   deleteOverlay.addEventListener('click', (e) => { if(e.target === deleteOverlay) closeDeleteModal(); });
-  document.getElementById('btn-confirm-delete').addEventListener('click', () => {
-    const a = activities.find(x => x.id === pendingDeleteId);
-    activities = activities.filter(x => x.id !== pendingDeleteId);
-    closeDeleteModal();
-    render();
-    if(a) setStatus(`Actividad "${a.title}" eliminada.`, 'error');
+  document.getElementById('btn-confirm-delete').addEventListener('click', async () => {
+    if(!pendingDeleteId) return;
+    const confirmBtn = document.getElementById('btn-confirm-delete');
+    confirmBtn.disabled = true;
+    try {
+      setStatus('Eliminando actividad pedagógica...', '');
+      const res = await ApiClient.request(`/activities/${pendingDeleteId}`, {
+        method: 'DELETE'
+      });
+      if(res.ok && res.data && res.data.success){
+        setStatus('Actividad eliminada correctamente.', 'error');
+        closeDeleteModal();
+        await loadActivitiesFromBackend();
+      } else {
+        const msg = (res.data && res.data.message) || 'Error al eliminar actividad.';
+        setStatus(msg, 'error');
+        closeDeleteModal();
+      }
+    } catch(err){
+      console.error('Error al eliminar actividad:', err);
+      setStatus('Error de conexión al eliminar actividad.', 'error');
+      closeDeleteModal();
+    } finally {
+      confirmBtn.disabled = false;
+    }
   });
- 
+
   tableBody.addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-action]');
     if(!btn) return;
-    const id = Number(btn.dataset.id);
-    const a = activities.find(x => x.id === id);
+    const id = btn.dataset.id;
+    const a = activities.find(x => String(x.id) === String(id));
     if(!a) return;
     if(btn.dataset.action === 'edit') openModal(a);
     if(btn.dataset.action === 'delete') openDeleteModal(a);
   });
- 
+
+  async function loadModulesFromBackend(){
+    try {
+      const res = await ApiClient.request('/modules?onlyActive=true');
+      if(res.ok && res.data && res.data.success){
+        modules = res.data.data;
+        if (moduloSelect) {
+          moduloSelect.innerHTML = modules.map(m => `<option value="${m.id}">${escapeHtml(m.titulo)}</option>`).join('');
+        }
+      }
+    } catch(err){
+      console.warn('Error al cargar módulos:', err);
+    }
+  }
+
+  async function loadStudentsFromBackend(){
+    try {
+      const res = await ApiClient.request('/students');
+      if(res.ok && res.data && res.data.success){
+        students = res.data.data.map(s => ({
+          id: s.id,
+          name: s.nombreCompleto || s.codigoEstudiante || 'Estudiante'
+        }));
+      }
+    } catch(err){
+      console.warn('Error al cargar estudiantes:', err);
+    }
+    renderAssignGrid();
+  }
+
+  async function loadActivitiesFromBackend(){
+    try {
+      try {
+        const assignRes = await ApiClient.request('/assignments');
+        if(assignRes.ok && assignRes.data && assignRes.data.success){
+          assignments = assignRes.data.data;
+        }
+      } catch(e){
+        console.warn('No se pudieron obtener asignaciones:', e);
+      }
+
+      const res = await ApiClient.request('/activities');
+      if(res.ok && res.data && res.data.success){
+        activities = res.data.data.map(a => {
+          let parsedContent = { steps: [], pairs: [] };
+          try {
+            const raw = JSON.parse(a.configJson || '{}');
+            if(raw.steps) parsedContent.steps = raw.steps;
+            else if(raw.pasos) parsedContent.steps = raw.pasos.map((p, idx) => ({ id: idx + 1, order: idx + 1, label: typeof p === 'string' ? p : (p.label || ''), icon: p.icon || 'estudio' }));
+            if(raw.pairs) parsedContent.pairs = raw.pairs;
+            else if(raw.pares) parsedContent.pairs = raw.pares.map((p, idx) => ({ id: idx + 1, leftLabel: p.emocion || p.elementoA || '', leftIcon: 'circulo', rightLabel: p.pareja || p.elementoB || p.color || '', rightIcon: 'estrella' }));
+          } catch(e){}
+
+          const actAssigned = assignments
+            .filter(asg => asg.activityId === a.id)
+            .map(asg => asg.studentProfileId);
+
+          return {
+            id: a.id,
+            title: a.titulo,
+            type: (a.tipoActividadNombre === 'EmparejamientoVisual' || a.tipoActividad === 1) ? 'emparejamiento' : 'secuencia',
+            instruction: a.descripcion || a.objetivoPedagogico,
+            status: 'Activa',
+            assignedStudentIds: actAssigned,
+            moduloId: a.moduloId,
+            content: parsedContent,
+            updatedAt: a.createdAt
+          };
+        });
+      }
+    } catch(err){
+      console.warn('Error al cargar actividades:', err);
+    }
+    render();
+  }
+
   document.addEventListener('keydown', (e) => {
     if(e.key === 'Escape'){
       if(overlay.classList.contains('open')) closeModal();
       if(deleteOverlay.classList.contains('open')) closeDeleteModal();
     }
   });
- 
+
   function setStatus(message, kind){
     status.textContent = message;
     status.className = 'status-region ' + (kind || '');
   }
- 
+
   render();
+  loadModulesFromBackend();
+  loadStudentsFromBackend();
+  loadActivitiesFromBackend();
 </script>
 </body>
 </html>

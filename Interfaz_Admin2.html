@@ -203,6 +203,7 @@
     .modal .field-row{ flex-direction:column; }
   }
 </style>
+<script src="api-client.js"></script>
 </head>
 <body>
 <div class="app">
@@ -232,6 +233,7 @@
           <div class="role">Sesión activa</div>
         </div>
       </div>
+      <button type="button" class="btn btn-ghost" id="btn-logout" style="width:100%; margin-top:12px; font-size:13px; padding:7px 10px;">Cerrar sesión</button>
     </div>
   </aside>
 
@@ -419,11 +421,17 @@
         <div class="field-error" id="error-email" role="alert"></div>
       </div>
 
+      <div class="field" id="field-password">
+        <label for="user-password">Contraseña temporal</label>
+        <input type="password" id="user-password" autocomplete="new-password">
+        <div class="field-error" id="error-password" role="alert"></div>
+      </div>
+
       <div class="field" id="field-role">
         <label for="user-role">Rol</label>
         <select id="user-role">
           <option value="Administrador">Administrador</option>
-          <option value="Profesor">Profesor</option>
+          <option value="Docente">Docente</option>
           <option value="Acudiente">Acudiente</option>
           <option value="Estudiante" selected>Estudiante</option>
         </select>
@@ -602,21 +610,23 @@
     });
   });
 
-  // ---------- Datos de ejemplo (en memoria; el backend aún no está listo) ----------
-  let users = [
-    { id: 1, name: 'María Fernanda Ríos', email: 'maria.rios@correo.com', role: 'Estudiante', status: 'Activo', lastActivity: '13 sep 2026' },
-    { id: 2, name: 'Carlos Andrés Peña', email: 'carlos.pena@correo.com', role: 'Profesor', status: 'Activo', lastActivity: '12 sep 2026' },
-    { id: 3, name: 'Luisa Gómez', email: 'luisa.gomez@correo.com', role: 'Acudiente', status: 'Activo', lastActivity: '10 sep 2026' },
-    { id: 4, name: 'Jorge Iván Salas', email: 'jorge.salas@correo.com', role: 'Estudiante', status: 'Inactivo', lastActivity: '02 ago 2026' },
-    { id: 5, name: 'Daniela Torres', email: 'daniela.torres@correo.com', role: 'Administrador', status: 'Activo', lastActivity: '14 sep 2026' },
-    { id: 6, name: 'Pedro Ramírez', email: 'pedro.ramirez@correo.com', role: 'Estudiante', status: 'Activo', lastActivity: '09 sep 2026' },
-  ];
-  let nextId = 7;
+  // ---------- Verificación de autenticación y sesión ----------
+  if (!ApiClient.requireAuth(['Administrador'])) {
+    throw new Error('Acceso no autorizado');
+  }
 
-  // Nombre del administrador con la sesión activa (mockup: reemplazar con el dato real de sesión/backend)
-  const currentAdminName = 'Daniela Torres';
+  const currentUser = ApiClient.getUser();
+  const currentAdminName = (currentUser && (currentUser.nombreCompleto || currentUser.nombres)) ? (currentUser.nombreCompleto || currentUser.nombres) : 'Administrador';
   document.getElementById('welcome-name').textContent = 'Bienvenido(a), ' + currentAdminName;
   document.getElementById('admin-chip-name').textContent = currentAdminName;
+
+  const logoutBtn = document.getElementById('btn-logout');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => ApiClient.logout());
+  }
+
+  // ---------- Lista de usuarios cargada desde la API ----------
+  let users = [];
 
   const tableBody = document.getElementById('table-body');
   const emptyState = document.getElementById('empty-state');
@@ -675,6 +685,8 @@
   const userIdInput = document.getElementById('user-id');
   const nameInput = document.getElementById('user-name');
   const emailInput = document.getElementById('user-email');
+  const passwordInput = document.getElementById('user-password');
+  const passwordField = document.getElementById('field-password');
   const roleInput = document.getElementById('user-role');
   const statusInput = document.getElementById('user-status');
 
@@ -682,20 +694,26 @@
     userForm.reset();
     clearFieldError('field-name', 'error-name');
     clearFieldError('field-email', 'error-email');
+    if (passwordField) clearFieldError('field-password', 'error-password');
+
     if(user){
       userModalTitle.textContent = 'Editar usuario';
       userModalSub.textContent = 'Actualiza los datos de la cuenta.';
       userIdInput.value = user.id;
       nameInput.value = user.name;
       emailInput.value = user.email;
+      emailInput.disabled = true;
       roleInput.value = user.role;
       statusInput.value = user.status;
+      if (passwordField) passwordField.style.display = 'none';
     } else {
       userModalTitle.textContent = 'Nuevo usuario';
       userModalSub.textContent = 'Completa los datos para crear la cuenta.';
       userIdInput.value = '';
+      emailInput.disabled = false;
       roleInput.value = 'Estudiante';
       statusInput.value = 'Activo';
+      if (passwordField) passwordField.style.display = 'flex';
     }
     userOverlay.classList.add('open');
     nameInput.focus();
@@ -710,19 +728,25 @@
   userOverlay.addEventListener('click', (e) => { if(e.target === userOverlay) closeUserModal(); });
 
   function setFieldError(fieldId, errorId, message){
-    document.getElementById(fieldId).classList.add('invalid');
+    const field = document.getElementById(fieldId);
+    if (field) field.classList.add('invalid');
     const el = document.getElementById(errorId);
-    el.textContent = message;
-    el.classList.add('show');
+    if (el) {
+      el.textContent = message;
+      el.classList.add('show');
+    }
   }
   function clearFieldError(fieldId, errorId){
-    document.getElementById(fieldId).classList.remove('invalid');
+    const field = document.getElementById(fieldId);
+    if (field) field.classList.remove('invalid');
     const el = document.getElementById(errorId);
-    el.textContent = '';
-    el.classList.remove('show');
+    if (el) {
+      el.textContent = '';
+      el.classList.remove('show');
+    }
   }
 
-  userForm.addEventListener('submit', (e) => {
+  userForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     let valid = true;
 
@@ -733,43 +757,88 @@
       clearFieldError('field-name', 'error-name');
     }
 
-    if(emailInput.value.trim() === '' || !emailInput.value.includes('@')){
-      setFieldError('field-email', 'error-email', 'Escribe un correo electrónico válido, con el símbolo @.');
-      valid = false;
-    } else {
-      const duplicate = users.find(u => u.email.toLowerCase() === emailInput.value.trim().toLowerCase() && String(u.id) !== userIdInput.value);
-      if(duplicate){
-        setFieldError('field-email', 'error-email', 'Ya existe un usuario registrado con este correo.');
+    if (!userIdInput.value) {
+      if(emailInput.value.trim() === '' || !emailInput.value.includes('@')){
+        setFieldError('field-email', 'error-email', 'Escribe un correo electrónico válido, con el símbolo @.');
         valid = false;
       } else {
-        clearFieldError('field-email', 'error-email');
+        const duplicate = users.find(u => u.email.toLowerCase() === emailInput.value.trim().toLowerCase());
+        if(duplicate){
+          setFieldError('field-email', 'error-email', 'Ya existe un usuario registrado con este correo.');
+          valid = false;
+        } else {
+          clearFieldError('field-email', 'error-email');
+        }
+      }
+
+      if(!passwordInput.value || passwordInput.value.length < 6){
+        setFieldError('field-password', 'error-password', 'La contraseña debe tener al menos 6 caracteres.');
+        valid = false;
+      } else {
+        clearFieldError('field-password', 'error-password');
       }
     }
 
     if(!valid) return;
 
-    if(userIdInput.value){
-      const id = Number(userIdInput.value);
-      const u = users.find(x => x.id === id);
-      u.name = nameInput.value.trim();
-      u.email = emailInput.value.trim();
-      u.role = roleInput.value;
-      u.status = statusInput.value;
-      setStatus(`Usuario "${u.name}" actualizado correctamente.`, 'ok');
-    } else {
-      users.push({
-        id: nextId++,
-        name: nameInput.value.trim(),
-        email: emailInput.value.trim(),
-        role: roleInput.value,
-        status: statusInput.value,
-        lastActivity: 'Sin actividad aún'
-      });
-      setStatus(`Usuario "${nameInput.value.trim()}" creado correctamente.`, 'ok');
-    }
+    const rawName = nameInput.value.trim();
+    const parts = rawName.split(/\s+/);
+    const nombres = parts.length > 1 ? parts.slice(0, -1).join(' ') : parts[0];
+    const apellidos = parts.length > 1 ? parts.slice(-1).join(' ') : parts[0];
+    const rol = roleInput.value;
+    const isActive = statusInput.value === 'Activo';
 
-    closeUserModal();
-    render();
+    if(userIdInput.value){
+      try {
+        setStatus('Actualizando datos de usuario...', '');
+        const res = await ApiClient.request(`/users/${userIdInput.value}`, {
+          method: 'PUT',
+          body: {
+            nombres,
+            apellidos,
+            isActive,
+            roles: [rol]
+          }
+        });
+        if(res.ok && res.data && res.data.success){
+          setStatus(`Usuario "${rawName}" actualizado correctamente.`, 'ok');
+          closeUserModal();
+          await loadUsersFromBackend();
+        } else {
+          const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al actualizar usuario.';
+          setStatus(msg, 'error');
+        }
+      } catch(err){
+        console.error('Error al actualizar usuario:', err);
+        setStatus('Error de conexión al actualizar usuario.', 'error');
+      }
+    } else {
+      try {
+        setStatus('Creando usuario en la base de datos...', '');
+        const res = await ApiClient.request('/auth/register', {
+          method: 'POST',
+          body: {
+            nombres,
+            apellidos,
+            email: emailInput.value.trim(),
+            password: passwordInput.value,
+            rol
+          }
+        });
+        if(res.ok && res.data && res.data.success){
+          setStatus(`Usuario "${rawName}" creado exitosamente.`, 'ok');
+          closeUserModal();
+          await loadUsersFromBackend();
+        } else {
+          const errMsg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al registrar el usuario.';
+          setFieldError('field-email', 'error-email', errMsg);
+          setStatus(errMsg, 'error');
+        }
+      } catch(err){
+        console.error('Error al registrar usuario:', err);
+        setStatus('Error de conexión al registrar usuario.', 'error');
+      }
+    }
   });
 
   // ---------- Modal eliminar usuario ----------
@@ -790,23 +859,71 @@
   document.getElementById('btn-cancel-delete').addEventListener('click', closeDeleteModal);
   deleteOverlay.addEventListener('click', (e) => { if(e.target === deleteOverlay) closeDeleteModal(); });
 
-  document.getElementById('btn-confirm-delete').addEventListener('click', () => {
-    const u = users.find(x => x.id === pendingDeleteId);
-    users = users.filter(x => x.id !== pendingDeleteId);
-    closeDeleteModal();
-    render();
-    if(u) setStatus(`Usuario "${u.name}" eliminado.`, 'error');
+  document.getElementById('btn-confirm-delete').addEventListener('click', async () => {
+    const confirmBtn = document.getElementById('btn-confirm-delete');
+    confirmBtn.disabled = true;
+    setStatus('Eliminando usuario...', '');
+
+    try {
+      const res = await ApiClient.request(`/users/${pendingDeleteId}`, {
+        method: 'DELETE'
+      });
+      confirmBtn.disabled = false;
+
+      if(res.ok && res.data && res.data.success){
+        setStatus('Usuario eliminado exitosamente.', 'ok');
+        closeDeleteModal();
+        await loadUsersFromBackend();
+      } else {
+        const errMsg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al eliminar usuario.';
+        setStatus(errMsg, 'error');
+        closeDeleteModal();
+      }
+    } catch(err){
+      confirmBtn.disabled = false;
+      console.error('Error al eliminar usuario:', err);
+      setStatus('Error de conexión al eliminar usuario.', 'error');
+      closeDeleteModal();
+    }
   });
 
   tableBody.addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-action]');
     if(!btn) return;
-    const id = Number(btn.dataset.id);
-    const user = users.find(u => u.id === id);
+    const id = btn.dataset.id;
+    const user = users.find(u => String(u.id) === String(id));
     if(!user) return;
     if(btn.dataset.action === 'edit') openUserModal(user);
     if(btn.dataset.action === 'delete') openDeleteModal(user);
   });
+
+  async function loadUsersFromBackend() {
+    try {
+      const res = await ApiClient.request('/users');
+      if (res.ok && res.data && res.data.success) {
+        users = res.data.data.map(u => {
+          let activityStr = 'Sin actividad aún';
+          if (u.ultimaActividadAt) {
+            const actDate = new Date(u.ultimaActividadAt);
+            activityStr = actDate.toLocaleDateString('es-CO') + ' ' + actDate.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+          } else if (u.createdAt) {
+            activityStr = new Date(u.createdAt).toLocaleDateString('es-CO');
+          }
+          return {
+            id: u.id,
+            name: u.nombreCompleto || `${u.nombres} ${u.apellidos}`.trim(),
+            email: u.email,
+            role: (u.roles && u.roles.length > 0) ? u.roles[0] : 'Sin rol',
+            status: u.isActive ? 'Activo' : 'Inactivo',
+            lastActivity: activityStr
+          };
+        });
+      }
+    } catch (err) {
+      console.warn('Error al cargar usuarios de la API:', err);
+    }
+    render();
+  }
 
   // =====================================================================
   // CATEGORÍAS DE APRENDIZAJE
@@ -1160,61 +1277,76 @@
   document.getElementById('btn-cancel-modulo').addEventListener('click', closeModuloModal);
   moduloOverlay.addEventListener('click', (e) => { if(e.target === moduloOverlay) closeModuloModal(); });
 
-  moduloForm.addEventListener('submit', (e) => {
+  moduloForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     let valid = true;
 
     const nombre = moduloNombreInput.value.trim();
-    const categoriaId = Number(moduloCategoriaInput.value);
+    const categoriaId = Number(moduloCategoriaInput.value) || 1;
 
     if(nombre === ''){
       setFieldError('field-modulo-nombre', 'error-modulo-nombre', 'El nombre del módulo es obligatorio.');
       valid = false;
     } else {
-      const duplicate = modulos.find(m => m.categoriaId === categoriaId && m.nombre.toLowerCase() === nombre.toLowerCase() && String(m.id) !== moduloIdInput.value);
-      if(duplicate){
-        setFieldError('field-modulo-nombre', 'error-modulo-nombre', 'Ya existe un módulo con este nombre en la misma categoría.');
-        valid = false;
-      } else {
-        clearFieldError('field-modulo-nombre', 'error-modulo-nombre');
-      }
-    }
-
-    if(!categoriaId){
-      setFieldError('field-modulo-categoria', 'error-modulo-categoria', 'Selecciona una categoría.');
-      valid = false;
-    } else {
-      clearFieldError('field-modulo-categoria', 'error-modulo-categoria');
+      clearFieldError('field-modulo-nombre', 'error-modulo-nombre');
     }
 
     if(!valid) return;
 
-    const orden = Number(moduloOrdenInput.value) || (moduloCount(categoriaId) + 1);
+    const orden = Number(moduloOrdenInput.value) || 1;
+    const descripcion = moduloDescripcionInput.value.trim() || 'Módulo de aprendizaje';
+    const isActive = moduloStatusInput.value === 'Activo';
 
     if(moduloIdInput.value){
-      const id = Number(moduloIdInput.value);
-      const m = modulos.find(x => x.id === id);
-      m.nombre = nombre;
-      m.categoriaId = categoriaId;
-      m.descripcion = moduloDescripcionInput.value.trim();
-      m.orden = orden;
-      m.estado = moduloStatusInput.value;
-      setStatus(`Módulo "${m.nombre}" actualizado correctamente.`, 'ok');
+      try {
+        setStatus('Actualizando módulo temático en la base de datos...', '');
+        const res = await ApiClient.request(`/modules/${moduloIdInput.value}`, {
+          method: 'PUT',
+          body: {
+            titulo: nombre,
+            descripcion: descripcion,
+            icono: 'modulo',
+            orden: orden,
+            isActive: isActive
+          }
+        });
+        if(res.ok && res.data && res.data.success){
+          setStatus(`Módulo "${nombre}" actualizado correctamente.`, 'ok');
+          closeModuloModal();
+          await loadModulesFromBackend();
+        } else {
+          const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al actualizar módulo.';
+          setStatus(msg, 'error');
+        }
+      } catch(err){
+        console.error('Error al actualizar módulo:', err);
+        setStatus('Error de conexión con el servidor al actualizar módulo.', 'error');
+      }
     } else {
-      modulos.push({
-        id: nextModuloId++,
-        categoriaId,
-        nombre,
-        descripcion: moduloDescripcionInput.value.trim(),
-        orden,
-        estado: moduloStatusInput.value
-      });
-      setStatus(`Módulo "${nombre}" creado correctamente.`, 'ok');
+      try {
+        setStatus('Creando módulo temático en la base de datos...', '');
+        const res = await ApiClient.request('/modules', {
+          method: 'POST',
+          body: {
+            titulo: nombre,
+            descripcion: descripcion,
+            icono: 'modulo',
+            orden: orden
+          }
+        });
+        if(res.ok && res.data && res.data.success){
+          setStatus(`Módulo "${nombre}" creado correctamente.`, 'ok');
+          closeModuloModal();
+          await loadModulesFromBackend();
+        } else {
+          const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al crear módulo.';
+          setStatus(msg, 'error');
+        }
+      } catch(err){
+        console.error('Error al crear módulo:', err);
+        setStatus('Error de conexión con el servidor al crear módulo.', 'error');
+      }
     }
-
-    closeModuloModal();
-    renderModulos();
-    renderCategorias();
   });
 
   // ---------------- Modal eliminar módulo ----------------
@@ -1249,25 +1381,59 @@
   document.getElementById('btn-cancel-delete-modulo').addEventListener('click', closeModuloDeleteModal);
   moduloDeleteOverlay.addEventListener('click', (e) => { if(e.target === moduloDeleteOverlay) closeModuloDeleteModal(); });
 
-  btnConfirmDeleteModulo.addEventListener('click', () => {
-    if(pendingDeleteModuloId == null || actividadCount(pendingDeleteModuloId) > 0) return;
-    const m = modulos.find(x => x.id === pendingDeleteModuloId);
-    modulos = modulos.filter(x => x.id !== pendingDeleteModuloId);
-    closeModuloDeleteModal();
-    renderModulos();
-    renderCategorias();
-    if(m) setStatus(`Módulo "${m.nombre}" eliminado.`, 'error');
+  btnConfirmDeleteModulo.addEventListener('click', async () => {
+    if(!pendingDeleteModuloId) return;
+    try {
+      setStatus('Eliminando módulo temático...', '');
+      const res = await ApiClient.request(`/modules/${pendingDeleteModuloId}`, {
+        method: 'DELETE'
+      });
+      if(res.ok && res.data && res.data.success){
+        setStatus('Módulo temático eliminado correctamente.', 'error');
+        closeModuloDeleteModal();
+        await loadModulesFromBackend();
+      } else {
+        const msg = (res.data && res.data.message) || 'Error al eliminar módulo.';
+        setStatus(msg, 'error');
+        closeModuloDeleteModal();
+      }
+    } catch(err){
+      console.error('Error al eliminar módulo:', err);
+      setStatus('Error de conexión al eliminar módulo.', 'error');
+      closeModuloDeleteModal();
+    }
   });
 
   tableBodyModulos.addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-action]');
     if(!btn) return;
-    const id = Number(btn.dataset.id);
-    const modulo = modulos.find(x => x.id === id);
+    const id = btn.dataset.id;
+    const modulo = modulos.find(x => String(x.id) === String(id));
     if(!modulo) return;
     if(btn.dataset.action === 'edit') openModuloModal(modulo);
     if(btn.dataset.action === 'delete') openModuloDeleteModal(modulo);
   });
+
+  async function loadModulesFromBackend(){
+    try {
+      const res = await ApiClient.request('/modules?onlyActive=false');
+      if(res.ok && res.data && res.data.success){
+        modulos = res.data.data.map((m, idx) => ({
+          id: m.id,
+          categoriaId: 1,
+          nombre: m.titulo,
+          descripcion: m.descripcion,
+          orden: m.orden || (idx + 1),
+          estado: m.isActive ? 'Activo' : 'Inactivo',
+          actividadesCount: m.totalActividades || 0
+        }));
+      }
+    } catch(err){
+      console.warn('Error al cargar módulos desde el backend:', err);
+    }
+    renderModulos();
+    renderCategorias();
+  }
 
   // ---------- Cerrar modales con Escape ----------
   document.addEventListener('keydown', (e) => {
@@ -1281,11 +1447,13 @@
     }
   });
 
-  // ---------- Primer render ----------
+  // ---------- Primer render e inicialización con backend ----------
   render();
   refreshCategoriaSelects();
   renderCategorias();
   renderModulos();
+  loadUsersFromBackend();
+  loadModulesFromBackend();
 </script>
 </body>
 </html>

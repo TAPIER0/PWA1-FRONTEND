@@ -15,7 +15,7 @@ const MIME = {
 
 const server = http.createServer((req, res) => {
   let file = decodeURIComponent(req.url.split('?')[0]);
-  if (file === '/' || file === '') file = '/login.html';
+  if (file === '/' || file === '') file = '/Interfaz_General.html';
   const filePath = path.join(__dirname, file);
 
   fs.readFile(filePath, (err, data) => {
@@ -34,5 +34,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Frontend escuchando en http://127.0.0.1:${PORT}/login.html`);
+  console.log(`Frontend escuchando en http://127.0.0.1:${PORT}/ (Interfaz_General.html)`);
 });

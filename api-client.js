@@ -33,7 +33,7 @@ const ApiClient = {
 
   logout() {
     this.clearSession();
-    window.location.href = 'login.html';
+    window.location.href = 'login_Rework.html';
   },
 
   requireAuth(allowedRoles = []) {
@@ -41,7 +41,7 @@ const ApiClient = {
     const user = this.getUser();
 
     if (!token || !user) {
-      window.location.href = 'login.html';
+      window.location.href = 'login_Rework.html';
       return false;
     }
 
@@ -64,10 +64,12 @@ const ApiClient = {
       window.location.href = 'Interfaz_Estudiante.html';
     } else if (roles.includes('Acudiente')) {
       window.location.href = 'Interfaz_Acudiente.html';
+    } else if (roles.includes('Docente') || roles.includes('Profesor')) {
+      window.location.href = 'Interfaz_Docente.html';
     } else if (roles.includes('Administrador')) {
-      window.location.href = 'Interfaz_Admin.html';
+      window.location.href = 'Interfaz_Admin2.html';
     } else {
-      window.location.href = 'login.html';
+      window.location.href = 'login_Rework.html';
     }
   },
 
@@ -98,7 +100,7 @@ const ApiClient = {
 
       if (response.status === 401) {
         this.clearSession();
-        window.location.href = 'login.html';
+        window.location.href = 'login_Rework.html';
         throw new Error('Sesión expirada o no autorizada.');
       }
 
