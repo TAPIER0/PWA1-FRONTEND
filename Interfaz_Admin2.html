@@ -185,7 +185,18 @@
     border:1px solid var(--warn-border); border-radius:8px; padding:8px 10px;
   }
   .field-error.show{ display:block; }
-  .field.invalid input, .field.invalid select, .field.invalid textarea{ border-color: var(--warn-border); }
+  .password-row{ position: relative; display:flex; align-items:center; width:100%; }
+  .password-row input{ padding-right: 80px !important; }
+  .toggle-visibility{
+    position:absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    background: var(--surface); border: 1.5px solid var(--border);
+    font-family: inherit; font-size: 12.5px;
+    font-weight: 700; color: var(--primary);
+    padding: 6px 11px; cursor: pointer; border-radius: 6px;
+  }
+  .toggle-visibility:hover{ background: var(--bg); }
+  .toggle-visibility:focus{ outline: 3px solid var(--focus); outline-offset: 1px; }
+
   .modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:6px; }
 
   .confirm-modal p{ font-size:14.5px; color:var(--text-muted); }
@@ -259,7 +270,7 @@
           <select id="filter-role">
             <option value="">Todos</option>
             <option value="Administrador">Administrador</option>
-            <option value="Profesor">Profesor</option>
+            <option value="Docente">Docente</option>
             <option value="Acudiente">Acudiente</option>
             <option value="Estudiante">Estudiante</option>
           </select>
@@ -423,7 +434,10 @@
 
       <div class="field" id="field-password">
         <label for="user-password">Contraseña temporal</label>
-        <input type="password" id="user-password" autocomplete="new-password">
+        <div class="password-row">
+          <input type="password" id="user-password" autocomplete="new-password">
+          <button type="button" class="toggle-visibility" id="toggle-user-pw">Mostrar</button>
+        </div>
         <div class="field-error" id="error-password" role="alert"></div>
       </div>
 
@@ -713,7 +727,12 @@
       emailInput.disabled = false;
       roleInput.value = 'Estudiante';
       statusInput.value = 'Activo';
-      if (passwordField) passwordField.style.display = 'flex';
+      if (passwordField) {
+        passwordField.style.display = 'flex';
+        passwordInput.type = 'password';
+        const toggleBtn = document.getElementById('toggle-user-pw');
+        if (toggleBtn) toggleBtn.textContent = 'Mostrar';
+      }
     }
     userOverlay.classList.add('open');
     nameInput.focus();
@@ -726,6 +745,15 @@
   document.getElementById('btn-new-user').addEventListener('click', () => openUserModal(null));
   document.getElementById('btn-cancel-user').addEventListener('click', closeUserModal);
   userOverlay.addEventListener('click', (e) => { if(e.target === userOverlay) closeUserModal(); });
+
+  const toggleUserPw = document.getElementById('toggle-user-pw');
+  if (toggleUserPw) {
+    toggleUserPw.addEventListener('click', () => {
+      const isPassword = passwordInput.type === 'password';
+      passwordInput.type = isPassword ? 'text' : 'password';
+      toggleUserPw.textContent = isPassword ? 'Ocultar' : 'Mostrar';
+    });
+  }
 
   function setFieldError(fieldId, errorId, message){
     const field = document.getElementById(fieldId);
@@ -926,33 +954,43 @@
   }
 
   // =====================================================================
-  // CATEGORÍAS DE APRENDIZAJE
+  // CATEGORÍAS DE APRENDIZAJE (Persistidas en SQL Server LocalDB)
   // =====================================================================
-  let categorias = [
-    { id: 1, nombre: 'Comunicación', descripcion: 'Habilidades para expresar necesidades, ideas y opiniones.', color: '#2F6E5C', orden: 1, estado: 'Activo' },
-    { id: 2, nombre: 'Rutinas diarias', descripcion: 'Actividades de la vida cotidiana: higiene, orden, tiempo.', color: '#9C7A4C', orden: 2, estado: 'Activo' },
-    { id: 3, nombre: 'Habilidades sociales', descripcion: 'Interacción con pares y adultos, turnos, juego compartido.', color: '#3B6D11', orden: 3, estado: 'Inactivo' },
-  ];
-  let nextCategoriaId = 4;
+  let categorias = [];
 
   // =====================================================================
-  // MÓDULOS TEMÁTICOS
+  // MÓDULOS TEMÁTICOS (Persistidos en SQL Server LocalDB)
   // =====================================================================
-  let modulos = [
-    { id: 1, categoriaId: 1, nombre: 'Saludos', descripcion: 'Reconocer y responder saludos en distintos contextos.', orden: 1, estado: 'Activo' },
-    { id: 2, categoriaId: 1, nombre: 'Pedir ayuda', descripcion: 'Solicitar apoyo a un adulto cuando se necesita.', orden: 2, estado: 'Activo' },
-    { id: 3, categoriaId: 2, nombre: 'Higiene personal', descripcion: 'Lavado de manos, cepillado de dientes, orden del espacio.', orden: 1, estado: 'Activo' },
-    { id: 4, categoriaId: 3, nombre: 'Turnos de juego', descripcion: 'Esperar y respetar turnos en actividades grupales.', orden: 1, estado: 'Inactivo' },
-  ];
-  let nextModuloId = 5;
+  let modulos = [];
 
   // Mock de actividades ya creadas por el rol Profesor, solo para representar
   // la relación módulo → actividad mientras ese módulo del sistema se conecta al backend real.
-  const actividadesPorModulo = { 1: 3, 2: 1, 3: 2, 4: 0 };
+  const actividadesPorModulo = {};
 
-  function categoriaById(id){ return categorias.find(c => c.id === id); }
-  function moduloCount(categoriaId){ return modulos.filter(m => m.categoriaId === categoriaId).length; }
+  function categoriaById(id){ return categorias.find(c => String(c.id) === String(id)); }
+  function moduloCount(categoriaId){ return modulos.filter(m => String(m.categoriaId) === String(categoriaId)).length; }
   function actividadCount(moduloId){ return actividadesPorModulo[moduloId] || 0; }
+
+  async function loadCategoriasFromBackend(){
+    try {
+      const res = await ApiClient.request('/categories?onlyActive=false');
+      if(res.ok && res.data && res.data.success){
+        categorias = res.data.data.map(c => ({
+          id: c.id,
+          nombre: c.nombre,
+          descripcion: c.descripcion || '',
+          color: c.color || '#2F6E5C',
+          orden: c.orden,
+          estado: c.isActive ? 'Activo' : 'Inactivo',
+          totalModulos: c.totalModulos ?? 0
+        }));
+      }
+    } catch(err){
+      console.warn('Error al cargar categorías desde la API:', err);
+    }
+    refreshCategoriaSelects();
+    renderCategorias();
+  }
 
   // Mantiene sincronizados los <select> de categoría que dependen de la lista de categorías
   function refreshCategoriaSelects(){
@@ -962,12 +1000,16 @@
     const currentFilter = filterSelect.value;
     filterSelect.innerHTML = '<option value="">Todas</option>' +
       ordered.map(c => `<option value="${c.id}">${escapeHtml(c.nombre)}${c.estado === 'Inactivo' ? ' (inactiva)' : ''}</option>`).join('');
-    filterSelect.value = ordered.some(c => String(c.id) === currentFilter) ? currentFilter : '';
+    filterSelect.value = ordered.some(c => String(c.id) === String(currentFilter)) ? currentFilter : '';
 
     const formSelect = document.getElementById('modulo-categoria');
     const currentForm = formSelect.value;
     formSelect.innerHTML = ordered.map(c => `<option value="${c.id}">${escapeHtml(c.nombre)}${c.estado === 'Inactivo' ? ' (inactiva)' : ''}</option>`).join('');
-    if(ordered.some(c => String(c.id) === currentForm)) formSelect.value = currentForm;
+    if(ordered.some(c => String(c.id) === String(currentForm))) {
+      formSelect.value = currentForm;
+    } else if(ordered.length > 0) {
+      formSelect.value = ordered[0].id;
+    }
   }
 
   // ---------------- Render tabla de categorías ----------------
@@ -995,7 +1037,7 @@
     resultCountCategorias.textContent = list.length + (list.length === 1 ? ' categoría encontrada' : ' categorías encontradas');
 
     list.forEach(c => {
-      const count = moduloCount(c.id);
+      const count = moduloCount(c.id) || c.totalModulos || 0;
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>
@@ -1065,7 +1107,7 @@
   document.getElementById('btn-cancel-categoria').addEventListener('click', closeCategoriaModal);
   categoriaOverlay.addEventListener('click', (e) => { if(e.target === categoriaOverlay) closeCategoriaModal(); });
 
-  categoriaForm.addEventListener('submit', (e) => {
+  categoriaForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     let valid = true;
 
@@ -1074,7 +1116,7 @@
       setFieldError('field-categoria-nombre', 'error-categoria-nombre', 'El nombre de la categoría es obligatorio.');
       valid = false;
     } else {
-      const duplicate = categorias.find(c => c.nombre.toLowerCase() === nombre.toLowerCase() && String(c.id) !== categoriaIdInput.value);
+      const duplicate = categorias.find(c => c.nombre.toLowerCase() === nombre.toLowerCase() && String(c.id) !== String(categoriaIdInput.value));
       if(duplicate){
         setFieldError('field-categoria-nombre', 'error-categoria-nombre', 'Ya existe una categoría con este nombre.');
         valid = false;
@@ -1086,32 +1128,65 @@
     if(!valid) return;
 
     const orden = Number(categoriaOrdenInput.value) || (categorias.length + 1);
+    const descripcion = categoriaDescripcionInput.value.trim();
+    const color = categoriaColorInput.value || '#2F6E5C';
+    const isActive = categoriaStatusInput.value === 'Activo';
 
     if(categoriaIdInput.value){
-      const id = Number(categoriaIdInput.value);
-      const c = categoriaById(id);
-      c.nombre = nombre;
-      c.descripcion = categoriaDescripcionInput.value.trim();
-      c.color = categoriaColorInput.value;
-      c.orden = orden;
-      c.estado = categoriaStatusInput.value;
-      setStatus(`Categoría "${c.nombre}" actualizada correctamente.`, 'ok');
+      try {
+        setStatus('Actualizando categoría en la base de datos SQL Server...', '');
+        const res = await ApiClient.request(`/categories/${categoriaIdInput.value}`, {
+          method: 'PUT',
+          body: {
+            nombre,
+            descripcion,
+            color,
+            orden,
+            isActive
+          }
+        });
+        if(res.ok && res.data && res.data.success){
+          setStatus(`Categoría "${nombre}" actualizada correctamente en la base de datos.`, 'ok');
+          closeCategoriaModal();
+          await loadCategoriasFromBackend();
+          await loadModulesFromBackend();
+        } else {
+          const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al actualizar categoría.';
+          setFieldError('field-categoria-nombre', 'error-categoria-nombre', msg);
+          setStatus(msg, 'error');
+        }
+      } catch(err){
+        console.error('Error al actualizar categoría:', err);
+        setStatus('Error de conexión al actualizar categoría.', 'error');
+      }
     } else {
-      categorias.push({
-        id: nextCategoriaId++,
-        nombre,
-        descripcion: categoriaDescripcionInput.value.trim(),
-        color: categoriaColorInput.value,
-        orden,
-        estado: categoriaStatusInput.value
-      });
-      setStatus(`Categoría "${nombre}" creada correctamente.`, 'ok');
+      try {
+        setStatus('Guardando categoría en la base de datos SQL Server...', '');
+        const res = await ApiClient.request('/categories', {
+          method: 'POST',
+          body: {
+            nombre,
+            descripcion,
+            color,
+            orden,
+            isActive
+          }
+        });
+        if(res.ok && res.data && res.data.success){
+          setStatus(`Categoría "${nombre}" creada correctamente en la base de datos.`, 'ok');
+          closeCategoriaModal();
+          await loadCategoriasFromBackend();
+          await loadModulesFromBackend();
+        } else {
+          const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al crear categoría.';
+          setFieldError('field-categoria-nombre', 'error-categoria-nombre', msg);
+          setStatus(msg, 'error');
+        }
+      } catch(err){
+        console.error('Error al crear categoría:', err);
+        setStatus('Error de conexión al crear categoría.', 'error');
+      }
     }
-
-    closeCategoriaModal();
-    refreshCategoriaSelects();
-    renderCategorias();
-    renderModulos();
   });
 
   // ---------------- Modal eliminar categoría ----------------
@@ -1146,21 +1221,44 @@
   document.getElementById('btn-cancel-delete-categoria').addEventListener('click', closeCategoriaDeleteModal);
   categoriaDeleteOverlay.addEventListener('click', (e) => { if(e.target === categoriaDeleteOverlay) closeCategoriaDeleteModal(); });
 
-  btnConfirmDeleteCategoria.addEventListener('click', () => {
-    if(pendingDeleteCategoriaId == null || moduloCount(pendingDeleteCategoriaId) > 0) return;
+  btnConfirmDeleteCategoria.addEventListener('click', async () => {
+    if(!pendingDeleteCategoriaId) return;
+    const count = moduloCount(pendingDeleteCategoriaId);
+    if(count > 0) return;
+
     const c = categoriaById(pendingDeleteCategoriaId);
-    categorias = categorias.filter(x => x.id !== pendingDeleteCategoriaId);
-    closeCategoriaDeleteModal();
-    refreshCategoriaSelects();
-    renderCategorias();
-    renderModulos();
-    if(c) setStatus(`Categoría "${c.nombre}" eliminada.`, 'error');
+    const catName = c ? c.nombre : '';
+
+    try {
+      btnConfirmDeleteCategoria.disabled = true;
+      setStatus('Eliminando categoría de la base de datos SQL Server...', '');
+      const res = await ApiClient.request(`/categories/${pendingDeleteCategoriaId}`, {
+        method: 'DELETE'
+      });
+      btnConfirmDeleteCategoria.disabled = false;
+
+      if(res.ok && res.data && res.data.success){
+        setStatus(`Categoría "${catName}" eliminada permanentemente de la base de datos.`, 'ok');
+        closeCategoriaDeleteModal();
+        await loadCategoriasFromBackend();
+        await loadModulesFromBackend();
+      } else {
+        const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al eliminar categoría.';
+        setStatus(msg, 'error');
+        closeCategoriaDeleteModal();
+      }
+    } catch(err){
+      btnConfirmDeleteCategoria.disabled = false;
+      console.error('Error al eliminar categoría:', err);
+      setStatus('Error de conexión al eliminar la categoría.', 'error');
+      closeCategoriaDeleteModal();
+    }
   });
 
   tableBodyCategorias.addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-action]');
     if(!btn) return;
-    const id = Number(btn.dataset.id);
+    const id = btn.dataset.id;
     const categoria = categoriaById(id);
     if(!categoria) return;
     if(btn.dataset.action === 'edit') openCategoriaModal(categoria);
@@ -1256,7 +1354,7 @@
       moduloModalSub.textContent = 'Actualiza los datos del módulo.';
       moduloIdInput.value = modulo.id;
       moduloNombreInput.value = modulo.nombre;
-      moduloCategoriaInput.value = modulo.categoriaId;
+      moduloCategoriaInput.value = modulo.categoriaId || (categorias.length > 0 ? categorias[0].id : '');
       moduloDescripcionInput.value = modulo.descripcion || '';
       moduloOrdenInput.value = modulo.orden;
       moduloStatusInput.value = modulo.estado;
@@ -1264,8 +1362,12 @@
       moduloModalTitle.textContent = 'Nuevo módulo temático';
       moduloModalSub.textContent = 'Completa los datos para crear el módulo.';
       moduloIdInput.value = '';
-      if(filterCategoriaModulos.value) moduloCategoriaInput.value = filterCategoriaModulos.value;
-      moduloOrdenInput.value = moduloCount(Number(moduloCategoriaInput.value)) + 1;
+      if(filterCategoriaModulos.value) {
+        moduloCategoriaInput.value = filterCategoriaModulos.value;
+      } else if(categorias.length > 0) {
+        moduloCategoriaInput.value = categorias[0].id;
+      }
+      moduloOrdenInput.value = moduloCount(moduloCategoriaInput.value) + 1;
       moduloStatusInput.value = 'Activo';
     }
     moduloOverlay.classList.add('open');
@@ -1282,7 +1384,7 @@
     let valid = true;
 
     const nombre = moduloNombreInput.value.trim();
-    const categoriaId = Number(moduloCategoriaInput.value) || 1;
+    const categoriaId = moduloCategoriaInput.value || null;
 
     if(nombre === ''){
       setFieldError('field-modulo-nombre', 'error-modulo-nombre', 'El nombre del módulo es obligatorio.');
@@ -1307,6 +1409,7 @@
             descripcion: descripcion,
             icono: 'modulo',
             orden: orden,
+            categoriaId: categoriaId,
             isActive: isActive
           }
         });
@@ -1314,6 +1417,7 @@
           setStatus(`Módulo "${nombre}" actualizado correctamente.`, 'ok');
           closeModuloModal();
           await loadModulesFromBackend();
+          await loadCategoriasFromBackend();
         } else {
           const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al actualizar módulo.';
           setStatus(msg, 'error');
@@ -1331,13 +1435,15 @@
             titulo: nombre,
             descripcion: descripcion,
             icono: 'modulo',
-            orden: orden
+            orden: orden,
+            categoriaId: categoriaId
           }
         });
         if(res.ok && res.data && res.data.success){
           setStatus(`Módulo "${nombre}" creado correctamente.`, 'ok');
           closeModuloModal();
           await loadModulesFromBackend();
+          await loadCategoriasFromBackend();
         } else {
           const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al crear módulo.';
           setStatus(msg, 'error');
@@ -1420,7 +1526,7 @@
       if(res.ok && res.data && res.data.success){
         modulos = res.data.data.map((m, idx) => ({
           id: m.id,
-          categoriaId: 1,
+          categoriaId: m.categoriaId || '',
           nombre: m.titulo,
           descripcion: m.descripcion,
           orden: m.orden || (idx + 1),
@@ -1453,7 +1559,7 @@
   renderCategorias();
   renderModulos();
   loadUsersFromBackend();
-  loadModulesFromBackend();
+  loadCategoriasFromBackend().then(() => loadModulesFromBackend());
 </script>
 </body>
 </html>
