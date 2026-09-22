@@ -460,7 +460,10 @@
 
   function studentNames(ids){
     if(!ids || ids.length === 0) return 'Sin asignar';
-    return ids.map(id => students.find(s => String(s.id) === String(id))?.name).filter(Boolean).join(', ') || 'Sin asignar';
+    const uniqueIds = [...new Set(ids.map(String))];
+    const names = uniqueIds.map(id => students.find(s => String(s.id) === id)?.name).filter(Boolean);
+    const uniqueNames = [...new Set(names)];
+    return uniqueNames.join(', ') || 'Sin asignar';
   }
  
   function getFiltered(){
@@ -640,13 +643,13 @@
   function renderAssignGrid(){
     assignGrid.innerHTML = students.map(s => `
       <label class="assign-option">
-        <input type="checkbox" data-student-id="${s.id}" ${currentAssigned.has(s.id) ? 'checked' : ''}>
+        <input type="checkbox" data-student-id="${escapeHtml(s.id)}" ${currentAssigned.has(String(s.id)) ? 'checked' : ''}>
         ${escapeHtml(s.name)}
       </label>
     `).join('');
     assignGrid.querySelectorAll('input[type="checkbox"]').forEach(cb => {
       cb.addEventListener('change', () => {
-        const id = Number(cb.dataset.studentId);
+        const id = cb.dataset.studentId;
         if(cb.checked) currentAssigned.add(id); else currentAssigned.delete(id);
       });
     });
@@ -725,7 +728,7 @@
       currentType = activity.type;
       currentSteps = activity.type === 'secuencia' ? JSON.parse(JSON.stringify(activity.content.steps || [])) : [];
       currentPairs = activity.type === 'emparejamiento' ? JSON.parse(JSON.stringify(activity.content.pairs || [])) : [];
-      currentAssigned = new Set(activity.assignedStudentIds || []);
+      currentAssigned = new Set((activity.assignedStudentIds || []).map(String));
     } else {
       modalTitle.textContent = 'Nueva actividad';
       idInput.value = '';
@@ -819,9 +822,12 @@
         });
         if(res.ok && res.data && res.data.success){
           const actId = idInput.value;
+          const currentActAssignments = assignments.filter(a => String(a.activityId) === String(actId));
+          const currentAssignedStudentIds = new Set(currentActAssignments.map(a => String(a.studentProfileId)));
+
+          // Asignar nuevos estudiantes marcados
           for (const studentId of currentAssigned) {
-            const alreadyAssigned = assignments.some(a => (a.activityId === actId || a.activityId === res.data.data.id) && String(a.studentProfileId) === String(studentId));
-            if (!alreadyAssigned) {
+            if (!currentAssignedStudentIds.has(String(studentId))) {
               await ApiClient.request('/assignments', {
                 method: 'POST',
                 body: {
@@ -834,6 +840,16 @@
               });
             }
           }
+
+          // Eliminar asignaciones para estudiantes que fueron desmarcados
+          for (const existingAsg of currentActAssignments) {
+            if (!currentAssigned.has(String(existingAsg.studentProfileId))) {
+              await ApiClient.request(`/assignments/${existingAsg.id}`, {
+                method: 'DELETE'
+              });
+            }
+          }
+
           setStatus(`Actividad "${payload.titulo}" actualizada correctamente.`, 'ok');
           closeModal();
           await loadActivitiesFromBackend();
@@ -859,7 +875,7 @@
           if(currentAssigned.size > 0){
             setStatus('Asignando actividad a estudiantes seleccionados (HU-005)...', '');
             for(const studentId of currentAssigned){
-              await ApiClient.request('/assignments', {
+              const assignRes = await ApiClient.request('/assignments', {
                 method: 'POST',
                 body: {
                   activityId: createdAct.id,
@@ -869,6 +885,9 @@
                   prioridad: 1
                 }
               });
+              if(!assignRes.ok){
+                console.warn('Fallo al asignar estudiante:', studentId, assignRes.data);
+              }
             }
           }
           setStatus(`Actividad "${payload.titulo}" creada y asignada exitosamente.`, 'ok');
@@ -965,6 +984,7 @@
       console.warn('Error al cargar estudiantes:', err);
     }
     renderAssignGrid();
+    render();
   }
 
   async function loadActivitiesFromBackend(){
@@ -990,9 +1010,11 @@
             else if(raw.pares) parsedContent.pairs = raw.pares.map((p, idx) => ({ id: idx + 1, leftLabel: p.emocion || p.elementoA || '', leftIcon: 'circulo', rightLabel: p.pareja || p.elementoB || p.color || '', rightIcon: 'estrella' }));
           } catch(e){}
 
-          const actAssigned = assignments
-            .filter(asg => asg.activityId === a.id)
-            .map(asg => asg.studentProfileId);
+          const actAssigned = [...new Set(
+            assignments
+              .filter(asg => String(asg.activityId) === String(a.id))
+              .map(asg => String(asg.studentProfileId))
+          )];
 
           return {
             id: a.id,
@@ -1025,10 +1047,15 @@
     status.className = 'status-region ' + (kind || '');
   }
 
-  render();
-  loadModulesFromBackend();
-  loadStudentsFromBackend();
-  loadActivitiesFromBackend();
+  async function init(){
+    render();
+    await Promise.all([
+      loadModulesFromBackend(),
+      loadStudentsFromBackend()
+    ]);
+    await loadActivitiesFromBackend();
+  }
+  init();
 </script>
 </body>
 </html>
