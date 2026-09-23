@@ -247,6 +247,10 @@ Si "activities" es un arreglo vacío, el tablero muestra el estado
  
 <script src="api-client.js"></script>
 <script>
+  if (!ApiClient.requireAuth(['Estudiante'])) {
+    throw new Error('Acceso no autorizado');
+  }
+
   /* ========================================================================
    * 1) PREFERENCIAS SENSORIALES — se obtienen del mismo backend que usa el
    *    panel del Acudiente (GET /api/students/:id/sensory-preferences).

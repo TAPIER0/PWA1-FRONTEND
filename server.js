@@ -20,15 +20,36 @@ const server = http.createServer((req, res) => {
 
   fs.readFile(filePath, (err, data) => {
     if (err) {
-      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-      res.end('Archivo no encontrado: ' + file);
+      const errorPagePath = path.join(__dirname, 'error.html');
+      fs.readFile(errorPagePath, (errErr, errorHtml) => {
+        if (!errErr && errorHtml) {
+          res.writeHead(404, {
+            'Content-Type': 'text/html; charset=utf-8',
+            'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'Access-Control-Allow-Origin': '*'
+          });
+          const content = errorHtml.toString().replace('{{RESOURCE_PATH}}', file);
+          res.end(content);
+        } else {
+          res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+          res.end('Archivo no encontrado: ' + file);
+        }
+      });
       return;
     }
     const ext = path.extname(filePath).toLowerCase();
-    res.writeHead(200, {
+    const headers = {
       'Content-Type': MIME[ext] || 'application/octet-stream',
       'Access-Control-Allow-Origin': '*'
-    });
+    };
+    if (ext === '.html') {
+      headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
+      headers['Pragma'] = 'no-cache';
+      headers['Expires'] = '0';
+    }
+    res.writeHead(200, headers);
     res.end(data);
   });
 });

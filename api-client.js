@@ -26,22 +26,37 @@ const ApiClient = {
   },
 
   clearSession() {
-    localStorage.removeItem('tea_token');
-    localStorage.removeItem('tea_refresh_token');
-    localStorage.removeItem('tea_user');
+    try {
+      localStorage.removeItem('tea_token');
+      localStorage.removeItem('tea_refresh_token');
+      localStorage.removeItem('tea_user');
+      sessionStorage.clear();
+    } catch (e) {}
   },
 
   logout() {
     this.clearSession();
-    window.location.href = 'login_Rework.html';
+    window.location.replace('login_Rework.html');
   },
 
   requireAuth(allowedRoles = []) {
+    // Escuchar eventos de restauración de historial (bfcache / Back-Forward Cache)
+    if (!window._teaPageShowListenerAttached) {
+      window._teaPageShowListenerAttached = true;
+      window.addEventListener('pageshow', (event) => {
+        if (event.persisted || !this.getToken() || !this.getUser()) {
+          if (!this.getToken() || !this.getUser()) {
+            window.location.replace('login_Rework.html');
+          }
+        }
+      });
+    }
+
     const token = this.getToken();
     const user = this.getUser();
 
     if (!token || !user) {
-      window.location.href = 'login_Rework.html';
+      window.location.replace('login_Rework.html');
       return false;
     }
 
@@ -49,8 +64,7 @@ const ApiClient = {
       const roles = user.roles || [];
       const hasRole = roles.some(r => allowedRoles.includes(r));
       if (!hasRole) {
-        alert(`No tienes permisos para acceder a esta sección con el rol "${roles.join(', ')}".`);
-        this.redirectToRoleHome(user);
+        window.location.replace('error.html?code=403&roles=' + encodeURIComponent(roles.join(',')));
         return false;
       }
     }
@@ -61,15 +75,15 @@ const ApiClient = {
   redirectToRoleHome(user) {
     const roles = (user && user.roles) ? user.roles : [];
     if (roles.includes('Estudiante')) {
-      window.location.href = 'Interfaz_Estudiante.html';
+      window.location.replace('Interfaz_Estudiante.html');
     } else if (roles.includes('Acudiente')) {
-      window.location.href = 'Interfaz_Acudiente.html';
+      window.location.replace('Interfaz_Acudiente.html');
     } else if (roles.includes('Docente') || roles.includes('Profesor')) {
-      window.location.href = 'Interfaz_Docente.html';
+      window.location.replace('Interfaz_Docente.html');
     } else if (roles.includes('Administrador')) {
-      window.location.href = 'Interfaz_Admin2.html';
+      window.location.replace('Interfaz_Admin2.html');
     } else {
-      window.location.href = 'login_Rework.html';
+      window.location.replace('login_Rework.html');
     }
   },
 
@@ -100,7 +114,7 @@ const ApiClient = {
 
       if (response.status === 401) {
         this.clearSession();
-        window.location.href = 'login_Rework.html';
+        window.location.replace('login_Rework.html');
         throw new Error('Sesión expirada o no autorizada.');
       }
 

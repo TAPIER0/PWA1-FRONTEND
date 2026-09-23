@@ -228,6 +228,20 @@
   .student-picker .student-option-meta{ color:var(--text-muted); font-size:12.5px; }
   .student-picker .empty-note{ font-size:13.5px; color:var(--text-muted); padding:8px 4px; }
 
+  /* ---------- Controles de Orden y Preajustes ---------- */
+  .order-control-wrap{ display:flex; flex-direction:column; gap:6px; width:100%; }
+  .order-presets{ display:flex; gap:6px; width:100%; }
+  .btn-preset{
+    flex:1; font-family:inherit; font-size:12px; font-weight:700;
+    color:var(--primary); background:var(--primary-soft);
+    border:1px solid var(--border); border-radius:6px;
+    padding:6px 8px; cursor:pointer; text-align:center;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .btn-preset:hover{ background:var(--bg); border-color:var(--primary); }
+  .btn-preset:focus-visible{ outline:2px solid var(--focus); outline-offset:1px; }
+  .field-hint{ font-size:12.5px; color:var(--text-muted); font-weight:normal; }
+
   @media (max-width: 860px){
     .app{ flex-direction:column; }
     .sidebar{ width:100%; flex-direction:row; align-items:center; overflow-x:auto; }
@@ -533,8 +547,15 @@
           <input type="color" id="categoria-color" value="#2F6E5C">
         </div>
         <div class="field" id="field-categoria-orden">
-          <label for="categoria-orden">Orden</label>
-          <input type="number" id="categoria-orden" min="1" step="1">
+          <label for="categoria-orden">Orden <span class="field-hint" id="categoria-orden-hint">(Rango permitido: 1 a 1)</span></label>
+          <div class="order-control-wrap">
+            <input type="number" id="categoria-orden" min="1" step="1">
+            <div class="order-presets" role="group" aria-label="Posiciones predefinidas de orden">
+              <button type="button" class="btn-preset" id="btn-preset-cat-first" title="Ubicar al inicio de la lista">Siempre al Inicio</button>
+              <button type="button" class="btn-preset" id="btn-preset-cat-last" title="Ubicar al final de la lista">Siempre al Final</button>
+            </div>
+          </div>
+          <div class="field-error" id="error-categoria-orden" role="alert"></div>
         </div>
       </div>
 
@@ -595,8 +616,15 @@
 
       <div class="field-row">
         <div class="field" id="field-modulo-orden">
-          <label for="modulo-orden">Orden dentro de la categoría</label>
-          <input type="number" id="modulo-orden" min="1" step="1">
+          <label for="modulo-orden">Orden dentro de la categoría <span class="field-hint" id="modulo-orden-hint">(Rango permitido: 1 a 1)</span></label>
+          <div class="order-control-wrap">
+            <input type="number" id="modulo-orden" min="1" step="1">
+            <div class="order-presets" role="group" aria-label="Posiciones predefinidas de orden">
+              <button type="button" class="btn-preset" id="btn-preset-mod-first" title="Ubicar al inicio de la categoría">Siempre al Inicio</button>
+              <button type="button" class="btn-preset" id="btn-preset-mod-last" title="Ubicar al final de la categoría">Siempre al Final</button>
+            </div>
+          </div>
+          <div class="field-error" id="error-modulo-orden" role="alert"></div>
         </div>
         <div class="field" id="field-modulo-status">
           <label for="modulo-status">Estado</label>
@@ -1186,11 +1214,23 @@
   const categoriaDescripcionInput = document.getElementById('categoria-descripcion');
   const categoriaColorInput = document.getElementById('categoria-color');
   const categoriaOrdenInput = document.getElementById('categoria-orden');
+  const categoriaOrdenHint = document.getElementById('categoria-orden-hint');
+  const btnPresetCatFirst = document.getElementById('btn-preset-cat-first');
+  const btnPresetCatLast = document.getElementById('btn-preset-cat-last');
   const categoriaStatusInput = document.getElementById('categoria-status');
 
   function openCategoriaModal(categoria){
     categoriaForm.reset();
     clearFieldError('field-categoria-nombre', 'error-categoria-nombre');
+    clearFieldError('field-categoria-orden', 'error-categoria-orden');
+
+    const maxCatOrder = categoria ? Math.max(1, categorias.length) : (categorias.length + 1);
+    categoriaOrdenInput.min = 1;
+    categoriaOrdenInput.max = maxCatOrder;
+    if (categoriaOrdenHint) {
+      categoriaOrdenHint.textContent = `(Rango permitido: 1 a ${maxCatOrder})`;
+    }
+
     if(categoria){
       categoriaModalTitle.textContent = 'Editar categoría';
       categoriaModalSub.textContent = 'Actualiza los datos de la categoría.';
@@ -1198,20 +1238,48 @@
       categoriaNombreInput.value = categoria.nombre;
       categoriaDescripcionInput.value = categoria.descripcion || '';
       categoriaColorInput.value = categoria.color;
-      categoriaOrdenInput.value = categoria.orden;
+      categoriaOrdenInput.value = Math.min(Math.max(1, Number(categoria.orden) || 1), maxCatOrder);
       categoriaStatusInput.value = categoria.estado;
     } else {
       categoriaModalTitle.textContent = 'Nueva categoría';
       categoriaModalSub.textContent = 'Completa los datos para crear la categoría.';
       categoriaIdInput.value = '';
       categoriaColorInput.value = '#2F6E5C';
-      categoriaOrdenInput.value = categorias.length + 1;
+      categoriaOrdenInput.value = maxCatOrder;
       categoriaStatusInput.value = 'Activo';
     }
     categoriaOverlay.classList.add('open');
     categoriaNombreInput.focus();
   }
   function closeCategoriaModal(){ categoriaOverlay.classList.remove('open'); }
+
+  if (btnPresetCatFirst) {
+    btnPresetCatFirst.addEventListener('click', () => {
+      categoriaOrdenInput.value = 1;
+      clearFieldError('field-categoria-orden', 'error-categoria-orden');
+      categoriaOrdenInput.focus();
+    });
+  }
+
+  if (btnPresetCatLast) {
+    btnPresetCatLast.addEventListener('click', () => {
+      const maxOrder = categoriaIdInput.value ? Math.max(1, categorias.length) : (categorias.length + 1);
+      categoriaOrdenInput.value = maxOrder;
+      clearFieldError('field-categoria-orden', 'error-categoria-orden');
+      categoriaOrdenInput.focus();
+    });
+  }
+
+  categoriaOrdenInput.addEventListener('input', () => {
+    const maxCatOrder = categoriaIdInput.value ? Math.max(1, categorias.length) : (categorias.length + 1);
+    const rawVal = categoriaOrdenInput.value.trim();
+    const val = Number(rawVal);
+    if (!rawVal || isNaN(val) || val < 1 || val > maxCatOrder || !Number.isInteger(val)) {
+      setFieldError('field-categoria-orden', 'error-categoria-orden', `El orden debe ser un número entero entre 1 y ${maxCatOrder}.`);
+    } else {
+      clearFieldError('field-categoria-orden', 'error-categoria-orden');
+    }
+  });
 
   document.getElementById('btn-new-categoria').addEventListener('click', () => openCategoriaModal(null));
   document.getElementById('btn-cancel-categoria').addEventListener('click', closeCategoriaModal);
@@ -1235,9 +1303,19 @@
       }
     }
 
+    const maxCatOrder = categoriaIdInput.value ? Math.max(1, categorias.length) : (categorias.length + 1);
+    const rawCatOrden = categoriaOrdenInput.value.trim();
+    const catOrdenNum = Number(rawCatOrden);
+    if(!rawCatOrden || isNaN(catOrdenNum) || catOrdenNum < 1 || catOrdenNum > maxCatOrder || !Number.isInteger(catOrdenNum)){
+      setFieldError('field-categoria-orden', 'error-categoria-orden', `El orden debe ser un número entero entre 1 y ${maxCatOrder}.`);
+      valid = false;
+    } else {
+      clearFieldError('field-categoria-orden', 'error-categoria-orden');
+    }
+
     if(!valid) return;
 
-    const orden = Number(categoriaOrdenInput.value) || (categorias.length + 1);
+    const orden = catOrdenNum;
     const descripcion = categoriaDescripcionInput.value.trim();
     const color = categoriaColorInput.value;
     const isActive = categoriaStatusInput.value === 'Activo';
@@ -1469,12 +1547,70 @@
   const moduloCategoriaInput = document.getElementById('modulo-categoria');
   const moduloDescripcionInput = document.getElementById('modulo-descripcion');
   const moduloOrdenInput = document.getElementById('modulo-orden');
+  const moduloOrdenHint = document.getElementById('modulo-orden-hint');
+  const btnPresetModFirst = document.getElementById('btn-preset-mod-first');
+  const btnPresetModLast = document.getElementById('btn-preset-mod-last');
   const moduloStatusInput = document.getElementById('modulo-status');
+
+  function updateModuloOrderLimits(keepCurrentValue = false){
+    const catId = moduloCategoriaInput.value;
+    const currentModId = moduloIdInput.value;
+    const inCatCount = modulos.filter(m => String(m.categoriaId) === String(catId)).length;
+    const maxModOrder = currentModId ? Math.max(1, inCatCount) : (inCatCount + 1);
+    moduloOrdenInput.min = 1;
+    moduloOrdenInput.max = maxModOrder;
+    if (moduloOrdenHint) {
+      moduloOrdenHint.textContent = `(Rango permitido: 1 a ${maxModOrder})`;
+    }
+    if (!keepCurrentValue) {
+      moduloOrdenInput.value = maxModOrder;
+    } else {
+      const curr = Number(moduloOrdenInput.value);
+      if (isNaN(curr) || curr > maxModOrder) moduloOrdenInput.value = maxModOrder;
+      if (curr < 1) moduloOrdenInput.value = 1;
+    }
+  }
+
+  moduloCategoriaInput.addEventListener('change', () => {
+    updateModuloOrderLimits(false);
+    clearFieldError('field-modulo-orden', 'error-modulo-orden');
+  });
+
+  if (btnPresetModFirst) {
+    btnPresetModFirst.addEventListener('click', () => {
+      moduloOrdenInput.value = 1;
+      clearFieldError('field-modulo-orden', 'error-modulo-orden');
+      moduloOrdenInput.focus();
+    });
+  }
+
+  if (btnPresetModLast) {
+    btnPresetModLast.addEventListener('click', () => {
+      updateModuloOrderLimits(false);
+      clearFieldError('field-modulo-orden', 'error-modulo-orden');
+      moduloOrdenInput.focus();
+    });
+  }
+
+  moduloOrdenInput.addEventListener('input', () => {
+    const catId = moduloCategoriaInput.value;
+    const currentModId = moduloIdInput.value;
+    const inCatCount = modulos.filter(m => String(m.categoriaId) === String(catId)).length;
+    const maxModOrder = currentModId ? Math.max(1, inCatCount) : (inCatCount + 1);
+    const rawVal = moduloOrdenInput.value.trim();
+    const val = Number(rawVal);
+    if (!rawVal || isNaN(val) || val < 1 || val > maxModOrder || !Number.isInteger(val)) {
+      setFieldError('field-modulo-orden', 'error-modulo-orden', `El orden debe ser un número entero entre 1 y ${maxModOrder}.`);
+    } else {
+      clearFieldError('field-modulo-orden', 'error-modulo-orden');
+    }
+  });
 
   function openModuloModal(modulo){
     moduloForm.reset();
     clearFieldError('field-modulo-nombre', 'error-modulo-nombre');
     clearFieldError('field-modulo-categoria', 'error-modulo-categoria');
+    clearFieldError('field-modulo-orden', 'error-modulo-orden');
     refreshCategoriaSelects();
 
     if(categorias.length === 0){
@@ -1489,14 +1625,16 @@
       moduloNombreInput.value = modulo.nombre;
       moduloCategoriaInput.value = modulo.categoriaId;
       moduloDescripcionInput.value = modulo.descripcion || '';
-      moduloOrdenInput.value = modulo.orden;
+      updateModuloOrderLimits(true);
+      const catCount = modulos.filter(m => String(m.categoriaId) === String(modulo.categoriaId)).length;
+      moduloOrdenInput.value = Math.min(Math.max(1, Number(modulo.orden) || 1), Math.max(1, catCount));
       moduloStatusInput.value = modulo.estado;
     } else {
       moduloModalTitle.textContent = 'Nuevo módulo temático';
       moduloModalSub.textContent = 'Completa los datos para crear el módulo.';
       moduloIdInput.value = '';
       if(filterCategoriaModulos.value) moduloCategoriaInput.value = filterCategoriaModulos.value;
-      moduloOrdenInput.value = moduloCount(moduloCategoriaInput.value) + 1;
+      updateModuloOrderLimits(false);
       moduloStatusInput.value = 'Activo';
     }
     moduloOverlay.classList.add('open');
@@ -1535,9 +1673,20 @@
       clearFieldError('field-modulo-categoria', 'error-modulo-categoria');
     }
 
+    const inCatCount = modulos.filter(m => String(m.categoriaId) === String(categoriaId)).length;
+    const maxModOrder = moduloIdInput.value ? Math.max(1, inCatCount) : (inCatCount + 1);
+    const rawModOrden = moduloOrdenInput.value.trim();
+    const modOrdenNum = Number(rawModOrden);
+    if (!rawModOrden || isNaN(modOrdenNum) || modOrdenNum < 1 || modOrdenNum > maxModOrder || !Number.isInteger(modOrdenNum)) {
+      setFieldError('field-modulo-orden', 'error-modulo-orden', `El orden debe ser un número entero entre 1 y ${maxModOrder}.`);
+      valid = false;
+    } else {
+      clearFieldError('field-modulo-orden', 'error-modulo-orden');
+    }
+
     if(!valid) return;
 
-    const orden = Number(moduloOrdenInput.value) || 1;
+    const orden = modOrdenNum;
     const descripcion = moduloDescripcionInput.value.trim() || 'Módulo de aprendizaje';
     const isActive = moduloStatusInput.value === 'Activo';
 

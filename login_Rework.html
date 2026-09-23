@@ -312,6 +312,23 @@
 </div>
 
 <script>
+  // Prevenir que presionar "Atrás" en el navegador vuelva a mostrar interfaces protegidas anteriores
+  try {
+    history.pushState(null, '', window.location.href);
+    window.addEventListener('popstate', () => {
+      history.pushState(null, '', window.location.href);
+    });
+  } catch (e) {}
+
+  // Si ya existe sesión activa válida, redirigir automáticamente a la interfaz del usuario
+  try {
+    const existingToken = ApiClient.getToken();
+    const existingUser = ApiClient.getUser();
+    if (existingToken && existingUser) {
+      ApiClient.redirectToRoleHome(existingUser);
+    }
+  } catch (e) {}
+
   const root = document.getElementById('root');
   const settingsToggle = document.getElementById('settings-toggle');
   const settingsBody = document.getElementById('settings-body');
