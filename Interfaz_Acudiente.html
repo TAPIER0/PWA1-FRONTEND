@@ -278,6 +278,37 @@
   .history-empty{ text-align:center; color:var(--text-muted); font-size:15px; padding:32px 12px; }
   .history-more{ display:flex; justify-content:center; margin-top:16px; }
 
+  /* ---------- Notas del docente (bitácora, solo lectura) ---------- */
+  .notes-month{ font-size:15px; font-weight:700; color:var(--text-muted); margin:22px 0 10px; }
+  .notes-month:first-child{ margin-top:0; }
+  .notes-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px; }
+  .note-card{ display:grid; grid-template-columns:64px minmax(0,1fr); gap:16px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px 18px; }
+  .note-date{ text-align:center; border-right:1px solid var(--border); padding-right:14px; }
+  .note-date .day{ font-size:26px; font-weight:700; line-height:1.1; font-variant-numeric:tabular-nums; }
+  .note-date .mon{ font-size:14px; color:var(--text-muted); text-transform:capitalize; }
+  .note-head{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px; }
+  .note-title{ font-size:16.5px; font-weight:700; margin:0 0 4px; }
+  .note-text{ font-size:15px; margin:0; white-space:pre-line; }
+  .note-reco{ margin-top:10px; background:var(--primary-soft); border:1px solid var(--border); border-left:4px solid var(--primary); border-radius:8px; padding:10px 12px; font-size:15px; white-space:pre-line; }
+  .note-reco strong{ display:flex; align-items:center; gap:6px; font-size:14px; color:var(--primary); margin-bottom:2px; }
+  .note-reco strong svg{ width:16px; height:16px; }
+  .note-foot{ margin-top:10px; font-size:14px; color:var(--text-muted); }
+  .tipo-badge{ display:inline-flex; align-items:center; gap:6px; font-size:14px; font-weight:700; padding:4px 11px; border-radius:999px; }
+  .tipo-badge svg{ width:15px; height:15px; }
+  .tipo-Avance{ background:var(--ok-bg); color:var(--ok-text); }
+  .tipo-Recomendacion{ background:#E6ECF5; color:#2E4A72; }
+  .tipo-Observacion{ background:var(--bg); color:var(--text); border:1px solid var(--border); }
+  .tipo-AspectoAReforzar{ background:var(--warn-bg); color:var(--warn-text); border:1px solid var(--warn-border); }
+  .area-badge{ font-size:14px; color:var(--text-muted); }
+  .new-badge{ font-size:13.5px; font-weight:700; color:#fff; background:var(--primary); padding:3px 9px; border-radius:999px; }
+  .notes-empty{ text-align:center; color:var(--text-muted); font-size:15px; padding:32px 12px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); }
+  .notes-empty strong{ display:block; color:var(--text); font-size:16px; margin-bottom:4px; }
+  @media (max-width: 640px){
+    .note-card{ grid-template-columns:1fr; }
+    .note-date{ border-right:none; border-bottom:1px solid var(--border); padding:0 0 8px; text-align:left; display:flex; gap:6px; align-items:baseline; }
+    .note-date .day{ font-size:18px; }
+  }
+
   .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 
   /* ---------- Responsivo ---------- */
@@ -313,6 +344,7 @@
     <nav class="nav-list" aria-label="Navegación principal">
       <button type="button" class="nav-item active" data-view="preferencias" aria-current="page"><span class="dot"></span> Preferencias sensoriales</button>
       <button type="button" class="nav-item" data-view="progreso"><span class="dot"></span> Progreso</button>
+      <button type="button" class="nav-item" data-view="notas"><span class="dot"></span> Notas del docente</button>
       <a class="nav-item disabled" href="#" aria-disabled="true"><span class="dot"></span> Mensajes <span class="badge-soon">Próx.</span></a>
     </nav>
  
@@ -601,6 +633,47 @@
         <button type="button" class="btn btn-ghost" id="history-more" hidden>Mostrar más actividades</button>
       </div>
     </section>
+   </div>
+
+   <!-- ================= Vista: Notas del docente (bitácora, solo lectura) ================= -->
+   <div class="view" id="view-notas" hidden>
+    <div class="page-header">
+      <div>
+        <h1>Notas del docente</h1>
+        <p class="subtitle">Observaciones y recomendaciones que el docente escribe sobre el estudiante, de la más reciente a la más antigua.</p>
+      </div>
+    </div>
+
+    <div class="student-bar">
+      <div class="field">
+        <label for="notes-student">Estudiante</label>
+        <select id="notes-student"></select>
+      </div>
+      <div class="field" style="min-width:220px;">
+        <label for="notes-type">Tipo de nota</label>
+        <select id="notes-type">
+          <option value="">Todas</option>
+          <option value="Avance">Avances</option>
+          <option value="Recomendacion">Recomendaciones</option>
+          <option value="Observacion">Observaciones</option>
+          <option value="AspectoAReforzar">Aspectos a reforzar</option>
+        </select>
+      </div>
+      <span class="range-label" id="notes-count"></span>
+    </div>
+
+    <p class="progress-notice" id="notes-notice" role="status" hidden></p>
+
+    <section class="student-hero" aria-labelledby="notes-student-name">
+      <div class="student-avatar" id="notes-student-initials" aria-hidden="true">—</div>
+      <div>
+        <p class="student-hero-label">Notas sobre</p>
+        <h2 class="student-hero-name" id="notes-student-name">—</h2>
+        <p class="student-hero-code" id="notes-student-code" hidden></p>
+      </div>
+    </section>
+
+    <div id="notes-timeline"></div>
    </div>
   </main>
 </div>
@@ -976,6 +1049,10 @@
     if(name === 'progreso'){
       progressStudent.value = studentSelect.value;   // mismo estudiante que en Preferencias
       loadProgress();
+    }
+    if(name === 'notas'){
+      notesStudent.value = studentSelect.value;
+      loadNotes();
     }
   }
   navItems.forEach(item => item.addEventListener('click', () => showView(item.dataset.view)));
@@ -1605,6 +1682,163 @@
         }),
       },
     };
+  }
+
+  /* =====================================================================
+   * NOTAS DEL DOCENTE — consulta cronológica de la bitácora pedagógica
+   * (las notas se crean, editan y eliminan en Interfaz_Docente.html → Bitácora)
+   *
+   * CONEXIÓN BACKEND
+   *   GET /api/students/{studentId}/log-entries
+   *   Respuesta: { success: true, data: [ nota, ... ] }
+   *   - El modelo completo de la nota y los permisos están en la GUÍA DE CONEXIÓN
+   *     de la bitácora, dentro de Interfaz_Docente.html.
+   *   - Para el rol Acudiente el SERVIDOR debe devolver solo:
+   *       · notas de estudiantes a su cargo (si no, 403/404 con success: false), y
+   *       · notas con visibleAcudiente = true.
+   *     El filtro de abajo es solo una protección extra, no reemplaza al del servidor.
+   *   - Campos que usa esta vista: id, fecha, tipo, area, titulo, contenido,
+   *     recomendacionCasa, docenteNombre, createdAt, updatedAt, visibleAcudiente.
+   * =================================================================== */
+  const NOTE_TYPES = {
+    Avance:           { label: 'Avance',             icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16l5-5 4 4 7-7"/><path d="M15 8h5v5"/></svg>' },
+    Recomendacion:    { label: 'Recomendación',      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.8V16h5v-.3c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3z"/></svg>' },
+    Observacion:      { label: 'Observación',        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>' },
+    AspectoAReforzar: { label: 'Aspecto a reforzar', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5h.01"/></svg>' },
+  };
+  const NOTE_AREAS = { Academica: 'Académica', Comunicacion: 'Comunicación', Socioemocional: 'Socioemocional', Autonomia: 'Autonomía', Sensorial: 'Sensorial' };
+  const NEW_NOTE_DAYS = 7;   // se marca "Nueva" si se escribió hace 7 días o menos
+
+  const notesStudent = document.getElementById('notes-student');
+  const notesType = document.getElementById('notes-type');
+  const notesNotice = document.getElementById('notes-notice');
+  const notesTimeline = document.getElementById('notes-timeline');
+  const notesCount = document.getElementById('notes-count');
+
+  students.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = s.name;
+    notesStudent.appendChild(opt);
+  });
+
+  let notesEntries = [];
+  let notesRequestId = 0;
+
+  notesStudent.addEventListener('change', () => { studentSelect.value = notesStudent.value; loadNotes(); });
+  notesType.addEventListener('change', renderNotes);
+
+  async function loadNotes(){
+    const studentId = notesStudent.value;
+    const info = studentInfo(studentId);
+    const reqId = ++notesRequestId;
+
+    document.getElementById('notes-student-name').textContent = info.name;
+    document.getElementById('notes-student-initials').textContent = info.initials;
+    const code = document.getElementById('notes-student-code');
+    code.textContent = info.code ? `Código: ${info.code}` : '';
+    code.hidden = !info.code;
+
+    notesNotice.hidden = false;
+    notesNotice.textContent = `Cargando las notas sobre ${info.name}…`;
+
+    let entries, demo = false;
+    try {
+      // CONEXIÓN BACKEND: consulta cronológica de la bitácora (solo lectura para el acudiente).
+      const res = await ApiClient.request(`/students/${encodeURIComponent(studentId)}/log-entries`);
+      if(!(res.ok && res.data && res.data.success)) throw new Error('Respuesta no válida de /log-entries');
+      entries = res.data.data || [];
+    } catch(err){
+      console.warn('Notas del docente: se usan datos de demostración.', err);
+      demo = true;
+      entries = buildDemoNotes(studentId);
+    }
+    if(reqId !== notesRequestId) return;
+
+    notesEntries = entries
+      .filter(e => e.visibleAcudiente !== false)   // protección extra (el servidor ya debe filtrarlas)
+      .sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)) || String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+
+    notesNotice.hidden = !demo;
+    notesNotice.textContent = demo
+      ? 'Mostrando notas de demostración: el servidor todavía no responde. Cuando esté conectado verás las notas reales del docente.'
+      : '';
+    renderNotes();
+  }
+
+  function renderNotes(){
+    const type = notesType.value;
+    const list = notesEntries.filter(e => !type || e.tipo === type);
+    const recos = notesEntries.filter(e => e.recomendacionCasa).length;
+    notesCount.textContent = notesEntries.length
+      ? `${notesEntries.length} ${notesEntries.length === 1 ? 'nota' : 'notas'} · ${recos} con recomendación para casa`
+      : '';
+
+    if(list.length === 0){
+      notesTimeline.innerHTML = notesEntries.length
+        ? '<div class="notes-empty"><strong>No hay notas de este tipo</strong>Elige "Todas" en Tipo de nota para ver las demás.</div>'
+        : `<div class="notes-empty"><strong>Todavía no hay notas</strong>Cuando el docente escriba una observación sobre ${escapeHtml(studentInfo(notesStudent.value).firstName)}, aparecerá aquí.</div>`;
+      return;
+    }
+
+    const byMonth = new Map();
+    list.forEach(e => {
+      const key = String(e.fecha).slice(0, 7);
+      if(!byMonth.has(key)) byMonth.set(key, []);
+      byMonth.get(key).push(e);
+    });
+
+    const recoIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>';
+    notesTimeline.innerHTML = [...byMonth.entries()].map(([key, items]) => {
+      const monthText = parseIsoDate(key + '-01').toLocaleDateString('es-CO', { month: 'long', year: 'numeric' });
+      const month = monthText.charAt(0).toUpperCase() + monthText.slice(1);
+      return `<h3 class="notes-month">${escapeHtml(month)}</h3>
+        <ol class="notes-list">${items.map(e => {
+          const d = parseIsoDate(e.fecha);
+          const t = NOTE_TYPES[e.tipo] || NOTE_TYPES.Observacion;
+          const isNew = e.createdAt && daysAgo(e.createdAt) <= NEW_NOTE_DAYS;
+          const fullDate = d.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+          const edited = e.updatedAt ? ` · Actualizada el ${new Date(e.updatedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}` : '';
+          return `<li class="note-card">
+            <div class="note-date" aria-label="${escapeHtml(fullDate)}">
+              <div class="day" aria-hidden="true">${d.getDate()}</div>
+              <div class="mon" aria-hidden="true">${escapeHtml(d.toLocaleDateString('es-CO', { month: 'short' }).replace('.', ''))}</div>
+            </div>
+            <div>
+              <div class="note-head">
+                <span class="tipo-badge tipo-${escapeHtml(e.tipo)}">${t.icon}${t.label}</span>
+                <span class="area-badge">Área: ${escapeHtml(NOTE_AREAS[e.area] || e.area || '—')}</span>
+                ${isNew ? '<span class="new-badge">Nueva</span>' : ''}
+              </div>
+              <h4 class="note-title">${escapeHtml(e.titulo)}</h4>
+              <p class="note-text">${escapeHtml(e.contenido)}</p>
+              ${e.recomendacionCasa ? `<div class="note-reco"><strong>${recoIcon}Para hacer en casa</strong>${escapeHtml(e.recomendacionCasa)}</div>` : ''}
+              <p class="note-foot">Escrita por ${escapeHtml(e.docenteNombre || 'el docente')}${edited}</p>
+            </div>
+          </li>`;
+        }).join('')}</ol>`;
+    }).join('');
+  }
+
+  /** CONEXIÓN BACKEND: ejemplo de la respuesta esperada (solo notas visibles para el acudiente). */
+  function buildDemoNotes(studentId){
+    const first = studentInfo(studentId).firstName;
+    const day = n => { const d = new Date(); d.setDate(d.getDate() - n); return isoDate(d); };
+    const created = n => { const d = new Date(); d.setDate(d.getDate() - n); d.setHours(15, 20, 0, 0); return d.toISOString(); };
+    return [
+      { id: 'demo-n1', fecha: day(2), tipo: 'Avance', area: 'Autonomia', titulo: 'Completó la rutina de la mañana sin ayuda',
+        contenido: `${first} ordenó los 5 pasos de la rutina en el primer intento y explicó cada paso con sus palabras.`,
+        recomendacionCasa: 'Pídale que le cuente los pasos de su rutina antes de salir de casa.',
+        docenteNombre: 'Carlos Andrés Peña', createdAt: created(2), updatedAt: null, visibleAcudiente: true },
+      { id: 'demo-n2', fecha: day(6), tipo: 'AspectoAReforzar', area: 'Socioemocional', titulo: 'Se frustra cuando cambia de actividad',
+        contenido: 'Cuando la actividad terminó antes de lo esperado, se tapó los oídos y tardó unos minutos en volver a trabajar.',
+        recomendacionCasa: 'Avísele con 5 minutos de anticipación antes de cambiar de actividad, por ejemplo: "En 5 minutos vamos a comer".',
+        docenteNombre: 'Carlos Andrés Peña', createdAt: created(6), updatedAt: null, visibleAcudiente: true },
+      { id: 'demo-n3', fecha: day(24), tipo: 'Recomendacion', area: 'Comunicacion', titulo: 'Usar instrucciones de un solo paso',
+        contenido: 'Responde mejor cuando cada instrucción tiene una sola acción, por ejemplo "Guarda el lápiz" en lugar de "Guarda todo y ven".',
+        recomendacionCasa: 'En casa, dé una instrucción a la vez y espere a que la termine antes de dar la siguiente.',
+        docenteNombre: 'Lic. Marta Ruiz', createdAt: created(24), updatedAt: null, visibleAcudiente: true },
+    ];
   }
 
   // ---------- Inicializar ----------
