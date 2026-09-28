@@ -300,6 +300,7 @@
   .tipo-Observacion{ background:var(--bg); color:var(--text); border:1px solid var(--border); }
   .tipo-AspectoAReforzar{ background:var(--warn-bg); color:var(--warn-text); border:1px solid var(--warn-border); }
   .area-badge{ font-size:14px; color:var(--text-muted); }
+  .note-activity{ font-size:14px; color:var(--text); background:var(--bg); border:1px solid var(--border); border-radius:999px; padding:3px 10px; }
   .new-badge{ font-size:13.5px; font-weight:700; color:#fff; background:var(--primary); padding:3px 9px; border-radius:999px; }
   .notes-empty{ text-align:center; color:var(--text-muted); font-size:15px; padding:32px 12px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); }
   .notes-empty strong{ display:block; color:var(--text); font-size:16px; margin-bottom:4px; }
@@ -1698,7 +1699,8 @@
    *       · notas con visibleAcudiente = true.
    *     El filtro de abajo es solo una protección extra, no reemplaza al del servidor.
    *   - Campos que usa esta vista: id, fecha, tipo, area, titulo, contenido,
-   *     recomendacionCasa, docenteNombre, createdAt, updatedAt, visibleAcudiente.
+   *     recomendacionCasa, docenteNombre, createdAt, updatedAt, visibleAcudiente,
+   *     actividadTitulo (null si la observación no es sobre una actividad concreta).
    * =================================================================== */
   const NOTE_TYPES = {
     Avance:           { label: 'Avance',             icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16l5-5 4 4 7-7"/><path d="M15 8h5v5"/></svg>' },
@@ -1809,6 +1811,7 @@
                 <span class="tipo-badge tipo-${escapeHtml(e.tipo)}">${t.icon}${t.label}</span>
                 <span class="area-badge">Área: ${escapeHtml(NOTE_AREAS[e.area] || e.area || '—')}</span>
                 ${isNew ? '<span class="new-badge">Nueva</span>' : ''}
+                ${e.actividadTitulo ? `<span class="note-activity">Actividad: ${escapeHtml(e.actividadTitulo)}</span>` : ''}
               </div>
               <h4 class="note-title">${escapeHtml(e.titulo)}</h4>
               <p class="note-text">${escapeHtml(e.contenido)}</p>
@@ -1829,6 +1832,7 @@
       { id: 'demo-n1', fecha: day(2), tipo: 'Avance', area: 'Autonomia', titulo: 'Completó la rutina de la mañana sin ayuda',
         contenido: `${first} ordenó los 5 pasos de la rutina en el primer intento y explicó cada paso con sus palabras.`,
         recomendacionCasa: 'Pídale que le cuente los pasos de su rutina antes de salir de casa.',
+        actividadTitulo: 'Ordena tu rutina de la mañana',
         docenteNombre: 'Carlos Andrés Peña', createdAt: created(2), updatedAt: null, visibleAcudiente: true },
       { id: 'demo-n2', fecha: day(6), tipo: 'AspectoAReforzar', area: 'Socioemocional', titulo: 'Se frustra cuando cambia de actividad',
         contenido: 'Cuando la actividad terminó antes de lo esperado, se tapó los oídos y tardó unos minutos en volver a trabajar.',
