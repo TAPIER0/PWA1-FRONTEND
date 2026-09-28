@@ -190,6 +190,115 @@
     background:var(--bg); border:1px solid var(--border); color:var(--text-muted);
     display:flex; align-items:center; gap:6px;
   }
+
+  /* ---------- Navegación entre vistas ---------- */
+  button.nav-item{ border:none; background:none; width:100%; text-align:left; font-family:inherit; cursor:pointer; }
+  button.nav-item:hover:not(.active){ background:var(--bg); color:var(--text); }
+  .nav-item:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+  .view[hidden]{ display:none; }
+
+  /* ---------- Progreso: avance general ---------- */
+  .progress-notice{ font-size:14px; background:var(--warn-bg); color:var(--warn-text); border:1px solid var(--warn-border); border-radius:8px; padding:10px 14px; margin-bottom:18px; }
+  .progress-notice[hidden]{ display:none; }
+  .student-bar .range-label{ font-size:14px; color:var(--text-muted); margin-left:auto; }
+
+  .student-hero{ display:flex; align-items:center; gap:16px; background:var(--primary-soft); border:1px solid var(--border); border-radius:var(--radius); padding:16px 20px; margin-bottom:18px; }
+  .student-avatar{ width:56px; height:56px; border-radius:50%; background:var(--primary); color:#fff; font-size:21px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; letter-spacing:.02em; }
+  .student-hero-label{ font-size:14px; color:var(--text-muted); margin:0; }
+  .student-hero-name{ font-size:22px; font-weight:700; margin:0; line-height:1.25; }
+  .student-hero-code{ font-size:14px; color:var(--text-muted); margin:2px 0 0; }
+  .student-hero-code[hidden]{ display:none; }
+
+  .overall-card{ display:grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 2fr); gap:24px; align-items:center; }
+  .overall-card h2{ margin-bottom:8px; }
+  .overall-big{ font-size:34px; font-weight:700; line-height:1.1; margin:0 0 4px; font-variant-numeric:tabular-nums; }
+  .overall-text{ font-size:15px; color:var(--text-muted); margin:0 0 12px; }
+  .progress-track{ height:14px; background:var(--primary-soft); border-radius:999px; overflow:hidden; border:1px solid var(--border); }
+  .progress-fill{ height:100%; background:var(--primary); border-radius:999px; }
+
+  .stat-grid{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px; }
+  .stat{ background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+  .stat .stat-label{ font-size:14px; font-weight:700; color:var(--text-muted); margin:0; }
+  .stat .stat-value{ font-size:26px; font-weight:700; margin:4px 0 2px; font-variant-numeric:tabular-nums; }
+  .stat .stat-value small{ font-size:15px; color:var(--text-muted); margin-left:2px; }
+  .stat .stat-foot{ font-size:14px; color:var(--text-muted); margin:0; }
+
+  /* ---------- Progreso: gráficos ---------- */
+  .chart-grid{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:18px; }
+  .chart-grid .card{ margin-bottom:0; min-width:0; }
+  .chart-box{ position:relative; width:100%; }
+  .chart-box svg{ display:block; width:100%; overflow:visible; }
+  .chart-box .axis-text{ font-size:13px; fill:var(--text-muted); font-family:inherit; }
+  .chart-tip{
+    position:absolute; pointer-events:none; background:var(--text); color:#fff; font-size:14px; line-height:1.4;
+    padding:8px 10px; border-radius:8px; white-space:nowrap; transform:translate(-50%, calc(-100% - 10px)); z-index:5;
+  }
+  .chart-tip[hidden]{ display:none; }
+  .chart-tip b{ display:block; }
+  .chart-empty{ font-size:14px; color:var(--text-muted); text-align:center; padding:40px 0; }
+  details.chart-data{ margin-top:8px; font-size:14px; }
+  details.chart-data summary{ cursor:pointer; color:var(--primary); font-weight:700; padding:4px 0; }
+  details.chart-data summary:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; border-radius:4px; }
+  details.chart-data table{ border-collapse:collapse; margin-top:6px; }
+  details.chart-data th, details.chart-data td{ font-size:14px; padding:6px 10px; text-align:left; border-bottom:1px solid var(--border); }
+  .num{ font-variant-numeric:tabular-nums; white-space:nowrap; }
+
+  /* ---------- Progreso: sugerencias para casa ---------- */
+  .tips{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .tips li{ display:flex; gap:12px; align-items:flex-start; font-size:15px; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:12px 14px; }
+  .tips li svg{ width:22px; height:22px; color:var(--primary); flex-shrink:0; margin-top:1px; }
+
+  /* ---------- Progreso: historial ---------- */
+  .history-filters{ display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; margin-bottom:16px; }
+  .history-filters .field{ display:flex; flex-direction:column; gap:6px; }
+  .history-filters label{ font-size:14px; font-weight:700; color:var(--text-muted); }
+  .history-filters input, .history-filters select{
+    font-family:inherit; font-size:15px; padding:9px 12px; border:1.5px solid var(--border); border-radius:8px; background:var(--surface); color:var(--text); min-width:180px;
+  }
+  .history-filters input:focus, .history-filters select:focus{ outline:3px solid var(--focus); outline-offset:1px; border-color:var(--focus); }
+  .history-filters .search{ flex:1; min-width:200px; }
+  .history-filters .search input{ width:100%; min-width:0; }
+  .history-count{ font-size:14px; color:var(--text-muted); align-self:center; }
+
+  .history-day{ font-size:15px; font-weight:700; color:var(--text-muted); margin:18px 0 8px; }
+  .history-day:first-child{ margin-top:0; }
+  .history-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+  .history-item{ display:grid; grid-template-columns:auto minmax(0,1fr) auto auto; gap:14px; align-items:center; border:1px solid var(--border); border-radius:10px; padding:12px 14px; }
+  .hi-icon{ width:40px; height:40px; border-radius:10px; background:var(--primary-soft); color:var(--primary); display:flex; align-items:center; justify-content:center; }
+  .hi-icon.emparejamiento{ background:#F2E9DA; color:var(--accent); }
+  .hi-icon svg{ width:22px; height:22px; }
+  .hi-title{ font-size:15.5px; font-weight:700; }
+  .hi-meta{ font-size:14px; color:var(--text-muted); }
+  .hi-result{ font-size:14px; color:var(--text); text-align:right; }
+  .result-badge{ display:inline-flex; align-items:center; gap:6px; font-size:14px; font-weight:700; padding:5px 11px; border-radius:999px; white-space:nowrap; }
+  .result-badge svg{ width:15px; height:15px; }
+  .result-ok{ background:var(--ok-bg); color:var(--ok-text); }
+  .result-apoyo{ background:#F2E9DA; color:#6B4F2A; }
+  .result-pendiente{ background:var(--warn-bg); color:var(--warn-text); border:1px solid var(--warn-border); }
+  .history-empty{ text-align:center; color:var(--text-muted); font-size:15px; padding:32px 12px; }
+  .history-more{ display:flex; justify-content:center; margin-top:16px; }
+
+  .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+
+  /* ---------- Responsivo ---------- */
+  .main{ min-width:0; }
+  @media (max-width: 980px){
+    .overall-card{ grid-template-columns:1fr; }
+  }
+  @media (max-width: 860px){
+    .app{ flex-direction:column; }
+    .sidebar{ width:100%; flex-direction:row; align-items:center; overflow-x:auto; border-right:none; border-bottom:1px solid var(--border); }
+    nav.nav-list{ flex-direction:row; }
+    .sidebar-footer{ margin-top:0; margin-left:auto; border-top:none; }
+    .chart-grid{ grid-template-columns:1fr; }
+  }
+  @media (max-width: 640px){
+    .main{ padding:20px 16px; }
+    .stat-grid{ grid-template-columns:1fr; }
+    .history-item{ grid-template-columns:auto minmax(0,1fr); }
+    .hi-result{ grid-column:2; text-align:left; }
+    .history-item .result-badge{ grid-column:2; justify-self:start; }
+  }
 </style>
 </head>
 <body>
@@ -202,8 +311,8 @@
     </div>
  
     <nav class="nav-list" aria-label="Navegación principal">
-      <a class="nav-item active" href="#"><span class="dot"></span> Preferencias sensoriales</a>
-      <a class="nav-item disabled" href="#" aria-disabled="true"><span class="dot"></span> Progreso <span class="badge-soon">Próx.</span></a>
+      <button type="button" class="nav-item active" data-view="preferencias" aria-current="page"><span class="dot"></span> Preferencias sensoriales</button>
+      <button type="button" class="nav-item" data-view="progreso"><span class="dot"></span> Progreso</button>
       <a class="nav-item disabled" href="#" aria-disabled="true"><span class="dot"></span> Mensajes <span class="badge-soon">Próx.</span></a>
     </nav>
  
@@ -220,6 +329,7 @@
   </aside>
  
   <main class="main">
+   <div class="view" id="view-preferencias">
     <div class="page-header">
       <div>
         <h1>Preferencias sensoriales</h1>
@@ -383,6 +493,115 @@
         </div>
       </div>
     </div>
+   </div>
+
+   <!-- ================= Vista: Progreso (historial y avance general) ================= -->
+   <div class="view" id="view-progreso" hidden>
+    <div class="page-header">
+      <div>
+        <h1>Progreso del estudiante</h1>
+        <p class="subtitle">Revisa las actividades que ha realizado y cómo va avanzando, para acompañarlo en casa.</p>
+      </div>
+    </div>
+
+    <div class="student-bar">
+      <div class="field">
+        <label for="progress-student">Estudiante</label>
+        <select id="progress-student"></select>
+      </div>
+      <div class="field" style="min-width:200px;">
+        <label for="progress-range">Periodo</label>
+        <select id="progress-range">
+          <option value="4" selected>Últimas 4 semanas</option>
+          <option value="8">Últimas 8 semanas</option>
+          <option value="12">Últimas 12 semanas</option>
+        </select>
+      </div>
+      <span class="range-label" id="progress-range-label"></span>
+    </div>
+
+    <p class="progress-notice" id="progress-notice" role="status" hidden></p>
+
+    <!-- Estudiante que se está revisando -->
+    <section class="student-hero" aria-labelledby="progress-student-name">
+      <div class="student-avatar" id="progress-student-initials" aria-hidden="true">—</div>
+      <div>
+        <p class="student-hero-label">Estás revisando el progreso de</p>
+        <h2 class="student-hero-name" id="progress-student-name">—</h2>
+        <p class="student-hero-code" id="progress-student-code" hidden></p>
+      </div>
+    </section>
+
+    <!-- Avance general -->
+    <section class="card overall-card" aria-labelledby="overall-title">
+      <div>
+        <h2 id="overall-title">Avance general</h2>
+        <p class="overall-big" id="overall-percent">—</p>
+        <p class="overall-text" id="overall-text">Cargando…</p>
+        <div class="progress-track" id="overall-bar" role="progressbar" aria-labelledby="overall-title" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="progress-fill" id="overall-fill" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="stat-grid" id="overall-stats"></div>
+    </section>
+
+    <!-- Evolución semanal -->
+    <div class="chart-grid" style="margin-bottom:18px;">
+      <section class="card" aria-labelledby="chart-realizadas-title">
+        <h2 id="chart-realizadas-title">Actividades realizadas por semana</h2>
+        <p class="card-desc">Cuántas actividades terminó cada semana.</p>
+        <div id="chart-realizadas"></div>
+      </section>
+      <section class="card" aria-labelledby="chart-aciertos-title">
+        <h2 id="chart-aciertos-title">Respuestas correctas por semana</h2>
+        <p class="card-desc">Porcentaje de respuestas correctas. Si la línea sube, va mejorando.</p>
+        <div id="chart-aciertos"></div>
+      </section>
+    </div>
+
+    <!-- Sugerencias -->
+    <section class="card" aria-labelledby="tips-title">
+      <h2 id="tips-title">Ideas para acompañar en casa</h2>
+      <p class="card-desc">Sugerencias basadas en sus actividades recientes.</p>
+      <ul class="tips" id="tips-list"></ul>
+    </section>
+
+    <!-- Historial -->
+    <section class="card" aria-labelledby="history-title">
+      <h2 id="history-title">Historial de actividades</h2>
+      <p class="card-desc">Las más recientes primero.</p>
+
+      <div class="history-filters">
+        <div class="field search">
+          <label for="history-search">Buscar actividad</label>
+          <input type="text" id="history-search" placeholder="Ej. Rutina de la mañana">
+        </div>
+        <div class="field">
+          <label for="history-type">Tipo</label>
+          <select id="history-type">
+            <option value="">Todos</option>
+            <option value="secuencia">Secuencia lógica</option>
+            <option value="emparejamiento">Emparejamiento visual</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="history-result">Resultado</label>
+          <select id="history-result">
+            <option value="">Todos</option>
+            <option value="ok">Lo logró</option>
+            <option value="apoyo">Necesitó varios intentos</option>
+            <option value="pendiente">Sin terminar</option>
+          </select>
+        </div>
+        <span class="history-count" id="history-count" aria-live="polite"></span>
+      </div>
+
+      <div id="history-groups"></div>
+      <div class="history-more">
+        <button type="button" class="btn btn-ghost" id="history-more" hidden>Mostrar más actividades</button>
+      </div>
+    </section>
+   </div>
   </main>
 </div>
  
@@ -741,6 +960,651 @@
   const logoutBtn = document.getElementById('btn-logout');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => ApiClient.logout());
+  }
+
+  // ---------- Navegación entre vistas (Preferencias / Progreso) ----------
+  const navItems = document.querySelectorAll('.nav-item[data-view]');
+  const views = document.querySelectorAll('.view');
+
+  function showView(name){
+    navItems.forEach(n => {
+      const on = n.dataset.view === name;
+      n.classList.toggle('active', on);
+      if(on) n.setAttribute('aria-current', 'page'); else n.removeAttribute('aria-current');
+    });
+    views.forEach(v => { v.hidden = v.id !== 'view-' + name; });
+    if(name === 'progreso'){
+      progressStudent.value = studentSelect.value;   // mismo estudiante que en Preferencias
+      loadProgress();
+    }
+  }
+  navItems.forEach(item => item.addEventListener('click', () => showView(item.dataset.view)));
+
+  /* =====================================================================
+   * PROGRESO — historial de actividades y avance general del estudiante
+   *
+   * ###################################################################
+   * GUÍA DE CONEXIÓN PARA BACKEND
+   * Busca "CONEXIÓN BACKEND" en este archivo para ver cada punto de
+   * conexión. Si el API responde con estas formas, no hay que tocar
+   * nada más del frontend.
+   * ###################################################################
+   *
+   * 1) ENDPOINTS QUE DEBE EXPONER EL API (.NET 9, base http://localhost:5264/api)
+   *
+   *    GET /students/{studentId}/progress?desde=yyyy-mm-dd&hasta=yyyy-mm-dd
+   *        -> Avance general + evolución semanal (tarjeta "Avance general" y gráficos).
+   *    GET /students/{studentId}/activity-history?desde=yyyy-mm-dd&hasta=yyyy-mm-dd&page=1&pageSize=20
+   *        -> Historial paginado de actividades realizadas (más recientes primero).
+   *
+   *    - Autorización: el ApiClient ya envía "Authorization: Bearer <token>".
+   *      Roles: Acudiente (SOLO sus estudiantes a cargo) y Administrador.
+   *      Si el estudiante no está a cargo del acudiente -> 403/404 con success: false.
+   *    - "desde" es el lunes de la primera semana; "hasta" es hoy (inclusive).
+   *    - Respuestas envueltas como el resto del API: { "success": true, "data": { ... } }
+   *      Si falla (red, 404, 500 o success: false) se muestran datos de demostración
+   *      con un aviso naranja.
+   *
+   * 2) "data" DE /progress
+   *    {
+   *      "resumen": {
+   *        "actividadesAsignadas":   24,     // asignaciones con fecha en el periodo
+   *        "actividadesCompletadas": 18,     // de esas, las terminadas con éxito
+   *        "totalIntentos":          26,     // envíos a POST /activities/{id}/submit
+   *        "tasaAciertos":           78.5,   // 100 * SUM(aciertos) / SUM(aciertos + fallidos); null si no hay datos
+   *        "tiempoPromedioSegundos": 64.2,   // AVG(tiempoRespuestaSegundos)
+   *        "diasActivos":            11,     // días distintos con al menos un intento
+   *        "ultimaActividad": "2026-09-26T17:40:00"   // fecha del último intento (o null)
+   *      },
+   *      "historico": [                       // una fila por semana CON datos (lunes, yyyy-mm-dd)
+   *        { "periodo": "2026-09-01", "actividadesCompletadas": 5, "tasaAciertos": 72.0 }
+   *      ]
+   *    }
+   *
+   * 3) "data" DE /activity-history
+   *    {
+   *      "items": [
+   *        {
+   *          "id": "guid-del-intento",
+   *          "activityId": "guid",
+   *          "titulo": "Ordena tu rutina de la mañana",
+   *          "tipoActividad": "SecuenciaLogica",          // o "EmparejamientoVisual"
+   *          "fechaRegistro": "2026-09-26T17:40:00",      // hora local del intento
+   *          "tiempoRespuestaSegundos": 72,
+   *          "cantidadAciertos": 5,
+   *          "cantidadIntentosFallidos": 1,
+   *          "completadaExitosamente": true
+   *        }
+   *      ],
+   *      "total": 26,        // total de intentos en el periodo (para el botón "Mostrar más")
+   *      "page": 1,
+   *      "pageSize": 20
+   *    }
+   *    Los campos son los mismos que envía Interfaz_Estudiante.html al terminar
+   *    cada actividad (POST /activities/{assignmentId}/submit).
+   * =================================================================== */
+  const HISTORY_PAGE_SIZE = 20;
+  const MANY_ATTEMPTS = 3;                  // desde cuántos intentos fallidos se muestra "Necesitó varios intentos"
+  const CHART_COLOR = '#2F6E5C';
+
+  const progressStudent = document.getElementById('progress-student');
+  const progressRange = document.getElementById('progress-range');
+  const progressRangeLabel = document.getElementById('progress-range-label');
+  const progressNotice = document.getElementById('progress-notice');
+  const historySearch = document.getElementById('history-search');
+  const historyType = document.getElementById('history-type');
+  const historyResult = document.getElementById('history-result');
+  const historyCount = document.getElementById('history-count');
+  const historyGroups = document.getElementById('history-groups');
+  const historyMore = document.getElementById('history-more');
+
+  // CONEXIÓN BACKEND: la lista de estudiantes es la misma constante `students` de
+  // arriba (hoy está escrita a mano). Cuando exista un endpoint con los estudiantes a
+  // cargo del acudiente, basta con llenar `students` desde ahí y ambas vistas lo usan.
+  students.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = s.name;
+    progressStudent.appendChild(opt);
+  });
+
+  let progressRequestId = 0;
+  let progressState = null;   // { studentId, period, progress, history: [], total, page, demo, demoItems }
+
+  progressStudent.addEventListener('change', () => { studentSelect.value = progressStudent.value; loadProgress(); });
+  progressRange.addEventListener('change', loadProgress);
+  historySearch.addEventListener('input', renderHistory);
+  historyType.addEventListener('change', renderHistory);
+  historyResult.addEventListener('change', renderHistory);
+  historyMore.addEventListener('click', loadMoreHistory);
+
+  // ---------- Utilidades ----------
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+  function isoDate(d){
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+  function parseIsoDate(s){
+    const [y, m, d] = String(s).slice(0, 10).split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+  function fmtDay(d){ return d.toLocaleDateString('es-CO', { day:'numeric', month:'short' }); }
+  function fmtNum(v, decimals){
+    if(v == null || isNaN(v)) return '—';
+    return Number(v).toLocaleString('es-CO', { maximumFractionDigits: decimals });
+  }
+  function fmtDuration(seconds){
+    if(seconds == null) return '—';
+    const s = Math.round(seconds);
+    if(s < 60) return `${s} s`;
+    const m = Math.floor(s / 60), r = s % 60;
+    return r ? `${m} min ${r} s` : `${m} min`;
+  }
+  function daysAgo(dateLike){
+    const d = new Date(dateLike); d.setHours(0, 0, 0, 0);
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return Math.round((today - d) / 86400000);
+  }
+  function dayHeading(dateLike){
+    const n = daysAgo(dateLike);
+    if(n === 0) return 'Hoy';
+    if(n === 1) return 'Ayer';
+    const text = new Date(dateLike).toLocaleDateString('es-CO', { weekday:'long', day:'numeric', month:'long' });
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+
+  /** Semanas completas (lunes) que cubre el periodo elegido. */
+  function progressPeriod(weeks){
+    const hasta = new Date(); hasta.setHours(0, 0, 0, 0);
+    const monday = new Date(hasta);
+    monday.setDate(hasta.getDate() - ((hasta.getDay() + 6) % 7));
+    const desde = new Date(monday);
+    desde.setDate(monday.getDate() - (weeks - 1) * 7);
+    const weekKeys = [];
+    for(let i = 0; i < weeks; i++){
+      const d = new Date(desde); d.setDate(desde.getDate() + i * 7);
+      weekKeys.push(isoDate(d));
+    }
+    return { desde, hasta, weekKeys };
+  }
+
+  /**
+   * CONEXIÓN BACKEND: empareja cada "periodo" del histórico con las semanas del eje.
+   * "periodo" debe ser el LUNES de la semana en formato yyyy-mm-dd; si no, ese punto
+   * no aparece en el gráfico. Las semanas sin datos se pueden omitir en la respuesta.
+   */
+  function seriesFor(historico, weekKeys, field, emptyValue){
+    const byWeek = new Map((historico || []).map(h => [String(h.periodo).slice(0, 10), h]));
+    return weekKeys.map(k => {
+      const h = byWeek.get(k);
+      return h && h[field] != null ? Number(h[field]) : emptyValue;
+    });
+  }
+
+  /** Clasificación de cada intento para el historial (texto + ícono, nunca solo color). */
+  function resultOf(item){
+    if(!item.completadaExitosamente) return 'pendiente';
+    if((item.cantidadIntentosFallidos || 0) >= MANY_ATTEMPTS) return 'apoyo';
+    return 'ok';
+  }
+  const RESULT_BADGE = {
+    ok: '<span class="result-badge result-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="5 12.5 10 17.5 19 7"/></svg>Lo logró</span>',
+    apoyo: '<span class="result-badge result-apoyo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 12a8 8 0 1 1 3 6.2"/><polyline points="4 18 4 12 10 12" stroke-linejoin="round"/></svg>Necesitó varios intentos</span>',
+    pendiente: '<span class="result-badge result-pendiente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>Sin terminar</span>',
+  };
+  const TYPE_INFO = {
+    secuencia: { label: 'Secuencia lógica', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="9" width="5" height="6" rx="1"/><rect x="10" y="9" width="5" height="6" rx="1"/><rect x="17" y="9" width="4" height="6" rx="1"/></svg>' },
+    emparejamiento: { label: 'Emparejamiento visual', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="7" r="3"/><circle cx="18" cy="17" r="3"/><path d="M9 7h3a3 3 0 0 1 3 3v4"/></svg>' },
+  };
+  /** CONEXIÓN BACKEND: acepta "EmparejamientoVisual" (texto) o 1 (enum numérico); lo demás es secuencia. */
+  function typeOf(item){
+    const t = item.tipoActividad;
+    return (t === 'EmparejamientoVisual' || t === 1 || t === 'emparejamiento') ? 'emparejamiento' : 'secuencia';
+  }
+
+  /**
+   * Nombre visible del estudiante revisado. Separa "Mateo Pérez (EST-TEA-001)" en
+   * nombre y código. CONEXIÓN BACKEND: si el API devuelve nombre y código por separado
+   * (p. ej. nombreCompleto y codigoEstudiante), se pueden asignar aquí directamente.
+   */
+  function studentInfo(studentId){
+    const s = students.find(x => String(x.id) === String(studentId));
+    const raw = s ? s.name : 'Estudiante';
+    const match = raw.match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+    const name = match ? match[1] : raw;
+    const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('') || '—';
+    return { name, firstName: name.split(/\s+/)[0], code: match ? match[2] : '', initials };
+  }
+
+  function renderStudentHeader(studentId){
+    const info = studentInfo(studentId);
+    document.getElementById('progress-student-name').textContent = info.name;
+    document.getElementById('progress-student-initials').textContent = info.initials;
+    const code = document.getElementById('progress-student-code');
+    code.textContent = info.code ? `Código: ${info.code}` : '';
+    code.hidden = !info.code;
+  }
+
+  // ---------- Carga de datos ----------
+  async function loadProgress(){
+    const studentId = progressStudent.value;
+    renderStudentHeader(studentId);   // el nombre se ve de inmediato, antes de que lleguen los datos
+    const period = progressPeriod(Number(progressRange.value));
+    const qs = `?desde=${isoDate(period.desde)}&hasta=${isoDate(period.hasta)}`;
+    const reqId = ++progressRequestId;
+
+    progressRangeLabel.textContent = `Del ${fmtDay(period.desde)} al ${fmtDay(period.hasta)}`;
+    progressNotice.hidden = false;
+    progressNotice.textContent = `Cargando el progreso de ${studentInfo(studentId).name}…`;
+
+    let state;
+    try {
+      // CONEXIÓN BACKEND (1/2): avance general y evolución semanal.
+      //   GET /api/students/{studentId}/progress?desde=...&hasta=...
+      //   Respuesta: { success: true, data: { resumen, historico } }  (forma completa en la GUÍA)
+      const progressRes = await ApiClient.request(`/students/${encodeURIComponent(studentId)}/progress${qs}`);
+      if(!(progressRes.ok && progressRes.data && progressRes.data.success)) throw new Error('Respuesta no válida de /progress');
+
+      // CONEXIÓN BACKEND (2/2): primera página del historial.
+      //   GET /api/students/{studentId}/activity-history?desde=...&hasta=...&page=1&pageSize=20
+      //   Respuesta: { success: true, data: { items, total, page, pageSize } }
+      const historyRes = await ApiClient.request(`/students/${encodeURIComponent(studentId)}/activity-history${qs}&page=1&pageSize=${HISTORY_PAGE_SIZE}`);
+      if(!(historyRes.ok && historyRes.data && historyRes.data.success)) throw new Error('Respuesta no válida de /activity-history');
+
+      state = {
+        studentId, period, qs, demo: false,
+        progress: progressRes.data.data,
+        history: historyRes.data.data.items || [],
+        total: historyRes.data.data.total ?? 0,
+        page: 1,
+      };
+    } catch(err){
+      // CONEXIÓN BACKEND: si falla cualquiera de las dos peticiones se usan datos de
+      // demostración y se muestra el aviso naranja. El motivo exacto queda en la consola (F12).
+      console.warn('Progreso: se usan datos de demostración.', err);
+      const demo = buildDemoProgress(studentId, period);
+      state = {
+        studentId, period, qs, demo: true, demoItems: demo.items,
+        progress: demo.progress,
+        history: demo.items.slice(0, HISTORY_PAGE_SIZE),
+        total: demo.items.length,
+        page: 1,
+      };
+    }
+    if(reqId !== progressRequestId) return;   // llegó una respuesta más nueva
+
+    progressState = state;
+    progressNotice.hidden = !state.demo;
+    progressNotice.textContent = state.demo
+      ? 'Mostrando datos de demostración: el servidor todavía no responde. Cuando esté conectado verás las actividades reales del estudiante.'
+      : '';
+    renderProgress();
+  }
+
+  async function loadMoreHistory(){
+    if(!progressState) return;
+    const st = progressState;
+    const nextPage = st.page + 1;
+    historyMore.disabled = true;
+    try {
+      let items;
+      if(st.demo){
+        items = st.demoItems.slice(st.page * HISTORY_PAGE_SIZE, nextPage * HISTORY_PAGE_SIZE);
+      } else {
+        // CONEXIÓN BACKEND: páginas siguientes del historial (mismo endpoint, page = 2, 3, ...).
+        const res = await ApiClient.request(`/students/${encodeURIComponent(st.studentId)}/activity-history${st.qs}&page=${nextPage}&pageSize=${HISTORY_PAGE_SIZE}`);
+        if(!(res.ok && res.data && res.data.success)) throw new Error('Respuesta no válida de /activity-history');
+        items = res.data.data.items || [];
+      }
+      if(st !== progressState) return;
+      st.history = st.history.concat(items);
+      st.page = nextPage;
+      renderHistory();
+    } catch(err){
+      console.warn('No se pudo cargar más historial:', err);
+      historyCount.textContent = 'No se pudieron cargar más actividades. Intenta de nuevo.';
+    } finally {
+      historyMore.disabled = false;
+    }
+  }
+
+  // ---------- Dibujo ----------
+  function renderProgress(){
+    const { progress, period } = progressState;
+    const r = progress.resumen || {};
+
+    // Avance general
+    const asignadas = r.actividadesAsignadas || 0;
+    const completadas = r.actividadesCompletadas || 0;
+    const pct = asignadas > 0 ? Math.round(100 * completadas / asignadas) : null;
+    document.getElementById('overall-percent').textContent = pct == null ? '—' : `${pct} %`;
+    const firstName = studentInfo(progressState.studentId).firstName;
+    document.getElementById('overall-text').textContent = asignadas > 0
+      ? `${firstName} completó ${completadas} de ${asignadas} actividades asignadas en este periodo.`
+      : `${firstName} todavía no tiene actividades asignadas en este periodo.`;
+    document.getElementById('overall-fill').style.width = (pct || 0) + '%';
+    const bar = document.getElementById('overall-bar');
+    bar.setAttribute('aria-valuenow', String(pct || 0));
+    bar.setAttribute('aria-valuetext', pct == null ? 'Sin actividades asignadas' : `${pct} % de actividades completadas`);
+
+    const last = r.ultimaActividad;
+    const lastText = !last ? 'Aún sin actividades' : (daysAgo(last) === 0 ? 'Última: hoy' : daysAgo(last) === 1 ? 'Última: ayer' : `Última: hace ${daysAgo(last)} días`);
+    document.getElementById('overall-stats').innerHTML = [
+      statHtml('Respuestas correctas', r.tasaAciertos == null ? '—' : fmtNum(r.tasaAciertos, 0), r.tasaAciertos == null ? '' : '%', 'del total de sus respuestas'),
+      statHtml('Tiempo por actividad', r.tiempoPromedioSegundos == null ? '—' : fmtDuration(r.tiempoPromedioSegundos), '', 'en promedio'),
+      statHtml('Días con actividades', fmtNum(r.diasActivos ?? 0, 0), '', lastText),
+    ].join('');
+
+    // Gráficos
+    const labels = period.weekKeys.map(k => fmtDay(parseIsoDate(k)));
+    drawChart(document.getElementById('chart-realizadas'), {
+      title: 'Actividades realizadas', type: 'bar', labels, fmt: v => fmtNum(v, 0),
+      values: seriesFor(progress.historico, period.weekKeys, 'actividadesCompletadas', 0),
+    });
+    drawChart(document.getElementById('chart-aciertos'), {
+      title: 'Respuestas correctas', type: 'line', labels, yMax: 100, fmt: v => fmtNum(v, 0) + ' %',
+      values: seriesFor(progress.historico, period.weekKeys, 'tasaAciertos', null),
+    });
+
+    renderTips();
+    renderHistory();
+  }
+
+  function statHtml(label, value, unit, foot){
+    return `<div class="stat">
+      <p class="stat-label">${label}</p>
+      <p class="stat-value">${value}${unit ? `<small>${unit}</small>` : ''}</p>
+      <p class="stat-foot">${foot}</p>
+    </div>`;
+  }
+
+  /** Sugerencias simples a partir de los datos (se calculan en el frontend). */
+  function renderTips(){
+    const { progress, period, history } = progressState;
+    const r = progress.resumen || {};
+    const tips = [];
+
+    if(r.ultimaActividad && daysAgo(r.ultimaActividad) >= 3){
+      tips.push(`Lleva ${daysAgo(r.ultimaActividad)} días sin actividades. Una sesión corta, a la misma hora cada día, ayuda a retomar la rutina.`);
+    }
+
+    const weekly = seriesFor(progress.historico, period.weekKeys, 'tasaAciertos', null).filter(v => v != null);
+    if(weekly.length >= 2){
+      const diff = weekly[weekly.length - 1] - weekly[weekly.length - 2];
+      if(diff >= 5) tips.push(`Esta semana respondió bien un ${fmtNum(diff, 0)} % más que la anterior. Díganle concretamente qué hizo bien.`);
+      else if(diff <= -5) tips.push('Esta semana tuvo más dificultad que la anterior. Repasen juntos una actividad que ya conoce antes de empezar una nueva.');
+    }
+
+    const byTitle = new Map();
+    history.forEach(h => {
+      const k = h.titulo || 'Actividad';
+      const e = byTitle.get(k) || { n: 0, fallidos: 0 };
+      e.n++; e.fallidos += h.cantidadIntentosFallidos || 0;
+      byTitle.set(k, e);
+    });
+    const hardest = [...byTitle.entries()].filter(([, e]) => e.n >= 2).sort((a, b) => b[1].fallidos / b[1].n - a[1].fallidos / a[1].n)[0];
+    if(hardest && hardest[1].fallidos / hardest[1].n >= 1){
+      tips.push(`«${hardest[0]}» es la actividad en la que más intentos necesita. Practíquenla juntos, un paso a la vez.`);
+    }
+
+    tips.push('Pídale que le muestre una actividad que ya domina: explicarla con sus palabras refuerza lo que aprendió.');
+
+    const icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.8V16h5v-.3c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3z"/></svg>';
+    document.getElementById('tips-list').innerHTML = tips.slice(0, 3).map(t => `<li>${icon}<span>${escapeHtml(t)}</span></li>`).join('');
+  }
+
+  function renderHistory(){
+    if(!progressState) return;
+    const q = historySearch.value.trim().toLowerCase();
+    const type = historyType.value, result = historyResult.value;
+    // Los filtros se aplican sobre las páginas ya cargadas.
+    // CONEXIÓN BACKEND (opcional): si el historial crece mucho, se pueden enviar como
+    // parámetros (&q=...&tipo=...&resultado=...) y filtrar en el servidor.
+    const list = progressState.history
+      .filter(h => !q || (h.titulo || '').toLowerCase().includes(q))
+      .filter(h => !type || typeOf(h) === type)
+      .filter(h => !result || resultOf(h) === result)
+      .sort((a, b) => new Date(b.fechaRegistro) - new Date(a.fechaRegistro));
+
+    const loaded = progressState.history.length, total = progressState.total;
+    historyCount.textContent = list.length === loaded
+      ? `${loaded} de ${total} actividades`
+      : `${list.length} coinciden (de ${loaded} cargadas)`;
+    historyMore.hidden = loaded >= total;
+
+    if(list.length === 0){
+      historyGroups.innerHTML = loaded === 0
+        ? '<p class="history-empty">Todavía no hay actividades realizadas en este periodo.</p>'
+        : '<p class="history-empty">Ninguna actividad coincide con la búsqueda o los filtros.</p>';
+      return;
+    }
+
+    const groups = new Map();
+    list.forEach(h => {
+      const key = isoDate(new Date(h.fechaRegistro));
+      if(!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(h);
+    });
+
+    historyGroups.innerHTML = [...groups.values()].map(items => `
+      <h3 class="history-day">${escapeHtml(dayHeading(items[0].fechaRegistro))}</h3>
+      <ol class="history-list">
+        ${items.map(h => {
+          const t = typeOf(h);
+          const hour = new Date(h.fechaRegistro).toLocaleTimeString('es-CO', { hour:'numeric', minute:'2-digit' });
+          const aciertos = h.cantidadAciertos || 0, fallidos = h.cantidadIntentosFallidos || 0;
+          return `<li class="history-item">
+            <span class="hi-icon ${t}">${TYPE_INFO[t].icon}</span>
+            <div>
+              <div class="hi-title">${escapeHtml(h.titulo || 'Actividad')}</div>
+              <div class="hi-meta">${TYPE_INFO[t].label} · ${escapeHtml(hour)} · ${fmtDuration(h.tiempoRespuestaSegundos)}</div>
+            </div>
+            <div class="hi-result">${aciertos} ${aciertos === 1 ? 'acierto' : 'aciertos'} · ${fallidos} ${fallidos === 1 ? 'intento fallido' : 'intentos fallidos'}</div>
+            ${RESULT_BADGE[resultOf(h)]}
+          </li>`;
+        }).join('')}
+      </ol>`).join('');
+  }
+
+  // ---------- Gráfico SVG sencillo (una serie) con tooltip y tabla de datos ----------
+  function niceMax(v){
+    if(!v || v <= 0) return 4;
+    const rawStep = v / 4;
+    const exp = Math.pow(10, Math.floor(Math.log10(rawStep)));
+    const f = rawStep / exp;
+    const nice = f <= 1 ? 1 : f <= 2 ? 2 : (f <= 2.5 && exp >= 10) ? 2.5 : (f <= 3 && exp === 1) ? 3 : f <= 5 ? 5 : 10;
+    return Math.max(1, nice * exp) * 4;
+  }
+
+  function drawChart(container, cfg){
+    container.innerHTML = '';
+    const values = cfg.values;
+    if(!values.some(v => v != null && (cfg.type !== 'bar' || v > 0))){
+      container.innerHTML = '<p class="chart-empty">Sin actividades en este periodo.</p>';
+      return;
+    }
+    const box = document.createElement('div');
+    box.className = 'chart-box';
+    container.appendChild(box);
+
+    const W = Math.max(box.clientWidth || 300, 220), H = 190;
+    const m = { top: 12, right: 12, bottom: 28, left: 42 };
+    const iw = W - m.left - m.right, ih = H - m.top - m.bottom;
+    const n = cfg.labels.length;
+    const yMax = cfg.yMax || niceMax(Math.max(...values.filter(v => v != null)) * 1.1);
+    const band = iw / n;
+    const x = i => m.left + band * (i + 0.5);
+    const y = v => m.top + ih - (v / yMax) * ih;
+
+    let svg = '';
+    for(let t = 0; t <= 4; t++){
+      const v = (yMax / 4) * t, yy = y(v).toFixed(1);
+      svg += `<line x1="${m.left}" x2="${W - m.right}" y1="${yy}" y2="${yy}" stroke="${t === 0 ? '#C9D1CC' : '#E8ECEA'}" stroke-width="1"/>`;
+      svg += `<text class="axis-text" x="${m.left - 8}" y="${yy}" text-anchor="end" dominant-baseline="middle">${cfg.fmt(v).replace(' ', ' ')}</text>`;
+    }
+    const step = Math.max(1, Math.ceil(n / Math.max(1, Math.floor(iw / 58))));
+    cfg.labels.forEach((lab, i) => {
+      if(i % step === 0) svg += `<text class="axis-text" x="${x(i).toFixed(1)}" y="${H - 8}" text-anchor="middle">${escapeHtml(lab)}</text>`;
+    });
+    svg += `<line class="crosshair" x1="0" x2="0" y1="${m.top}" y2="${m.top + ih}" stroke="#9AA39E" stroke-width="1" visibility="hidden"/>`;
+
+    if(cfg.type === 'bar'){
+      const bw = Math.min(band * 0.6, 34);
+      values.forEach((v, i) => {
+        if(!v) return;
+        const x0 = x(i) - bw / 2, y0 = y(v), r = Math.min(4, m.top + ih - y0, bw / 2);
+        svg += `<path class="bar" data-i="${i}" fill="${CHART_COLOR}" d="M${x0},${m.top + ih} V${y0 + r} Q${x0},${y0} ${x0 + r},${y0} H${x0 + bw - r} Q${x0 + bw},${y0} ${x0 + bw},${y0 + r} V${m.top + ih} Z"/>`;
+      });
+    } else {
+      let d = '', pen = false;
+      values.forEach((v, i) => {
+        if(v == null){ pen = false; return; }
+        d += `${pen ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)} `;
+        pen = true;
+      });
+      svg += `<path d="${d}" fill="none" stroke="${CHART_COLOR}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+      values.forEach((v, i) => {
+        if(v != null) svg += `<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="4" fill="${CHART_COLOR}" stroke="#fff" stroke-width="2"/>`;
+      });
+    }
+    svg += `<rect class="hit" x="${m.left}" y="${m.top}" width="${iw}" height="${ih}" fill="transparent"/>`;
+
+    const firstI = values.findIndex(v => v != null && (cfg.type !== 'bar' || v > 0));
+    let lastI = values.length - 1; while(lastI >= 0 && (values[lastI] == null || (cfg.type === 'bar' && !values[lastI]))) lastI--;
+    const summary = `${cfg.title}: ${cfg.fmt(values[firstI])} la semana del ${cfg.labels[firstI]} y ${cfg.fmt(values[lastI])} la semana del ${cfg.labels[lastI]}. Los valores exactos están en la tabla de datos.`;
+    box.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${escapeHtml(summary)}">${svg}</svg><div class="chart-tip" hidden></div>`;
+
+    const svgEl = box.querySelector('svg'), tip = box.querySelector('.chart-tip');
+    const cross = svgEl.querySelector('.crosshair'), hit = svgEl.querySelector('.hit'), bars = svgEl.querySelectorAll('.bar');
+    hit.addEventListener('pointermove', (ev) => {
+      const rect = svgEl.getBoundingClientRect();
+      const i = Math.min(n - 1, Math.max(0, Math.floor(((ev.clientX - rect.left) * (W / rect.width) - m.left) / band)));
+      const cx = x(i);
+      cross.setAttribute('x1', cx); cross.setAttribute('x2', cx);
+      cross.setAttribute('visibility', cfg.type === 'bar' ? 'hidden' : 'visible');
+      bars.forEach(b => b.setAttribute('opacity', b.dataset.i == i ? '1' : '0.55'));
+      tip.innerHTML = `<b>Semana del ${escapeHtml(cfg.labels[i])}</b>${values[i] == null ? 'Sin actividades' : escapeHtml(cfg.fmt(values[i]))}`;
+      tip.style.left = Math.min(Math.max(cx, 70), W - 70) + 'px';
+      tip.style.top = Math.max(y(values[i] ?? 0), m.top + 30) + 'px';
+      tip.hidden = false;
+    });
+    hit.addEventListener('pointerleave', () => {
+      tip.hidden = true;
+      cross.setAttribute('visibility', 'hidden');
+      bars.forEach(b => b.setAttribute('opacity', '1'));
+    });
+
+    const details = document.createElement('details');
+    details.className = 'chart-data';
+    details.innerHTML = `<summary>Ver datos en tabla</summary>
+      <table><thead><tr><th scope="col">Semana</th><th scope="col">${escapeHtml(cfg.title)}</th></tr></thead>
+      <tbody>${cfg.labels.map((lab, i) => `<tr><td>${escapeHtml(lab)}</td><td class="num">${values[i] == null ? 'Sin datos' : escapeHtml(cfg.fmt(values[i]))}</td></tr>`).join('')}</tbody></table>`;
+    container.appendChild(details);
+  }
+
+  // Redibuja los gráficos cuando cambia el ancho disponible
+  let progressLastWidth = 0, progressResizeFrame = 0;
+  new ResizeObserver(entries => {
+    const w = Math.round(entries[0].contentRect.width);
+    if(w === progressLastWidth) return;
+    progressLastWidth = w;
+    cancelAnimationFrame(progressResizeFrame);
+    progressResizeFrame = requestAnimationFrame(() => {
+      if(progressState && !document.getElementById('view-progreso').hidden) renderProgress();
+    });
+  }).observe(document.querySelector('#view-progreso .chart-grid'));
+
+  // ---------- Datos de demostración (misma forma que las respuestas del API) ----------
+  function seededRandom(seedText){
+    let h = 1779033703 ^ seedText.length;
+    for(let i = 0; i < seedText.length; i++){
+      h = Math.imul(h ^ seedText.charCodeAt(i), 3432918353);
+      h = (h << 13) | (h >>> 19);
+    }
+    return () => {
+      h = Math.imul(h ^ (h >>> 16), 2246822507);
+      h = Math.imul(h ^ (h >>> 13), 3266489909);
+      h ^= h >>> 16;
+      return (h >>> 0) / 4294967296;
+    };
+  }
+
+  /**
+   * CONEXIÓN BACKEND: ejemplo vivo del JSON esperado. En la consola (F12):
+   *   JSON.stringify(buildDemoProgress(progressStudent.value, progressPeriod(4)), null, 2)
+   * Cuando el backend esté listo se puede borrar esta función y el bloque catch de loadProgress.
+   */
+  function buildDemoProgress(studentId, period){
+    const acts = [
+      { id: 'act-1', titulo: 'Ordena tu rutina de la mañana', tipoActividad: 'SecuenciaLogica' },
+      { id: 'act-2', titulo: 'Empareja emociones y caras', tipoActividad: 'EmparejamientoVisual' },
+      { id: 'act-3', titulo: 'Pasos para lavarse las manos', tipoActividad: 'SecuenciaLogica' },
+      { id: 'act-4', titulo: 'Empareja figuras iguales', tipoActividad: 'EmparejamientoVisual' },
+      { id: 'act-5', titulo: 'Prepara tu mochila', tipoActividad: 'SecuenciaLogica' },
+    ];
+    const items = [];
+    const totalDays = Math.round((period.hasta - period.desde) / 86400000);
+    for(let d = 0; d <= totalDays; d++){
+      const day = new Date(period.desde); day.setDate(period.desde.getDate() + d);
+      const rnd = seededRandom(`dia:${studentId}:${isoDate(day)}`);
+      if(rnd() < 0.4) continue;                                     // días sin actividades
+      const count = 1 + Math.floor(rnd() * 2.5);
+      const progressFactor = d / Math.max(totalDays, 1);            // mejora con el tiempo
+      for(let k = 0; k < count; k++){
+        const act = acts[Math.floor(rnd() * acts.length)];
+        const pasos = 4 + Math.floor(rnd() * 3);
+        const p = Math.min(0.97, 0.55 + progressFactor * 0.3 + (rnd() - 0.5) * 0.3);
+        const aciertos = Math.max(1, Math.round(pasos * p));
+        const fallidos = Math.max(0, Math.round((pasos - aciertos) * (0.5 + rnd() * 1.5)));
+        const when = new Date(day); when.setHours(16 + Math.floor(rnd() * 3), Math.floor(rnd() * 60));
+        if(when > new Date()) continue;
+        items.push({
+          id: `demo-${isoDate(day)}-${k}`, activityId: act.id, titulo: act.titulo, tipoActividad: act.tipoActividad,
+          fechaRegistro: when.toISOString(),
+          tiempoRespuestaSegundos: Math.round(40 + rnd() * 70 + fallidos * 12),
+          cantidadAciertos: aciertos, cantidadIntentosFallidos: fallidos,
+          completadaExitosamente: rnd() > 0.12,
+        });
+      }
+    }
+    items.sort((a, b) => new Date(b.fechaRegistro) - new Date(a.fechaRegistro));
+
+    // Misma agregación que se espera del backend (ver GUÍA DE CONEXIÓN, punto 2)
+    const agg = list => {
+      const ac = list.reduce((s, i) => s + i.cantidadAciertos, 0);
+      const fa = list.reduce((s, i) => s + i.cantidadIntentosFallidos, 0);
+      return {
+        completadas: list.filter(i => i.completadaExitosamente).length,
+        tasaAciertos: ac + fa > 0 ? 100 * ac / (ac + fa) : null,
+        tiempo: list.length ? list.reduce((s, i) => s + i.tiempoRespuestaSegundos, 0) / list.length : null,
+      };
+    };
+    const weekOf = iso => { const d = new Date(iso); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return isoDate(d); };
+    const byWeek = new Map();
+    items.forEach(i => { const k = weekOf(i.fechaRegistro); if(!byWeek.has(k)) byWeek.set(k, []); byWeek.get(k).push(i); });
+
+    const all = agg(items);
+    return {
+      items,
+      progress: {
+        resumen: {
+          actividadesAsignadas: all.completadas + 2 + Math.floor(seededRandom('asig:' + studentId)() * 5),
+          actividadesCompletadas: all.completadas,
+          totalIntentos: items.length,
+          tasaAciertos: all.tasaAciertos,
+          tiempoPromedioSegundos: all.tiempo,
+          diasActivos: new Set(items.map(i => isoDate(new Date(i.fechaRegistro)))).size,
+          ultimaActividad: items[0] ? items[0].fechaRegistro : null,
+        },
+        historico: [...byWeek.entries()].map(([periodo, list]) => {
+          const a = agg(list);
+          return { periodo, actividadesCompletadas: a.completadas, tasaAciertos: a.tasaAciertos };
+        }),
+      },
+    };
   }
 
   // ---------- Inicializar ----------
