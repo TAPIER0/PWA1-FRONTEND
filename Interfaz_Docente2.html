@@ -67,6 +67,7 @@
   .btn-danger:hover{ background:var(--danger-hover); }
   .btn-sm{ padding:7px 12px; font-size:13px; }
   .btn[disabled]{ opacity:.5; cursor:not-allowed; }
+  .btn[hidden]{ display:none; }
  
   /* ---------- Toolbar ---------- */
   .toolbar{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding: 16px 18px; display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; margin-bottom:18px; }
@@ -269,6 +270,96 @@
   @media (max-width: 480px){
     .kpi-grid{ grid-template-columns:1fr; }
   }
+
+  /* ---------- Bitácora pedagógica ---------- */
+  .log-student{ display:flex; align-items:center; gap:14px; background:var(--primary-soft); border:1px solid var(--border); border-radius:var(--radius); padding:14px 18px; margin-bottom:18px; }
+  .log-student .avatar{ width:48px; height:48px; border-radius:50%; background:var(--primary); color:#fff; font-size:18px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .log-student .who-label{ font-size:14px; color:var(--text-muted); margin:0; }
+  .log-student .who-name{ font-size:20px; font-weight:700; margin:0; line-height:1.25; }
+  .log-student .who-count{ margin-left:auto; font-size:14px; color:var(--text-muted); text-align:right; }
+
+  .log-status{ font-size:15px; border-radius:8px; padding:10px 14px; margin:0 0 16px; }
+  .log-status[hidden]{ display:none; }
+  .log-status.ok{ background:var(--ok-bg); color:var(--ok-text); border:1px solid #B9D3C9; }
+  .log-status.error{ background:var(--warn-bg); color:var(--warn-text); border:1px solid var(--warn-border); }
+  .log-status.info{ background:var(--warn-bg); color:var(--warn-text); border:1px solid var(--warn-border); }
+
+  .log-month{ font-size:15px; font-weight:700; color:var(--text-muted); margin:22px 0 10px; }
+  .log-month:first-child{ margin-top:0; }
+  .log-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px; }
+  .log-entry{ display:grid; grid-template-columns:64px minmax(0,1fr); gap:16px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px 18px; }
+  .log-date{ text-align:center; border-right:1px solid var(--border); padding-right:14px; }
+  .log-date .day{ font-size:26px; font-weight:700; line-height:1.1; font-variant-numeric:tabular-nums; }
+  .log-date .mon{ font-size:14px; color:var(--text-muted); text-transform:capitalize; }
+  .log-head{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px; }
+  .log-title{ font-size:16.5px; font-weight:700; margin:0 0 4px; }
+  .log-text{ font-size:15px; margin:0; white-space:pre-line; }
+  .log-reco{ margin-top:10px; background:var(--bg); border:1px solid var(--border); border-left:4px solid var(--primary); border-radius:8px; padding:10px 12px; font-size:15px; white-space:pre-line; }
+  .log-reco strong{ display:block; font-size:14px; color:var(--primary); margin-bottom:2px; }
+  .log-foot{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:12px; font-size:14px; color:var(--text-muted); }
+  .log-foot .row-actions{ margin-left:auto; }
+  .log-visibility{ display:inline-flex; align-items:center; gap:6px; }
+  .log-visibility svg{ width:16px; height:16px; }
+
+  .tipo-badge{ display:inline-flex; align-items:center; gap:6px; font-size:14px; font-weight:700; padding:4px 11px; border-radius:999px; }
+  .tipo-badge svg{ width:15px; height:15px; }
+  .tipo-Avance{ background:var(--ok-bg); color:var(--ok-text); }
+  .tipo-Recomendacion{ background:#E6ECF5; color:#2E4A72; }
+  .tipo-Observacion{ background:var(--bg); color:var(--text); border:1px solid var(--border); }
+  .tipo-AspectoAReforzar{ background:var(--warn-bg); color:var(--warn-text); border:1px solid var(--warn-border); }
+  .area-badge{ font-size:14px; color:var(--text-muted); }
+
+  /* Pestañas internas de la bitácora */
+  .subtabs{ display:flex; gap:4px; border-bottom:1.5px solid var(--border); margin-bottom:18px; }
+  .subtab{ font-family:inherit; font-size:15.5px; font-weight:700; color:var(--text-muted); background:none; border:none; border-bottom:3px solid transparent; margin-bottom:-1.5px; padding:10px 14px; cursor:pointer; }
+  .subtab[aria-selected="true"]{ color:var(--primary); border-bottom-color:var(--primary); }
+  .subtab:hover{ color:var(--text); }
+  .subtab:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; border-radius:6px; }
+  .subtab-count{ font-size:14px; font-weight:700; background:var(--bg); border:1px solid var(--border); border-radius:999px; padding:1px 8px; margin-left:4px; color:var(--text-muted); }
+  [role="tabpanel"][hidden]{ display:none; }
+
+  /* Calificaciones */
+  .grade-summary{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:14px; margin-bottom:18px; }
+  .grade-summary .kpi .kpi-value{ font-size:26px; }
+  .grade-pill{ display:inline-flex; align-items:center; gap:6px; font-size:15px; font-weight:700; padding:4px 12px; border-radius:999px; white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .grade-pill svg{ width:15px; height:15px; }
+  .grade-ok{ background:var(--ok-bg); color:var(--ok-text); }
+  .grade-low{ background:var(--warn-bg); color:var(--warn-text); border:1px solid var(--warn-border); }
+  .grade-none{ background:var(--bg); color:var(--text-muted); border:1px dashed var(--border); font-weight:400; }
+  .grade-meta{ font-size:13.5px; color:var(--text-muted); margin-top:3px; }
+  .grade-comment{ font-size:14.5px; color:var(--text); max-width:280px; }
+  .grade-actions{ display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; }
+  .grade-modal{ max-width:520px; }
+  .grade-attempt{ background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:12px 14px; font-size:14.5px; margin-bottom:18px; }
+  .grade-attempt strong{ display:block; font-size:14px; color:var(--text-muted); margin-bottom:2px; }
+  .grade-input-row{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .grade-input-row input[type="number"]{ font-family:inherit; font-size:20px; font-weight:700; width:120px; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; color:var(--text); }
+  .grade-input-row input[type="number"]:focus{ outline:3px solid var(--focus); outline-offset:1px; border-color:var(--focus); }
+  .field-row.invalid .grade-input-row input{ border-color:var(--warn-border); }
+  .log-activity{ display:inline-flex; align-items:center; gap:6px; font-size:14px; color:var(--text); background:var(--bg); border:1px solid var(--border); border-radius:999px; padding:3px 10px; }
+  .log-activity svg{ width:14px; height:14px; color:var(--primary); }
+
+  /* Formulario de nota */
+  .note-modal{ max-width:640px; }
+  .note-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0 16px; }
+  .note-grid .full{ grid-column:1 / -1; }
+  .field-row select, .field-row input[type="date"]{
+    font-family:inherit; font-size:15px; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; width:100%; color:var(--text); background:var(--surface);
+  }
+  .field-row select:focus, .field-row input[type="date"]:focus{ outline:3px solid var(--focus); outline-offset:1px; border-color:var(--focus); }
+  .field-row.invalid select, .field-row.invalid input[type="date"]{ border-color:var(--warn-border); }
+  .char-count{ font-size:13.5px; color:var(--text-muted); text-align:right; margin-top:-4px; }
+  .chip-group .chip-btn svg{ width:15px; height:15px; vertical-align:-2px; margin-right:4px; }
+
+  @media (max-width: 640px){
+    .grade-summary{ grid-template-columns:1fr; }
+    .note-grid{ grid-template-columns:1fr; }
+    .log-entry{ grid-template-columns:1fr; }
+    .log-date{ border-right:none; border-bottom:1px solid var(--border); padding:0 0 8px; text-align:left; display:flex; gap:6px; align-items:baseline; }
+    .log-date .day{ font-size:18px; }
+    .log-student{ flex-wrap:wrap; }
+    .log-student .who-count{ margin-left:0; text-align:left; }
+  }
 </style>
 </head>
 <body>
@@ -283,6 +374,7 @@
     <nav class="nav-list" aria-label="Navegación principal">
       <button type="button" class="nav-item active" data-view="actividades" aria-current="page"><span class="dot"></span> Actividades</button>
       <button type="button" class="nav-item" data-view="desempeno"><span class="dot"></span> Desempeño</button>
+      <button type="button" class="nav-item" data-view="bitacora"><span class="dot"></span> Bitácora</button>
       <a class="nav-item disabled" href="#" aria-disabled="true"><span class="dot"></span> Estudiantes <span class="badge-soon">Próx.</span></a>
     </nav>
  
@@ -425,6 +517,102 @@
       </div>
     </div>
    </div>
+
+   <!-- ================= Vista: Bitácora pedagógica ================= -->
+   <div class="view" id="view-bitacora" hidden>
+    <div class="page-header">
+      <div>
+        <h1>Bitácora pedagógica</h1>
+        <p class="subtitle">Registra observaciones y califica las actividades de cada estudiante. Lo que marques como visible le llega al acudiente en orden cronológico.</p>
+      </div>
+      <button type="button" class="btn btn-primary" id="btn-new-note">+ Nueva observación</button>
+    </div>
+
+    <div class="toolbar">
+      <div class="field">
+        <label for="log-student">Estudiante</label>
+        <select id="log-student"></select>
+      </div>
+    </div>
+
+    <p class="log-status info" id="log-notice" role="status" hidden></p>
+    <p class="log-status" id="log-status" role="status" aria-live="polite" hidden></p>
+
+    <section class="log-student" aria-labelledby="log-student-name">
+      <div class="avatar" id="log-student-initials" aria-hidden="true">—</div>
+      <div>
+        <p class="who-label">Bitácora de</p>
+        <h2 class="who-name" id="log-student-name">—</h2>
+      </div>
+      <div class="who-count" id="log-count"></div>
+    </section>
+
+    <div class="subtabs" role="tablist" aria-label="Secciones de la bitácora">
+      <button type="button" class="subtab" role="tab" id="tab-notas" aria-controls="panel-notas" aria-selected="true">Observaciones <span class="subtab-count" id="tab-notas-count"></span></button>
+      <button type="button" class="subtab" role="tab" id="tab-calif" aria-controls="panel-calificaciones" aria-selected="false" tabindex="-1">Calificaciones <span class="subtab-count" id="tab-calif-count"></span></button>
+    </div>
+
+    <!-- Panel: observaciones -->
+    <div role="tabpanel" id="panel-notas" aria-labelledby="tab-notas">
+      <div class="toolbar">
+        <div class="field">
+          <label for="log-filter-type">Tipo de nota</label>
+          <select id="log-filter-type">
+            <option value="">Todas</option>
+            <option value="Avance">Avance</option>
+            <option value="Recomendacion">Recomendación</option>
+            <option value="Observacion">Observación</option>
+            <option value="AspectoAReforzar">Aspecto a reforzar</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="log-filter-activity">Actividad</label>
+          <select id="log-filter-activity">
+            <option value="">Todas</option>
+          </select>
+        </div>
+        <div class="field search-field">
+          <label for="log-search">Buscar en las notas</label>
+          <input type="text" id="log-search" placeholder="Ej. rutina, comunicación, casa">
+        </div>
+      </div>
+
+      <div id="log-timeline"></div>
+      <div class="empty-state table-card" id="log-empty" style="display:none;">
+        <strong id="log-empty-title">Todavía no hay notas para este estudiante</strong>
+        <span id="log-empty-text">Usa "+ Nueva observación" para registrar la primera.</span>
+      </div>
+    </div>
+
+    <!-- Panel: calificaciones por actividad -->
+    <div role="tabpanel" id="panel-calificaciones" aria-labelledby="tab-calif" hidden>
+      <div class="grade-summary" id="grade-summary"></div>
+      <div class="table-card">
+        <div class="perf-table-head">
+          <h3 id="grades-title">Actividades asignadas</h3>
+          <p>Escala de 1.0 a 5.0. Nota mínima aprobatoria: 3.0.</p>
+        </div>
+        <div class="table-scroll">
+          <table aria-labelledby="grades-title">
+            <thead>
+              <tr>
+                <th scope="col">Actividad</th>
+                <th scope="col">Último intento</th>
+                <th scope="col">Calificación</th>
+                <th scope="col">Comentario</th>
+                <th scope="col"><span class="sr-only">Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody id="grades-body"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="grades-empty" style="display:none;">
+          <strong>Este estudiante no tiene actividades asignadas</strong>
+          Asígnale actividades desde la vista "Actividades" para poder calificarlas.
+        </div>
+      </div>
+    </div>
+   </div>
   </main>
 </div>
  
@@ -523,7 +711,137 @@
     </div>
   </div>
 </div>
- 
+
+<!-- Modal: crear / editar nota de la bitácora -->
+<div class="overlay" id="note-overlay">
+  <div class="modal note-modal" role="dialog" aria-modal="true" aria-labelledby="note-modal-title">
+    <h2 id="note-modal-title">Nueva nota</h2>
+    <p class="modal-sub" id="note-modal-sub">Escribe con frases claras y concretas: el acudiente leerá esta nota.</p>
+
+    <form id="note-form" novalidate>
+      <input type="hidden" id="note-id">
+      <div class="note-grid">
+        <div class="field-row" id="field-note-date">
+          <label class="label" for="note-date">Fecha de la observación</label>
+          <input type="date" id="note-date">
+          <div class="field-error" id="error-note-date" role="alert"></div>
+        </div>
+        <div class="field-row">
+          <label class="label" for="note-area">Área</label>
+          <select id="note-area">
+            <option value="Academica">Académica</option>
+            <option value="Comunicacion">Comunicación</option>
+            <option value="Socioemocional">Socioemocional</option>
+            <option value="Autonomia">Autonomía</option>
+            <option value="Sensorial">Sensorial</option>
+          </select>
+        </div>
+
+        <div class="field-row full">
+          <label class="label" for="note-activity">Actividad relacionada <span style="font-weight:400; color:var(--text-muted);">(opcional)</span></label>
+          <span class="help">Elige una actividad si la observación es sobre un ejercicio concreto.</span>
+          <select id="note-activity">
+            <option value="">Ninguna: es una observación general</option>
+          </select>
+        </div>
+
+        <div class="field-row full">
+          <span class="label" id="note-type-label">Tipo de nota</span>
+          <div class="chip-group" id="note-type-group" role="radiogroup" aria-labelledby="note-type-label"></div>
+        </div>
+
+        <div class="field-row full" id="field-note-title">
+          <label class="label" for="note-title">Título</label>
+          <input type="text" id="note-title" maxlength="80" placeholder="Ej. Completó la rutina de la mañana sin ayuda">
+          <div class="char-count" id="count-note-title" aria-live="off">0 / 80</div>
+          <div class="field-error" id="error-note-title" role="alert"></div>
+        </div>
+
+        <div class="field-row full" id="field-note-content">
+          <label class="label" for="note-content">Observación</label>
+          <span class="help">Describe lo que observaste: qué hizo, en qué situación y cómo respondió.</span>
+          <textarea id="note-content" maxlength="1000" rows="4" placeholder="Ej. Hoy ordenó los 5 pasos de la rutina en el primer intento y explicó cada paso con sus palabras."></textarea>
+          <div class="char-count" id="count-note-content" aria-live="off">0 / 1000</div>
+          <div class="field-error" id="error-note-content" role="alert"></div>
+        </div>
+
+        <div class="field-row full" id="field-note-reco">
+          <label class="label" for="note-reco">Recomendación para casa <span style="font-weight:400; color:var(--text-muted);">(opcional)</span></label>
+          <span class="help">Una acción concreta que el acudiente pueda hacer en casa.</span>
+          <textarea id="note-reco" maxlength="500" rows="3" placeholder="Ej. Pídale que le cuente los pasos de su rutina antes de salir de casa."></textarea>
+          <div class="char-count" id="count-note-reco" aria-live="off">0 / 500</div>
+        </div>
+
+        <div class="field-row full">
+          <div class="switch-row">
+            <div class="switch-text">
+              <div class="label">Visible para el acudiente</div>
+              <div class="help">Si la desactivas, la nota queda solo para los docentes.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="note-visible" aria-label="Visible para el acudiente">
+              <span class="track"></span>
+              <span class="thumb"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="btn-cancel-note">Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="btn-save-note">Guardar observación</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: calificar actividad -->
+<div class="overlay" id="grade-overlay">
+  <div class="modal grade-modal" role="dialog" aria-modal="true" aria-labelledby="grade-modal-title">
+    <h2 id="grade-modal-title">Calificar actividad</h2>
+    <p class="modal-sub" id="grade-modal-sub">—</p>
+
+    <div class="grade-attempt" id="grade-attempt"></div>
+
+    <form id="grade-form" novalidate>
+      <input type="hidden" id="grade-assignment-id">
+      <div class="field-row" id="field-grade-value">
+        <label class="label" for="grade-value">Calificación (1.0 a 5.0)</label>
+        <div class="grade-input-row">
+          <input type="number" id="grade-value" min="1" max="5" step="0.1" inputmode="decimal" placeholder="Ej. 4.5">
+          <span class="grade-preview" id="grade-preview" aria-live="polite"></span>
+        </div>
+        <div class="field-error" id="error-grade-value" role="alert"></div>
+      </div>
+
+      <div class="field-row" id="field-grade-comment">
+        <label class="label" for="grade-comment">Comentario <span style="font-weight:400; color:var(--text-muted);">(opcional)</span></label>
+        <span class="help">Explica brevemente la calificación. El acudiente lo verá junto a la nota.</span>
+        <textarea id="grade-comment" maxlength="300" rows="3" placeholder="Ej. Ordenó todos los pasos; necesitó un recordatorio en el paso 4."></textarea>
+        <div class="char-count" id="count-grade-comment">0 / 300</div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="btn-remove-grade" style="margin-right:auto;" hidden>Quitar calificación</button>
+        <button type="button" class="btn btn-ghost" id="btn-cancel-grade">Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="btn-save-grade">Guardar calificación</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: confirmar eliminación de nota -->
+<div class="overlay" id="note-delete-overlay">
+  <div class="modal confirm-modal" role="dialog" aria-modal="true" aria-labelledby="note-delete-title" style="max-width:460px;">
+    <h2 id="note-delete-title">Eliminar observación</h2>
+    <p>¿Deseas eliminar la observación <span class="target-name" id="note-delete-name">—</span>? Esta acción no se puede deshacer y el acudiente ya no podrá verla.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="btn-cancel-note-delete">Cancelar</button>
+      <button type="button" class="btn btn-danger" id="btn-confirm-note-delete">Eliminar</button>
+    </div>
+  </div>
+</div>
+
 <script>
   /* ---------------------------------------------------------------------
    * MODELO DE DATOS: actividad interactiva (tabla `interactive_activities`)
@@ -1188,6 +1506,9 @@
     if(e.key === 'Escape'){
       if(overlay.classList.contains('open')) closeModal();
       if(deleteOverlay.classList.contains('open')) closeDeleteModal();
+      if(noteOverlay.classList.contains('open')) closeNoteModal();
+      if(noteDeleteOverlay.classList.contains('open')) closeNoteDeleteModal();
+      if(gradeOverlay.classList.contains('open')) closeGradeModal();
     }
   });
 
@@ -1208,6 +1529,7 @@
     });
     views.forEach(v => { v.hidden = v.id !== 'view-' + name; });
     if(name === 'desempeno') loadPerformance();
+    if(name === 'bitacora') openLogView();
   }
   navItems.forEach(item => item.addEventListener('click', () => showView(item.dataset.view)));
 
@@ -1840,6 +2162,818 @@
         })),
       },
     };
+  }
+
+  /* =====================================================================
+   * BITÁCORA PEDAGÓGICA — notas y recomendaciones cualitativas por estudiante
+   *
+   * ###################################################################
+   * GUÍA DE CONEXIÓN PARA BACKEND
+   * Busca "CONEXIÓN BACKEND" para ver cada punto de conexión. Si el API
+   * responde con estas formas, no hay que tocar nada más del frontend.
+   * El acudiente consulta las mismas notas en Interfaz_Acudiente.html
+   * (vista "Notas del docente").
+   * ###################################################################
+   *
+   * 1) MODELO DE DATOS — tabla sugerida `BitacoraNotas` (una fila por nota)
+   *
+   *    Id                 GUID, PK
+   *    StudentProfileId   GUID, FK -> StudentProfiles.Id   (estudiante del que trata la nota)
+   *    AssignmentId       GUID, FK -> Assignments.Id, NULL (actividad relacionada; null = observación general)
+   *    DocenteId          string, FK -> AspNetUsers.Id     (autor; se toma del token, no del body)
+   *    Fecha              date          fecha de la observación (puede ser anterior a hoy, nunca futura)
+   *    Tipo               string/enum   'Avance' | 'Recomendacion' | 'Observacion' | 'AspectoAReforzar'
+   *    Area               string/enum   'Academica' | 'Comunicacion' | 'Socioemocional' | 'Autonomia' | 'Sensorial'
+   *    Titulo             nvarchar(80)  obligatorio
+   *    Contenido          nvarchar(1000) obligatorio
+   *    RecomendacionCasa  nvarchar(500) opcional (null)
+   *    VisibleAcudiente   bit           true = el acudiente la ve; false = solo docentes
+   *    CreatedAt          datetime2     se llena al crear
+   *    UpdatedAt          datetime2     null hasta la primera edición
+   *    IsDeleted          bit           opcional: borrado lógico para conservar el historial
+   *
+   *    Índice sugerido para la consulta cronológica:
+   *      (StudentProfileId, Fecha DESC, CreatedAt DESC) INCLUDE (VisibleAcudiente)
+   *
+   * 2) ENDPOINTS (base http://localhost:5264/api)
+   *
+   *    GET    /students/{studentId}/log-entries        -> lista de notas, más recientes primero
+   *    POST   /students/{studentId}/log-entries        -> crea una nota (body = punto 3)
+   *    PUT    /log-entries/{entryId}                   -> edita una nota (body = punto 3)
+   *    DELETE /log-entries/{entryId}                   -> elimina una nota
+   *
+   *    Permisos:
+   *    - Docente: ve todas las notas de sus estudiantes; solo edita/elimina las SUYAS.
+   *    - Administrador: todo.
+   *    - Acudiente: SOLO GET, de sus estudiantes a cargo, y SOLO notas con VisibleAcudiente = true
+   *      (el filtro lo debe hacer el servidor, no el frontend).
+   *    - Respuestas envueltas como el resto del API: { "success": true, "data": ... }
+   *
+   * 3) BODY DE POST / PUT
+   *    {
+   *      "fecha": "2026-09-25",
+   *      "tipo": "Avance",
+   *      "area": "Comunicacion",
+   *      "titulo": "Pidió ayuda con palabras",
+   *      "contenido": "Durante la actividad de emparejamiento dijo \"no entiendo\" y pidió que le repitiera la instrucción.",
+   *      "recomendacionCasa": "Cuando pida ayuda con palabras, respóndale de inmediato y felicítelo por pedirla.",
+   *      "visibleAcudiente": true,
+   *      "assignmentId": "guid-de-la-asignacion"     // o null si no es sobre una actividad concreta
+   *    }
+   *
+   * 4) CADA NOTA QUE DEVUELVE EL API (GET -> data: [ ... ], POST/PUT -> data: { ... })
+   *    {
+   *      "id": "guid",
+   *      "studentProfileId": "guid",
+   *      "docenteId": "id-usuario",
+   *      "docenteNombre": "Carlos Andrés Peña",      // para mostrar "Por ..."
+   *      ...los campos del body (punto 3),
+   *      "actividadTitulo": "Ordena tu rutina",       // título de la actividad (JOIN), null si assignmentId es null
+   *      "createdAt": "2026-09-25T15:20:00",
+   *      "updatedAt": null,
+   *      "puedeEditar": true                          // lo calcula el servidor según el usuario del token
+   *    }
+   *
+   * ------------------------------------------------------------------
+   * CALIFICACIONES DE ACTIVIDADES (pestaña "Calificaciones")
+   * ------------------------------------------------------------------
+   * 5) MODELO DE DATOS — tabla sugerida `Calificaciones` (máximo una por asignación)
+   *
+   *    Id                 GUID, PK
+   *    AssignmentId       GUID, FK -> Assignments.Id, UNIQUE   (actividad asignada a UN estudiante)
+   *    DocenteId          string, FK -> AspNetUsers.Id          (quien califica; del token)
+   *    Valor              decimal(2,1)  CHECK (Valor BETWEEN 1.0 AND 5.0)
+   *    Comentario         nvarchar(300) opcional
+   *    CreatedAt / UpdatedAt  datetime2
+   *
+   *    Escala 1.0 a 5.0 con un decimal. Nota mínima aprobatoria: 3.0 (constante PASSING_GRADE).
+   *
+   * 6) ENDPOINTS DE CALIFICACIONES
+   *
+   *    GET    /students/{studentId}/grades               -> UNA fila por actividad asignada (calificada o no)
+   *    PUT    /assignments/{assignmentId}/grade          -> crea o actualiza la calificación (upsert)
+   *           body: { "calificacion": 4.5, "comentario": "Ordenó todos los pasos." }
+   *    DELETE /assignments/{assignmentId}/grade          -> quita la calificación (vuelve a "Sin calificar")
+   *
+   *    Cada fila de GET /grades (y la respuesta de PUT):
+   *    {
+   *      "assignmentId": "guid",
+   *      "activityId": "guid",
+   *      "titulo": "Ordena tu rutina de la mañana",
+   *      "tipoActividad": "SecuenciaLogica",               // o "EmparejamientoVisual"
+   *      "calificacion": 4.5,                              // null si aún no se califica
+   *      "comentario": "Ordenó todos los pasos.",          // null si no hay
+   *      "fechaCalificacion": "2026-09-25T16:00:00",       // null si no se ha calificado
+   *      "docenteNombre": "Carlos Andrés Peña",
+   *      "puedeEditar": true,
+   *      "ultimoIntento": {                                // null si nunca la ha hecho; sale de /activities/{id}/submit
+   *        "fechaRegistro": "2026-09-24T17:40:00",
+   *        "cantidadAciertos": 5,
+   *        "cantidadIntentosFallidos": 1,
+   *        "completadaExitosamente": true,
+   *        "tiempoRespuestaSegundos": 72
+   *      },
+   *      "totalIntentos": 3
+   *    }
+   *    Permisos: igual que la bitácora. El acudiente podría consultar GET /grades en modo
+   *    solo lectura si el equipo decide mostrárselas.
+   * =================================================================== */
+  const PASSING_GRADE = 3.0;   // nota mínima aprobatoria en la escala 1.0 – 5.0
+  const NOTE_TYPES = {
+    Avance:           { label: 'Avance',             icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 16l5-5 4 4 7-7"/><path d="M15 8h5v5"/></svg>' },
+    Recomendacion:    { label: 'Recomendación',      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.8V16h5v-.3c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3z"/></svg>' },
+    Observacion:      { label: 'Observación',        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>' },
+    AspectoAReforzar: { label: 'Aspecto a reforzar', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5h.01"/></svg>' },
+  };
+  const NOTE_AREAS = { Academica: 'Académica', Comunicacion: 'Comunicación', Socioemocional: 'Socioemocional', Autonomia: 'Autonomía', Sensorial: 'Sensorial' };
+  const DEMO_LOG_STUDENTS = [
+    { id: 'demo-1', name: 'Ana Gómez' }, { id: 'demo-2', name: 'Luis Pérez' }, { id: 'demo-3', name: 'Sofía Rojas' },
+    { id: 'demo-4', name: 'Mateo Díaz' }, { id: 'demo-5', name: 'Valentina Cruz' }, { id: 'demo-6', name: 'Samuel Torres' },
+  ];
+
+  const logStudentSelect = document.getElementById('log-student');
+  const logFilterType = document.getElementById('log-filter-type');
+  const logSearch = document.getElementById('log-search');
+  const logNotice = document.getElementById('log-notice');
+  const logStatus = document.getElementById('log-status');
+  const logTimeline = document.getElementById('log-timeline');
+  const logEmpty = document.getElementById('log-empty');
+
+  const logFilterActivity = document.getElementById('log-filter-activity');
+
+  let logEntries = [];
+  let logDemo = false;
+  let gradeRows = [];        // una fila por actividad asignada al estudiante (con o sin calificación)
+  let gradesDemo = false;
+  let logRequestId = 0;
+  const demoLogStore = {};   // notas de demostración por estudiante (solo en memoria)
+  const demoGradeStore = {}; // calificaciones de demostración por estudiante (solo en memoria)
+
+  logStudentSelect.addEventListener('change', loadLog);
+  logFilterType.addEventListener('change', renderLog);
+  logFilterActivity.addEventListener('change', renderLog);
+  logSearch.addEventListener('input', renderLog);
+
+  // CONEXIÓN BACKEND: la lista de estudiantes es la misma de GET /students que ya usa
+  // la vista de Actividades (variable `students`). Si está vacía (sin backend) se usan
+  // nombres de demostración.
+  function logStudentList(){ return students.length ? students : DEMO_LOG_STUDENTS; }
+
+  function fillLogStudents(){
+    const selected = logStudentSelect.value;
+    const list = [...logStudentList()].sort((a, b) => a.name.localeCompare(b.name, 'es'));
+    logStudentSelect.innerHTML = list.map(s => `<option value="${escapeHtml(String(s.id))}">${escapeHtml(s.name)}</option>`).join('');
+    if(list.some(s => String(s.id) === selected)) logStudentSelect.value = selected;
+  }
+
+  function openLogView(){
+    fillLogStudents();
+    loadLog();
+  }
+
+  function logStudentName(id){
+    const s = logStudentList().find(x => String(x.id) === String(id));
+    return s ? s.name : 'Estudiante';
+  }
+
+  function showLogStatus(message, kind){
+    logStatus.textContent = message;
+    logStatus.className = 'log-status ' + (kind || 'ok');
+    logStatus.hidden = !message;
+  }
+
+  function parseLocalDate(s){
+    const [y, m, d] = String(s).slice(0, 10).split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  function sortEntries(list){
+    return list.sort((a, b) =>
+      String(b.fecha).localeCompare(String(a.fecha)) || String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+  }
+
+  // ---------- Consulta ----------
+  async function loadLog(){
+    const studentId = logStudentSelect.value;
+    if(!studentId) return;
+    const reqId = ++logRequestId;
+    renderLogHeader(studentId);
+    showLogStatus('', 'ok');
+    logNotice.hidden = false;
+    logNotice.textContent = `Cargando la bitácora de ${logStudentName(studentId)}…`;
+
+    const [notes, grades] = await Promise.all([fetchLogEntries(studentId), fetchGrades(studentId)]);
+    if(reqId !== logRequestId) return;
+
+    logDemo = notes.demo;
+    logEntries = sortEntries(notes.data);
+    gradesDemo = grades.demo;
+    gradeRows = grades.data;
+
+    const demo = logDemo || gradesDemo;
+    logNotice.hidden = !demo;
+    logNotice.textContent = demo
+      ? 'Modo demostración: el servidor todavía no responde. Puedes crear, editar, eliminar y calificar para probar, pero los cambios no se guardan.'
+      : '';
+    fillActivityOptions();
+    renderLog();
+    renderGrades();
+  }
+
+  async function fetchLogEntries(studentId){
+    try {
+      // CONEXIÓN BACKEND (1/4): consulta cronológica de la bitácora.
+      //   GET /api/students/{studentId}/log-entries
+      //   Respuesta: { success: true, data: [ nota, nota, ... ] }  (forma de cada nota en la GUÍA, punto 4)
+      //   El frontend las ordena por fecha descendente, pero conviene que el API ya las envíe así.
+      const res = await ApiClient.request(`/students/${encodeURIComponent(studentId)}/log-entries`);
+      if(!(res.ok && res.data && res.data.success)) throw new Error('Respuesta no válida de /log-entries');
+      return { data: res.data.data || [], demo: false };
+    } catch(err){
+      // CONEXIÓN BACKEND: si el API no responde se usan notas de demostración en memoria.
+      // Crear / editar / eliminar siguen funcionando, pero no se guarda nada en el servidor.
+      console.warn('Bitácora: se usan datos de demostración.', err);
+      if(!demoLogStore[studentId]) demoLogStore[studentId] = buildDemoLog(studentId);
+      return { data: demoLogStore[studentId], demo: true };
+    }
+  }
+
+  async function fetchGrades(studentId){
+    try {
+      // CONEXIÓN BACKEND (calificaciones 1/3): actividades asignadas con su calificación.
+      //   GET /api/students/{studentId}/grades
+      //   Respuesta: { success: true, data: [ fila, ... ] }  (forma de cada fila en la GUÍA, punto 6)
+      //   Debe incluir TODAS las actividades asignadas, también las que aún no tienen calificación.
+      const res = await ApiClient.request(`/students/${encodeURIComponent(studentId)}/grades`);
+      if(!(res.ok && res.data && res.data.success)) throw new Error('Respuesta no válida de /grades');
+      return { data: res.data.data || [], demo: false };
+    } catch(err){
+      console.warn('Calificaciones: se usan datos de demostración.', err);
+      if(!demoGradeStore[studentId]) demoGradeStore[studentId] = buildDemoGrades(studentId);
+      return { data: demoGradeStore[studentId], demo: true };
+    }
+  }
+
+  /** Llena los selectores de actividad (formulario de nota y filtro) con las actividades asignadas. */
+  function fillActivityOptions(){
+    const opts = gradeRows.map(g => `<option value="${escapeHtml(String(g.assignmentId))}">${escapeHtml(g.titulo)}</option>`).join('');
+    const selected = logFilterActivity.value;
+    logFilterActivity.innerHTML = '<option value="">Todas</option><option value="__general">Solo observaciones generales</option>' + opts;
+    if([...logFilterActivity.options].some(o => o.value === selected)) logFilterActivity.value = selected;
+    document.getElementById('note-activity').innerHTML = '<option value="">Ninguna: es una observación general</option>' + opts;
+  }
+
+  function activityTitle(assignmentId){
+    const g = gradeRows.find(r => String(r.assignmentId) === String(assignmentId));
+    return g ? g.titulo : null;
+  }
+
+  function renderLogHeader(studentId){
+    const name = logStudentName(studentId);
+    document.getElementById('log-student-name').textContent = name;
+    document.getElementById('log-student-initials').textContent =
+      name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('') || '—';
+  }
+
+  function renderLog(){
+    const q = logSearch.value.trim().toLowerCase();
+    const type = logFilterType.value;
+    const act = logFilterActivity.value;
+    const list = logEntries.filter(e =>
+      (!type || e.tipo === type) &&
+      (!act || (act === '__general' ? !e.assignmentId : String(e.assignmentId) === act)) &&
+      (!q || [e.titulo, e.contenido, e.recomendacionCasa, NOTE_AREAS[e.area], e.actividadTitulo].some(t => (t || '').toLowerCase().includes(q))));
+
+    renderLogCounts();
+
+    if(list.length === 0){
+      logTimeline.innerHTML = '';
+      logEmpty.style.display = 'block';
+      const filtered = logEntries.length > 0;
+      document.getElementById('log-empty-title').textContent = filtered ? 'Ninguna nota coincide con los filtros' : 'Todavía no hay notas para este estudiante';
+      document.getElementById('log-empty-text').textContent = filtered ? 'Cambia el tipo de nota, la actividad o la búsqueda.' : 'Usa "+ Nueva observación" para registrar la primera.';
+      return;
+    }
+    logEmpty.style.display = 'none';
+
+    const byMonth = new Map();
+    list.forEach(e => {
+      const key = String(e.fecha).slice(0, 7);
+      if(!byMonth.has(key)) byMonth.set(key, []);
+      byMonth.get(key).push(e);
+    });
+
+    logTimeline.innerHTML = [...byMonth.entries()].map(([key, items]) => {
+      const monthText = parseLocalDate(key + '-01').toLocaleDateString('es-CO', { month: 'long', year: 'numeric' });
+      const monthTitle = monthText.charAt(0).toUpperCase() + monthText.slice(1);
+      return `<h3 class="log-month">${escapeHtml(monthTitle)}</h3>
+        <ol class="log-list">${items.map(noteCardHtml).join('')}</ol>`;
+    }).join('');
+  }
+
+  function noteCardHtml(e){
+    const d = parseLocalDate(e.fecha);
+    const type = NOTE_TYPES[e.tipo] || NOTE_TYPES.Observacion;
+    const eyeOpen = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+    const lock = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+    const edited = e.updatedAt ? ` · Editada el ${new Date(e.updatedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}` : '';
+    const canEdit = e.puedeEditar !== false;   // CONEXIÓN BACKEND: "puedeEditar" lo decide el servidor
+    const fullDate = d.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    return `<li class="log-entry">
+      <div class="log-date" aria-label="${escapeHtml(fullDate)}">
+        <div class="day" aria-hidden="true">${d.getDate()}</div>
+        <div class="mon" aria-hidden="true">${escapeHtml(d.toLocaleDateString('es-CO', { month: 'short' }).replace('.', ''))}</div>
+      </div>
+      <div>
+        <div class="log-head">
+          <span class="tipo-badge tipo-${escapeHtml(e.tipo)}">${type.icon}${type.label}</span>
+          <span class="area-badge">Área: ${escapeHtml(NOTE_AREAS[e.area] || e.area || '—')}</span>
+          ${e.assignmentId ? `<span class="log-activity">${ACTIVITY_ICON}Actividad: ${escapeHtml(e.actividadTitulo || activityTitle(e.assignmentId) || '—')}</span>` : ''}
+        </div>
+        <h4 class="log-title">${escapeHtml(e.titulo)}</h4>
+        <p class="log-text">${escapeHtml(e.contenido)}</p>
+        ${e.recomendacionCasa ? `<div class="log-reco"><strong>Recomendación para casa</strong>${escapeHtml(e.recomendacionCasa)}</div>` : ''}
+        <div class="log-foot">
+          <span class="log-visibility">${e.visibleAcudiente ? eyeOpen + 'Visible para el acudiente' : lock + 'Solo docentes'}</span>
+          <span>· Por ${escapeHtml(e.docenteNombre || 'Docente')}${edited}</span>
+          ${canEdit ? `<div class="row-actions">
+            <button type="button" class="icon-btn" data-note-action="edit" data-id="${escapeHtml(String(e.id))}">Editar<span class="sr-only"> nota ${escapeHtml(e.titulo)}</span></button>
+            <button type="button" class="icon-btn danger" data-note-action="delete" data-id="${escapeHtml(String(e.id))}">Eliminar<span class="sr-only"> nota ${escapeHtml(e.titulo)}</span></button>
+          </div>` : ''}
+        </div>
+      </div>
+    </li>`;
+  }
+
+  logTimeline.addEventListener('click', (ev) => {
+    const btn = ev.target.closest('button[data-note-action]');
+    if(!btn) return;
+    const entry = logEntries.find(e => String(e.id) === btn.dataset.id);
+    if(!entry) return;
+    if(btn.dataset.noteAction === 'edit') openNoteModal(entry, btn);
+    if(btn.dataset.noteAction === 'delete') openNoteDeleteModal(entry, btn);
+  });
+
+  // ---------- Crear / editar ----------
+  const noteOverlay = document.getElementById('note-overlay');
+  const noteForm = document.getElementById('note-form');
+  const noteIdInput = document.getElementById('note-id');
+  const noteDate = document.getElementById('note-date');
+  const noteArea = document.getElementById('note-area');
+  const noteTitle = document.getElementById('note-title');
+  const noteContent = document.getElementById('note-content');
+  const noteReco = document.getElementById('note-reco');
+  const noteVisible = document.getElementById('note-visible');
+  const noteTypeGroup = document.getElementById('note-type-group');
+  const btnSaveNote = document.getElementById('btn-save-note');
+  let noteType = 'Observacion';
+  let noteReturnFocus = null;
+
+  noteTypeGroup.innerHTML = Object.entries(NOTE_TYPES).map(([key, t]) =>
+    `<button type="button" class="chip-btn" data-value="${key}" aria-pressed="false">${t.icon}${t.label}</button>`).join('');
+  noteTypeGroup.addEventListener('click', (ev) => {
+    const btn = ev.target.closest('.chip-btn');
+    if(!btn) return;
+    noteType = btn.dataset.value;
+    refreshNoteTypeChips();
+  });
+  function refreshNoteTypeChips(){
+    noteTypeGroup.querySelectorAll('.chip-btn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.value === noteType)));
+  }
+
+  [['note-title', 80], ['note-content', 1000], ['note-reco', 500]].forEach(([id, max]) => {
+    const input = document.getElementById(id);
+    input.addEventListener('input', () => { document.getElementById('count-' + id).textContent = `${input.value.length} / ${max}`; });
+  });
+  function refreshNoteCounters(){
+    ['note-title', 'note-content', 'note-reco'].forEach(id => document.getElementById(id).dispatchEvent(new Event('input')));
+  }
+
+  function todayIso(){ return isoDate(new Date()); }
+
+  document.getElementById('btn-new-note').addEventListener('click', (ev) => openNoteModal(null, ev.currentTarget));
+  document.getElementById('btn-cancel-note').addEventListener('click', closeNoteModal);
+  noteOverlay.addEventListener('click', (ev) => { if(ev.target === noteOverlay) closeNoteModal(); });
+
+  /** @param presetAssignmentId  actividad preseleccionada (al escribir la observación desde "Calificaciones"). */
+  function openNoteModal(entry, returnFocusEl, presetAssignmentId){
+    if(!logStudentSelect.value) return;
+    noteReturnFocus = returnFocusEl || null;
+    const name = logStudentName(logStudentSelect.value);
+    document.getElementById('note-modal-title').textContent = entry ? 'Editar observación' : `Nueva observación para ${name}`;
+    noteIdInput.value = entry ? entry.id : '';
+    const noteActivity = document.getElementById('note-activity');
+    const wanted = entry ? (entry.assignmentId || '') : (presetAssignmentId || '');
+    noteActivity.value = [...noteActivity.options].some(o => o.value === String(wanted)) ? String(wanted) : '';
+    noteDate.value = entry ? String(entry.fecha).slice(0, 10) : todayIso();
+    noteDate.max = todayIso();
+    noteArea.value = entry ? entry.area : 'Academica';
+    noteType = entry ? entry.tipo : 'Observacion';
+    noteTitle.value = entry ? entry.titulo : '';
+    noteContent.value = entry ? entry.contenido : '';
+    noteReco.value = entry ? (entry.recomendacionCasa || '') : '';
+    noteVisible.checked = entry ? !!entry.visibleAcudiente : true;
+    refreshNoteTypeChips();
+    refreshNoteCounters();
+    ['note-date', 'note-title', 'note-content'].forEach(id => clearFieldError('field-' + id, 'error-' + id));
+    noteOverlay.classList.add('open');
+    noteTitle.focus();
+  }
+
+  function closeNoteModal(){
+    noteOverlay.classList.remove('open');
+    if(noteReturnFocus && document.body.contains(noteReturnFocus)) noteReturnFocus.focus();
+    noteReturnFocus = null;
+  }
+
+  function validateNote(){
+    let ok = true;
+    if(!noteDate.value){ setFieldError('field-note-date', 'error-note-date', 'Elige la fecha de la observación.'); ok = false; }
+    else if(noteDate.value > todayIso()){ setFieldError('field-note-date', 'error-note-date', 'La fecha no puede ser posterior a hoy.'); ok = false; }
+    else clearFieldError('field-note-date', 'error-note-date');
+
+    if(noteTitle.value.trim().length < 3){ setFieldError('field-note-title', 'error-note-title', 'Escribe un título de al menos 3 caracteres.'); ok = false; }
+    else clearFieldError('field-note-title', 'error-note-title');
+
+    if(noteContent.value.trim().length < 10){ setFieldError('field-note-content', 'error-note-content', 'Describe la observación con al menos 10 caracteres.'); ok = false; }
+    else clearFieldError('field-note-content', 'error-note-content');
+    return ok;
+  }
+
+  noteForm.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    if(!validateNote()){
+      noteForm.querySelector('.field-row.invalid input, .field-row.invalid textarea')?.focus();
+      return;
+    }
+    const studentId = logStudentSelect.value;
+    const id = noteIdInput.value;
+    const payload = {
+      fecha: noteDate.value,
+      tipo: noteType,
+      area: noteArea.value,
+      titulo: noteTitle.value.trim(),
+      contenido: noteContent.value.trim(),
+      recomendacionCasa: noteReco.value.trim() || null,
+      visibleAcudiente: noteVisible.checked,
+      assignmentId: document.getElementById('note-activity').value || null,   // actividad relacionada (opcional)
+    };
+
+    btnSaveNote.disabled = true;
+    try {
+      let saved;
+      if(logDemo){
+        const now = new Date().toISOString();
+        const previous = logEntries.find(e => String(e.id) === id);
+        const actividadTitulo = payload.assignmentId ? activityTitle(payload.assignmentId) : null;
+        saved = id
+          ? { ...previous, ...payload, actividadTitulo, updatedAt: now }
+          : { id: 'nota-' + Date.now(), studentProfileId: studentId, docenteNombre: currentTeacherName, ...payload, actividadTitulo, createdAt: now, updatedAt: null, puedeEditar: true };
+      } else if(id){
+        // CONEXIÓN BACKEND (2/4): editar nota.
+        //   PUT /api/log-entries/{entryId}   body = GUÍA punto 3
+        //   Respuesta: { success: true, data: nota actualizada }
+        const res = await ApiClient.request(`/log-entries/${encodeURIComponent(id)}`, { method: 'PUT', body: payload });
+        if(!(res.ok && res.data && res.data.success)) throw new Error((res.data && res.data.message) || 'No se pudo actualizar la nota.');
+        saved = res.data.data;
+      } else {
+        // CONEXIÓN BACKEND (3/4): crear nota.
+        //   POST /api/students/{studentId}/log-entries   body = GUÍA punto 3
+        //   Respuesta: { success: true, data: nota creada (con id, docenteNombre, createdAt, puedeEditar) }
+        const res = await ApiClient.request(`/students/${encodeURIComponent(studentId)}/log-entries`, { method: 'POST', body: payload });
+        if(!(res.ok && res.data && res.data.success)) throw new Error((res.data && res.data.message) || 'No se pudo guardar la nota.');
+        saved = res.data.data;
+      }
+
+      const idx = logEntries.findIndex(e => String(e.id) === String(saved.id));
+      if(idx >= 0) logEntries[idx] = saved; else logEntries.push(saved);
+      sortEntries(logEntries);
+      if(logDemo) demoLogStore[studentId] = logEntries;
+
+      closeNoteModal();
+      renderLog();
+      renderGrades();
+      showLogStatus(
+        (id ? 'La observación fue actualizada.' : 'La observación fue guardada.') +
+        (payload.visibleAcudiente ? ' El acudiente ya puede verla en su panel.' : ' Solo la verán los docentes.'), 'ok');
+    } catch(err){
+      console.error('Error al guardar la nota:', err);
+      setFieldError('field-note-content', 'error-note-content', err.message || 'Error de conexión al guardar la nota.');
+    } finally {
+      btnSaveNote.disabled = false;
+    }
+  });
+
+  // ---------- Eliminar ----------
+  const noteDeleteOverlay = document.getElementById('note-delete-overlay');
+  const btnConfirmNoteDelete = document.getElementById('btn-confirm-note-delete');
+  let pendingNoteDelete = null;
+  let noteDeleteReturnFocus = null;
+
+  function openNoteDeleteModal(entry, returnFocusEl){
+    pendingNoteDelete = entry;
+    noteDeleteReturnFocus = returnFocusEl || null;
+    document.getElementById('note-delete-name').textContent = `"${entry.titulo}"`;
+    noteDeleteOverlay.classList.add('open');
+    document.getElementById('btn-cancel-note-delete').focus();
+  }
+  function closeNoteDeleteModal(){
+    noteDeleteOverlay.classList.remove('open');
+    pendingNoteDelete = null;
+    if(noteDeleteReturnFocus && document.body.contains(noteDeleteReturnFocus)) noteDeleteReturnFocus.focus();
+    noteDeleteReturnFocus = null;
+  }
+  document.getElementById('btn-cancel-note-delete').addEventListener('click', closeNoteDeleteModal);
+  noteDeleteOverlay.addEventListener('click', (ev) => { if(ev.target === noteDeleteOverlay) closeNoteDeleteModal(); });
+
+  btnConfirmNoteDelete.addEventListener('click', async () => {
+    if(!pendingNoteDelete) return;
+    const entry = pendingNoteDelete;
+    btnConfirmNoteDelete.disabled = true;
+    try {
+      if(!logDemo){
+        // CONEXIÓN BACKEND (4/4): eliminar nota.
+        //   DELETE /api/log-entries/{entryId}
+        //   Respuesta: { success: true }
+        const res = await ApiClient.request(`/log-entries/${encodeURIComponent(entry.id)}`, { method: 'DELETE' });
+        if(!(res.ok && res.data && res.data.success)) throw new Error((res.data && res.data.message) || 'No se pudo eliminar la nota.');
+      }
+      logEntries = logEntries.filter(e => String(e.id) !== String(entry.id));
+      if(logDemo) demoLogStore[logStudentSelect.value] = logEntries;
+      noteDeleteReturnFocus = document.getElementById('btn-new-note');
+      closeNoteDeleteModal();
+      renderLog();
+      renderGrades();
+      showLogStatus(`La observación "${entry.titulo}" fue eliminada.`, 'ok');
+    } catch(err){
+      console.error('Error al eliminar la nota:', err);
+      closeNoteDeleteModal();
+      showLogStatus(err.message || 'Error de conexión al eliminar la nota.', 'error');
+    } finally {
+      btnConfirmNoteDelete.disabled = false;
+    }
+  });
+
+  // ---------- Datos de demostración ----------
+  function buildDemoLog(studentId){
+    const first = logStudentName(studentId).split(' ')[0];
+    const day = n => { const d = new Date(); d.setDate(d.getDate() - n); return isoDate(d); };
+    const created = n => { const d = new Date(); d.setDate(d.getDate() - n); d.setHours(15, 20, 0, 0); return d.toISOString(); };
+    return [
+      { id: `demo-${studentId}-1`, studentProfileId: studentId, fecha: day(2), tipo: 'Avance', area: 'Autonomia',
+        titulo: 'Completó la rutina de la mañana sin ayuda',
+        contenido: `${first} ordenó los 5 pasos de la rutina en el primer intento y explicó cada paso con sus palabras.`,
+        recomendacionCasa: 'Pídale que le cuente los pasos de su rutina antes de salir de casa.',
+        assignmentId: `${studentId}-a1`, actividadTitulo: 'Ordena tu rutina de la mañana',
+        visibleAcudiente: true, docenteNombre: currentTeacherName, createdAt: created(2), updatedAt: null, puedeEditar: true },
+      { id: `demo-${studentId}-2`, studentProfileId: studentId, fecha: day(6), tipo: 'AspectoAReforzar', area: 'Socioemocional',
+        titulo: 'Se frustra cuando cambia de actividad',
+        contenido: 'Cuando la actividad terminó antes de lo esperado, se tapó los oídos y tardó unos minutos en volver a trabajar.',
+        recomendacionCasa: 'Avísele con 5 minutos de anticipación antes de cambiar de actividad, por ejemplo: "En 5 minutos vamos a comer".',
+        visibleAcudiente: true, docenteNombre: currentTeacherName, createdAt: created(6), updatedAt: null, puedeEditar: true },
+      { id: `demo-${studentId}-3`, studentProfileId: studentId, fecha: day(13), tipo: 'Observacion', area: 'Sensorial',
+        titulo: 'Trabaja mejor con el volumen bajo',
+        contenido: 'Con los sonidos de la plataforma al 30 % se mantuvo concentrado durante toda la sesión.',
+        recomendacionCasa: null,
+        visibleAcudiente: false, docenteNombre: currentTeacherName, createdAt: created(13), updatedAt: null, puedeEditar: true },
+      { id: `demo-${studentId}-4`, studentProfileId: studentId, fecha: day(24), tipo: 'Recomendacion', area: 'Comunicacion',
+        titulo: 'Usar instrucciones de un solo paso',
+        contenido: 'Responde mejor cuando cada instrucción tiene una sola acción, por ejemplo "Guarda el lápiz" en lugar de "Guarda todo y ven".',
+        recomendacionCasa: 'En casa, dé una instrucción a la vez y espere a que la termine antes de dar la siguiente.',
+        visibleAcudiente: true, docenteNombre: 'Lic. Marta Ruiz', createdAt: created(24), updatedAt: null, puedeEditar: false },
+    ];
+  }
+
+  /* ---------------------------------------------------------------------
+   * Pestañas internas: Observaciones / Calificaciones
+   * ------------------------------------------------------------------- */
+  const ACTIVITY_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12l3 3 5-6"/></svg>';
+  const logTabs = [document.getElementById('tab-notas'), document.getElementById('tab-calif')];
+
+  function selectLogTab(tab, focus){
+    logTabs.forEach(t => {
+      const on = t === tab;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+    });
+    if(focus) tab.focus();
+  }
+  logTabs.forEach((t, i) => {
+    t.addEventListener('click', () => selectLogTab(t));
+    t.addEventListener('keydown', (ev) => {
+      if(ev.key === 'ArrowRight' || ev.key === 'ArrowLeft'){
+        ev.preventDefault();
+        selectLogTab(logTabs[(i + (ev.key === 'ArrowRight' ? 1 : logTabs.length - 1)) % logTabs.length], true);
+      }
+    });
+  });
+
+  function renderLogCounts(){
+    const visibles = logEntries.filter(e => e.visibleAcudiente).length;
+    const graded = gradeRows.filter(g => g.calificacion != null);
+    const avg = graded.length ? graded.reduce((s, g) => s + Number(g.calificacion), 0) / graded.length : null;
+    document.getElementById('tab-notas-count').textContent = logEntries.length;
+    document.getElementById('tab-calif-count').textContent = `${graded.length}/${gradeRows.length}`;
+    document.getElementById('log-count').innerHTML =
+      `${logEntries.length} ${logEntries.length === 1 ? 'observación' : 'observaciones'} · ${visibles} visibles para el acudiente<br>` +
+      (avg == null ? 'Sin calificaciones todavía' : `Promedio de calificaciones: <strong>${formatGrade(avg)}</strong>`);
+  }
+
+  /* ---------------------------------------------------------------------
+   * Calificaciones por actividad (escala 1.0 – 5.0)
+   * ------------------------------------------------------------------- */
+  const gradesBody = document.getElementById('grades-body');
+  const gradeOverlay = document.getElementById('grade-overlay');
+  const gradeForm = document.getElementById('grade-form');
+  const gradeValue = document.getElementById('grade-value');
+  const gradeComment = document.getElementById('grade-comment');
+  const gradePreview = document.getElementById('grade-preview');
+  const btnSaveGrade = document.getElementById('btn-save-grade');
+  const btnRemoveGrade = document.getElementById('btn-remove-grade');
+  let gradeReturnFocus = null;
+
+  function formatGrade(v){ return Number(v).toFixed(1); }
+
+  function gradePill(v){
+    if(v == null) return '<span class="grade-pill grade-none">Sin calificar</span>';
+    const ok = Number(v) >= PASSING_GRADE;
+    const icon = ok
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="5 12.5 10 17.5 19 7"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v9M12 18.5h.01"/></svg>';
+    return `<span class="grade-pill ${ok ? 'grade-ok' : 'grade-low'}">${icon}${formatGrade(v)} · ${ok ? 'Aprobada' : 'Por mejorar'}</span>`;
+  }
+
+  function attemptSummary(a){
+    if(!a) return 'Aún no la ha realizado';
+    const d = new Date(a.fechaRegistro).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' });
+    const res = a.completadaExitosamente ? 'Completada' : 'Sin terminar';
+    return `${res} el ${d} · ${a.cantidadAciertos} aciertos, ${a.cantidadIntentosFallidos} fallidos`;
+  }
+
+  function renderGrades(){
+    renderLogCounts();
+    const graded = gradeRows.filter(g => g.calificacion != null);
+    const avg = graded.length ? graded.reduce((s, g) => s + Number(g.calificacion), 0) / graded.length : null;
+    const approved = graded.filter(g => Number(g.calificacion) >= PASSING_GRADE).length;
+    document.getElementById('grade-summary').innerHTML = [
+      kpiHtml('Promedio', avg == null ? '—' : formatGrade(avg), avg == null ? '' : '/ 5.0', avg == null ? 'Aún no hay calificaciones' : (avg >= PASSING_GRADE ? 'Por encima de la nota mínima (3.0)' : 'Por debajo de la nota mínima (3.0)')),
+      kpiHtml('Actividades calificadas', `${graded.length}`, `/ ${gradeRows.length}`, `${gradeRows.length - graded.length} pendientes por calificar`),
+      kpiHtml('Aprobadas', `${approved}`, `/ ${graded.length}`, 'Con 3.0 o más'),
+    ].join('');
+
+    document.getElementById('grades-empty').style.display = gradeRows.length ? 'none' : 'block';
+    // Primero las pendientes por calificar, luego por título
+    const rows = [...gradeRows].sort((a, b) => (a.calificacion != null) - (b.calificacion != null) || String(a.titulo).localeCompare(String(b.titulo), 'es'));
+    gradesBody.innerHTML = rows.map(g => {
+      const type = (g.tipoActividad === 'EmparejamientoVisual' || g.tipoActividad === 1) ? 'emparejamiento' : 'secuencia';
+      const canEdit = g.puedeEditar !== false;
+      const id = escapeHtml(String(g.assignmentId));
+      const noteCount = logEntries.filter(e => String(e.assignmentId) === String(g.assignmentId)).length;
+      return `<tr>
+        <td>
+          <div class="act-title">${escapeHtml(g.titulo)}</div>
+          <div class="grade-meta"><span class="badge badge-${type}">${TYPE_LABEL[type]}</span>${noteCount ? ` · ${noteCount} ${noteCount === 1 ? 'observación' : 'observaciones'}` : ''}</div>
+        </td>
+        <td><div style="font-size:14.5px;">${escapeHtml(attemptSummary(g.ultimoIntento))}</div>${g.totalIntentos ? `<div class="grade-meta">${g.totalIntentos} ${g.totalIntentos === 1 ? 'intento' : 'intentos'} en total</div>` : ''}</td>
+        <td>${gradePill(g.calificacion)}${g.fechaCalificacion ? `<div class="grade-meta">${new Date(g.fechaCalificacion).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })}</div>` : ''}</td>
+        <td class="grade-comment">${g.comentario ? escapeHtml(g.comentario) : '<span class="grade-meta">—</span>'}</td>
+        <td><div class="grade-actions">
+          ${canEdit ? `<button type="button" class="icon-btn" data-grade-action="grade" data-id="${id}">${g.calificacion == null ? 'Calificar' : 'Editar nota'}<span class="sr-only"> de ${escapeHtml(g.titulo)}</span></button>` : ''}
+          <button type="button" class="icon-btn" data-grade-action="note" data-id="${id}">+ Observación<span class="sr-only"> sobre ${escapeHtml(g.titulo)}</span></button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  }
+
+  gradesBody.addEventListener('click', (ev) => {
+    const btn = ev.target.closest('button[data-grade-action]');
+    if(!btn) return;
+    const row = gradeRows.find(g => String(g.assignmentId) === btn.dataset.id);
+    if(!row) return;
+    if(btn.dataset.gradeAction === 'grade') openGradeModal(row, btn);
+    if(btn.dataset.gradeAction === 'note') openNoteModal(null, btn, row.assignmentId);
+  });
+
+  function openGradeModal(row, returnFocusEl){
+    gradeReturnFocus = returnFocusEl || null;
+    document.getElementById('grade-modal-title').textContent = row.calificacion == null ? 'Calificar actividad' : 'Editar calificación';
+    document.getElementById('grade-modal-sub').textContent = `${row.titulo} · ${logStudentName(logStudentSelect.value)}`;
+    document.getElementById('grade-attempt').innerHTML = `<strong>Último intento del estudiante</strong>${escapeHtml(attemptSummary(row.ultimoIntento))}` +
+      (row.ultimoIntento && row.ultimoIntento.tiempoRespuestaSegundos != null ? ` · ${Math.round(row.ultimoIntento.tiempoRespuestaSegundos)} s` : '');
+    document.getElementById('grade-assignment-id').value = row.assignmentId;
+    gradeValue.value = row.calificacion != null ? formatGrade(row.calificacion) : '';
+    gradeComment.value = row.comentario || '';
+    gradeComment.dispatchEvent(new Event('input'));
+    btnRemoveGrade.hidden = row.calificacion == null;
+    clearFieldError('field-grade-value', 'error-grade-value');
+    updateGradePreview();
+    gradeOverlay.classList.add('open');
+    gradeValue.focus();
+  }
+
+  function closeGradeModal(){
+    gradeOverlay.classList.remove('open');
+    if(gradeReturnFocus && document.body.contains(gradeReturnFocus)) gradeReturnFocus.focus();
+    gradeReturnFocus = null;
+  }
+  document.getElementById('btn-cancel-grade').addEventListener('click', closeGradeModal);
+  gradeOverlay.addEventListener('click', (ev) => { if(ev.target === gradeOverlay) closeGradeModal(); });
+  gradeComment.addEventListener('input', () => { document.getElementById('count-grade-comment').textContent = `${gradeComment.value.length} / 300`; });
+
+  /** Acepta coma o punto decimal ("4,5" o "4.5"). Devuelve null si no es válido. */
+  function parseGrade(raw){
+    const v = Number(String(raw).trim().replace(',', '.'));
+    if(String(raw).trim() === '' || isNaN(v)) return null;
+    return Math.round(v * 10) / 10;
+  }
+  function updateGradePreview(){
+    const v = parseGrade(gradeValue.value);
+    gradePreview.innerHTML = v != null && v >= 1 && v <= 5 ? gradePill(v) : '';
+  }
+  gradeValue.addEventListener('input', updateGradePreview);
+
+  gradeForm.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const v = parseGrade(gradeValue.value);
+    if(v == null || v < 1 || v > 5){
+      setFieldError('field-grade-value', 'error-grade-value', 'Escribe una calificación entre 1.0 y 5.0, por ejemplo 4.5.');
+      gradeValue.focus();
+      return;
+    }
+    clearFieldError('field-grade-value', 'error-grade-value');
+    const assignmentId = document.getElementById('grade-assignment-id').value;
+    const payload = { calificacion: v, comentario: gradeComment.value.trim() || null };
+
+    btnSaveGrade.disabled = true;
+    try {
+      let saved;
+      const row = gradeRows.find(g => String(g.assignmentId) === assignmentId);
+      if(gradesDemo){
+        saved = { ...row, ...payload, fechaCalificacion: new Date().toISOString(), docenteNombre: currentTeacherName };
+      } else {
+        // CONEXIÓN BACKEND (calificaciones 2/3): crear o actualizar la calificación (upsert).
+        //   PUT /api/assignments/{assignmentId}/grade   body: { calificacion: 4.5, comentario: "..." }
+        //   Respuesta: { success: true, data: fila actualizada (misma forma que GET /grades) }
+        const res = await ApiClient.request(`/assignments/${encodeURIComponent(assignmentId)}/grade`, { method: 'PUT', body: payload });
+        if(!(res.ok && res.data && res.data.success)) throw new Error((res.data && res.data.message) || 'No se pudo guardar la calificación.');
+        saved = { ...row, ...res.data.data };
+      }
+      gradeRows = gradeRows.map(g => String(g.assignmentId) === assignmentId ? saved : g);
+      if(gradesDemo) demoGradeStore[logStudentSelect.value] = gradeRows;
+      closeGradeModal();
+      renderGrades();
+      showLogStatus(`Calificación ${formatGrade(v)} guardada para "${saved.titulo}".`, 'ok');
+    } catch(err){
+      console.error('Error al guardar la calificación:', err);
+      setFieldError('field-grade-value', 'error-grade-value', err.message || 'Error de conexión al guardar la calificación.');
+    } finally {
+      btnSaveGrade.disabled = false;
+    }
+  });
+
+  btnRemoveGrade.addEventListener('click', async () => {
+    const assignmentId = document.getElementById('grade-assignment-id').value;
+    const row = gradeRows.find(g => String(g.assignmentId) === assignmentId);
+    if(!row) return;
+    btnRemoveGrade.disabled = true;
+    try {
+      if(!gradesDemo){
+        // CONEXIÓN BACKEND (calificaciones 3/3): quitar la calificación.
+        //   DELETE /api/assignments/{assignmentId}/grade   ->  { success: true }
+        const res = await ApiClient.request(`/assignments/${encodeURIComponent(assignmentId)}/grade`, { method: 'DELETE' });
+        if(!(res.ok && res.data && res.data.success)) throw new Error((res.data && res.data.message) || 'No se pudo quitar la calificación.');
+      }
+      gradeRows = gradeRows.map(g => String(g.assignmentId) === assignmentId ? { ...g, calificacion: null, comentario: null, fechaCalificacion: null } : g);
+      if(gradesDemo) demoGradeStore[logStudentSelect.value] = gradeRows;
+      closeGradeModal();
+      renderGrades();
+      showLogStatus(`Se quitó la calificación de "${row.titulo}". Quedó como "Sin calificar".`, 'ok');
+    } catch(err){
+      console.error('Error al quitar la calificación:', err);
+      setFieldError('field-grade-value', 'error-grade-value', err.message || 'Error de conexión.');
+    } finally {
+      btnRemoveGrade.disabled = false;
+    }
+  });
+
+  /** CONEXIÓN BACKEND: ejemplo vivo de GET /grades (misma forma que la GUÍA, punto 6). */
+  function buildDemoGrades(studentId){
+    const ago = (n, h) => { const d = new Date(); d.setDate(d.getDate() - n); d.setHours(h, 30, 0, 0); return d.toISOString(); };
+    return [
+      { assignmentId: `${studentId}-a1`, activityId: 'act-1', titulo: 'Ordena tu rutina de la mañana', tipoActividad: 'SecuenciaLogica',
+        calificacion: 4.5, comentario: 'Ordenó todos los pasos; necesitó un recordatorio en el paso 4.', fechaCalificacion: ago(2, 16), docenteNombre: currentTeacherName, puedeEditar: true,
+        ultimoIntento: { fechaRegistro: ago(2, 10), cantidadAciertos: 5, cantidadIntentosFallidos: 1, completadaExitosamente: true, tiempoRespuestaSegundos: 72 }, totalIntentos: 3 },
+      { assignmentId: `${studentId}-a2`, activityId: 'act-2', titulo: 'Empareja emociones y caras', tipoActividad: 'EmparejamientoVisual',
+        calificacion: 2.8, comentario: 'Confunde "sorpresa" con "miedo". Repasar con apoyo visual.', fechaCalificacion: ago(5, 16), docenteNombre: currentTeacherName, puedeEditar: true,
+        ultimoIntento: { fechaRegistro: ago(5, 11), cantidadAciertos: 3, cantidadIntentosFallidos: 4, completadaExitosamente: true, tiempoRespuestaSegundos: 118 }, totalIntentos: 4 },
+      { assignmentId: `${studentId}-a3`, activityId: 'act-3', titulo: 'Pasos para lavarse las manos', tipoActividad: 'SecuenciaLogica',
+        calificacion: null, comentario: null, fechaCalificacion: null, docenteNombre: null, puedeEditar: true,
+        ultimoIntento: { fechaRegistro: ago(1, 9), cantidadAciertos: 6, cantidadIntentosFallidos: 0, completadaExitosamente: true, tiempoRespuestaSegundos: 54 }, totalIntentos: 1 },
+      { assignmentId: `${studentId}-a4`, activityId: 'act-4', titulo: 'Empareja figuras iguales', tipoActividad: 'EmparejamientoVisual',
+        calificacion: null, comentario: null, fechaCalificacion: null, docenteNombre: null, puedeEditar: true,
+        ultimoIntento: null, totalIntentos: 0 },
+    ];
   }
 
   async function init(){
