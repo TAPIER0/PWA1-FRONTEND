@@ -79,7 +79,7 @@ const ApiClient = {
     } else if (roles.includes('Acudiente')) {
       window.location.replace('Interfaz_Acudiente.html');
     } else if (roles.includes('Docente') || roles.includes('Profesor')) {
-      window.location.replace('Interfaz_Docente.html');
+      window.location.replace('Interfaz_Docente2.html');
     } else if (roles.includes('Administrador')) {
       window.location.replace('Interfaz_Admin2.html');
     } else {
@@ -118,11 +118,31 @@ const ApiClient = {
         throw new Error('Sesión expirada o no autorizada.');
       }
 
-      const json = await response.json();
+      if (response.status === 204) {
+        return { ok: true, status: 204, data: { success: true } };
+      }
+
+      const text = await response.text();
+      let json = null;
+      if (text && text.trim().length > 0) {
+        try {
+          json = JSON.parse(text);
+        } catch (e) {
+          json = { success: response.ok, message: text };
+        }
+      } else {
+        json = { success: response.ok };
+      }
+
       return { ok: response.ok, status: response.status, data: json };
     } catch (err) {
       console.error(`[API Error] Error en llamada a ${url}:`, err);
       throw err;
     }
+  },
+
+  async getStudents() {
+    const res = await this.request('/students');
+    return res.data;
   }
 };

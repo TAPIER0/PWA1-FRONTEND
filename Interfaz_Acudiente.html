@@ -743,7 +743,7 @@
 
   const user = ApiClient.getUser();
   const currentGuardianName = user ? `${user.nombres} ${user.apellidos}`.trim() : 'Carlos Pérez';
-  const students = [
+  let students = [
     { id: 'd8442234-630f-4339-a26f-25a1aecff7db', name: 'Mateo Pérez (EST-TEA-001)' }
   ];
 
@@ -754,12 +754,29 @@
   document.getElementById('guardian-chip-name').textContent = currentGuardianName;
 
   const studentSelect = document.getElementById('student-select');
-  students.forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s.id;
-    opt.textContent = s.name;
-    studentSelect.appendChild(opt);
-  });
+
+  function populateAllStudentSelects() {
+    const selIds = ['student-select', 'progress-student', 'notes-student'];
+    selIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const prevVal = el.value;
+      el.innerHTML = '';
+      students.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.name;
+        el.appendChild(opt);
+      });
+      if (prevVal && students.some(s => String(s.id) === String(prevVal))) {
+        el.value = prevVal;
+      } else if (students.length > 0) {
+        el.value = students[0].id;
+      }
+    });
+  }
+
+  populateAllStudentSelects();
 
   let currentPrefs = defaultPrefs(students[0].id);
  
@@ -1136,15 +1153,7 @@
   const historyGroups = document.getElementById('history-groups');
   const historyMore = document.getElementById('history-more');
 
-  // CONEXIÓN BACKEND: la lista de estudiantes es la misma constante `students` de
-  // arriba (hoy está escrita a mano). Cuando exista un endpoint con los estudiantes a
-  // cargo del acudiente, basta con llenar `students` desde ahí y ambas vistas lo usan.
-  students.forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s.id;
-    opt.textContent = s.name;
-    progressStudent.appendChild(opt);
-  });
+  // Lista de estudiantes sincronizada por populateAllStudentSelects()
 
   let progressRequestId = 0;
   let progressState = null;   // { studentId, period, progress, history: [], total, page, demo, demoItems }
@@ -1280,23 +1289,57 @@
 
     let state;
     try {
-      // CONEXIÓN BACKEND (1/2): avance general y evolución semanal.
-      //   GET /api/students/{studentId}/progress?desde=...&hasta=...
-      //   Respuesta: { success: true, data: { resumen, historico } }  (forma completa en la GUÍA)
-      const progressRes = await ApiClient.request(`/students/${encodeURIComponent(studentId)}/progress${qs}`);
-      if(!(progressRes.ok && progressRes.data && progressRes.data.success)) throw new Error('Respuesta no válida de /progress');
+      // CONEXIÓN BACKEND (HU-009): avance general y evolución semanal del acudiente.
+      let progressRes = await ApiClient.request(`/guardian/students/${encodeURIComponent(studentId)}/progress${qs}`);
+      if (!(progressRes.ok && progressRes.data && progressRes.data.success)) {
+        progressRes = await ApiClient.request(`/students/${encodeURIComponent(studentId)}/progress${qs}`);
+      }
+      if (!(progressRes.ok && progressRes.data && progressRes.data.success)) throw new Error('Respuesta no válida de /progress');
 
-      // CONEXIÓN BACKEND (2/2): primera página del historial.
-      //   GET /api/students/{studentId}/activity-history?desde=...&hasta=...&page=1&pageSize=20
-      //   Respuesta: { success: true, data: { items, total, page, pageSize } }
-      const historyRes = await ApiClient.request(`/students/${encodeURIComponent(studentId)}/activity-history${qs}&page=1&pageSize=${HISTORY_PAGE_SIZE}`);
-      if(!(historyRes.ok && historyRes.data && historyRes.data.success)) throw new Error('Respuesta no válida de /activity-history');
+      const progressData = progressRes.data.data;
+
+      // CONEXIÓN BACKEND (HU-009): primera página del historial.
+      let historyItems = [];
+      let totalHistory = 0;
+      try {
+        let historyRes = await ApiClient.request(`/guardian/students/${encodeURIComponent(studentId)}/activity-history${qs}&page=1&pageSize=${HISTORY_PAGE_SIZE}`);
+        if (!(historyRes.ok && historyRes.data && historyRes.data.success)) {
+          historyRes = await ApiClient.request(`/students/${encodeURIComponent(studentId)}/activity-history${qs}&page=1&pageSize=${HISTORY_PAGE_SIZE}`);
+        }
+        if (historyRes.ok && historyRes.data && historyRes.data.success) {
+          historyItems = (historyRes.data.data.items || []).map(h => ({
+            titulo: h.titulo || h.activityTitulo || 'Actividad',
+            tipoActividad: h.tipoActividad,
+            fechaRegistro: h.fechaRegistro,
+            completadaExitosamente: h.completadaExitosamente,
+            cantidadAciertos: h.cantidadAciertos,
+            cantidadIntentosFallidos: h.cantidadIntentosFallidos,
+            tiempoRespuestaSegundos: h.tiempoRespuestaSegundos
+          }));
+          totalHistory = historyRes.data.data.total ?? historyItems.length;
+        }
+      } catch (histErr) {
+        console.warn('Historial detallado no disponible, usando ultimas actividades:', histErr);
+      }
+
+      if (historyItems.length === 0 && progressData.ultimasActividades && progressData.ultimasActividades.length > 0) {
+        historyItems = progressData.ultimasActividades.map(u => ({
+          titulo: u.activityTitulo || 'Actividad pedagógica',
+          tipoActividad: u.tipoActividad,
+          fechaRegistro: u.fechaRegistro,
+          completadaExitosamente: u.completadaExitosamente,
+          cantidadAciertos: u.cantidadAciertos,
+          cantidadIntentosFallidos: u.cantidadIntentosFallidos,
+          tiempoRespuestaSegundos: u.tiempoRespuestaSegundos
+        }));
+        totalHistory = historyItems.length;
+      }
 
       state = {
         studentId, period, qs, demo: false,
-        progress: progressRes.data.data,
-        history: historyRes.data.data.items || [],
-        total: historyRes.data.data.total ?? 0,
+        progress: progressData,
+        history: historyItems,
+        total: totalHistory,
         page: 1,
       };
     } catch(err){
@@ -1333,9 +1376,20 @@
         items = st.demoItems.slice(st.page * HISTORY_PAGE_SIZE, nextPage * HISTORY_PAGE_SIZE);
       } else {
         // CONEXIÓN BACKEND: páginas siguientes del historial (mismo endpoint, page = 2, 3, ...).
-        const res = await ApiClient.request(`/students/${encodeURIComponent(st.studentId)}/activity-history${st.qs}&page=${nextPage}&pageSize=${HISTORY_PAGE_SIZE}`);
+        let res = await ApiClient.request(`/guardian/students/${encodeURIComponent(st.studentId)}/activity-history${st.qs}&page=${nextPage}&pageSize=${HISTORY_PAGE_SIZE}`);
+        if (!(res.ok && res.data && res.data.success)) {
+          res = await ApiClient.request(`/students/${encodeURIComponent(st.studentId)}/activity-history${st.qs}&page=${nextPage}&pageSize=${HISTORY_PAGE_SIZE}`);
+        }
         if(!(res.ok && res.data && res.data.success)) throw new Error('Respuesta no válida de /activity-history');
-        items = res.data.data.items || [];
+        items = (res.data.data.items || []).map(h => ({
+          titulo: h.titulo || h.activityTitulo || 'Actividad',
+          tipoActividad: h.tipoActividad,
+          fechaRegistro: h.fechaRegistro,
+          completadaExitosamente: h.completadaExitosamente,
+          cantidadAciertos: h.cantidadAciertos,
+          cantidadIntentosFallidos: h.cantidadIntentosFallidos,
+          tiempoRespuestaSegundos: h.tiempoRespuestaSegundos
+        }));
       }
       if(st !== progressState) return;
       st.history = st.history.concat(items);
@@ -1404,6 +1458,10 @@
     const { progress, period, history } = progressState;
     const r = progress.resumen || {};
     const tips = [];
+
+    if(progress.mensajePedagogico){
+      tips.push(progress.mensajePedagogico);
+    }
 
     if(r.ultimaActividad && daysAgo(r.ultimaActividad) >= 3){
       tips.push(`Lleva ${daysAgo(r.ultimaActividad)} días sin actividades. Una sesión corta, a la misma hora cada día, ayuda a retomar la rutina.`);
@@ -1717,12 +1775,7 @@
   const notesTimeline = document.getElementById('notes-timeline');
   const notesCount = document.getElementById('notes-count');
 
-  students.forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s.id;
-    opt.textContent = s.name;
-    notesStudent.appendChild(opt);
-  });
+  // Lista de estudiantes sincronizada por populateAllStudentSelects()
 
   let notesEntries = [];
   let notesRequestId = 0;
@@ -1746,10 +1799,26 @@
 
     let entries, demo = false;
     try {
-      // CONEXIÓN BACKEND: consulta cronológica de la bitácora (solo lectura para el acudiente).
-      const res = await ApiClient.request(`/students/${encodeURIComponent(studentId)}/log-entries`);
-      if(!(res.ok && res.data && res.data.success)) throw new Error('Respuesta no válida de /log-entries');
-      entries = res.data.data || [];
+      // CONEXIÓN BACKEND (HU-010): consulta cronológica de la bitácora (solo lectura para el acudiente).
+      let res = await ApiClient.request(`/students/${encodeURIComponent(studentId)}/pedagogical-notes`);
+      if (!(res.ok && res.data && res.data.success)) {
+        res = await ApiClient.request(`/students/${encodeURIComponent(studentId)}/log-entries`);
+      }
+      if(!(res.ok && res.data && res.data.success)) throw new Error('Respuesta no válida de /pedagogical-notes');
+      entries = (res.data.data || []).map(n => ({
+        id: n.id,
+        fecha: n.fecha || (n.fechaRegistro ? String(n.fechaRegistro).slice(0, 10) : isoDate(new Date())),
+        tipo: n.tipo || 'Observacion',
+        area: n.area || 'Socioemocional',
+        titulo: n.titulo || 'Observación pedagógica',
+        contenido: n.contenido || '',
+        recomendacionCasa: n.recomendacionCasa || '',
+        docenteNombre: n.docenteNombre || n.teacherNombre || 'Docente',
+        createdAt: n.fechaRegistro || n.createdAt || new Date().toISOString(),
+        updatedAt: n.updatedAt || null,
+        visibleAcudiente: n.visibleAcudiente !== undefined ? n.visibleAcudiente : true,
+        actividadTitulo: n.actividadTitulo || null
+      }));
     } catch(err){
       console.warn('Notas del docente: se usan datos de demostración.', err);
       demo = true;
@@ -1846,7 +1915,33 @@
   }
 
   // ---------- Inicializar ----------
-  loadStudent(students[0].id);
+  async function initStudents() {
+    try {
+      const res = await ApiClient.getStudents();
+      const list = (res && Array.isArray(res.data)) ? res.data : (Array.isArray(res) ? res : []);
+      if (list.length > 0) {
+        students = list.map(s => {
+          const fullName = s.nombre || s.nombreCompleto || `${s.nombres || ''} ${s.apellidos || ''}`.trim() || 'Estudiante';
+          const code = s.codigoEstudiante || '';
+          return {
+            id: s.id,
+            name: code ? `${fullName} (${code})` : fullName
+          };
+        });
+        populateAllStudentSelects();
+      }
+    } catch(err) {
+      console.warn('Carga inicial de estudiantes desde backend:', err);
+    }
+    if (students.length > 0) {
+      studentSelect.value = students[0].id;
+      if (progressStudent) progressStudent.value = students[0].id;
+      if (notesStudent) notesStudent.value = students[0].id;
+      await loadStudent(students[0].id);
+    }
+  }
+
+  initStudents();
 </script>
 </body>
 </html>
