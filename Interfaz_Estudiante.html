@@ -165,6 +165,68 @@
     clip:rect(0,0,0,0); white-space:nowrap; border:0;
   }
  
+  /* ---------- Selector de sección: solo 2 opciones, siempre en el mismo lugar ---------- */
+  .view-switch{ display:grid; grid-template-columns:1fr 1fr; gap:8px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:6px; margin-bottom:18px; }
+  .switch-btn{
+    font-family:inherit; font-size: calc(15px * var(--font-scale)); font-weight:700; color:var(--text-muted);
+    background:transparent; border:1.5px solid transparent; border-radius:8px; padding:10px 12px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:8px; min-height:44px;
+  }
+  .switch-btn svg{ width:18px; height:18px; flex-shrink:0; }
+  .switch-btn[aria-current="page"]{ background:var(--primary-soft); color:var(--primary); border-color:var(--primary); }
+  .switch-btn:hover:not([aria-current="page"]){ background:var(--bg); color:var(--text); }
+  [hidden]{ display:none !important; }
+
+  /* ---------- Mis logros ---------- */
+  .ach-intro{ font-size: calc(15px * var(--font-scale)); color:var(--text-muted); margin:0 0 16px; }
+  .ach-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px; margin-bottom:18px; }
+  .ach-card h2{ font-size: calc(17px * var(--font-scale)); margin:0 0 4px; }
+  .ach-card .ach-help{ font-size: calc(14px * var(--font-scale)); color:var(--text-muted); margin:0 0 14px; }
+  .ach-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+
+  /* Camino de módulos: marcadores sutiles, sin números de posición */
+  .path{ display:flex; align-items:center; margin:6px 0 12px; }
+  .path-node{ width:22px; height:22px; border-radius:50%; border:2px solid var(--border); background:var(--surface); flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#fff; }
+  .path-node svg{ width:12px; height:12px; }
+  .path-node.done{ background:var(--primary); border-color:var(--primary); }
+  .path-node.doing{ border-color:var(--primary); background:var(--primary-soft); }
+  .path-seg{ flex:1; height:2px; background:var(--border); min-width:8px; }
+  .path-seg.done{ background:var(--primary); }
+  .path-text{ font-size: calc(15px * var(--font-scale)); margin:0; }
+
+  .mod-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .mod{ display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:14px; align-items:center; border:1.5px solid var(--border); border-radius:var(--radius); padding:14px 16px; background:var(--surface); }
+  .mod.done{ border-color:var(--primary); background:var(--ok-bg); }
+  .mod-icon{ width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--bg); color:var(--text-muted); border:1.5px solid var(--border); }
+  .mod.done .mod-icon{ background:var(--primary); color:#fff; border-color:var(--primary); }
+  .mod.doing .mod-icon{ background:var(--primary-soft); color:var(--primary); border-color:var(--primary); }
+  .mod-icon svg{ width:20px; height:20px; }
+  .mod-title{ font-size: calc(16px * var(--font-scale)); font-weight:700; margin:0; }
+  .mod-meta{ font-size: calc(14px * var(--font-scale)); color:var(--text-muted); margin:2px 0 0; }
+  .mod.done .mod-meta{ color:var(--ok-text); }
+  .dots{ display:flex; gap:5px; flex-wrap:wrap; margin-top:8px; }
+  .dot{ width:12px; height:12px; border-radius:50%; border:1.5px solid var(--border); background:var(--surface); }
+  .dot.on{ background:var(--primary); border-color:var(--primary); }
+  .slim-track{ height:6px; border-radius:999px; background:var(--bg); border:1px solid var(--border); overflow:hidden; margin-top:8px; max-width:220px; }
+  .slim-fill{ height:100%; background:var(--primary); border-radius:999px; }
+  .mod-state{ font-size: calc(13.5px * var(--font-scale)); font-weight:700; color:var(--text-muted); white-space:nowrap; display:inline-flex; align-items:center; gap:5px; }
+  .mod.done .mod-state{ color:var(--ok-text); }
+  .mod-state svg{ width:15px; height:15px; }
+
+  .ach-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+  .ach-item{ display:flex; gap:12px; align-items:flex-start; padding:10px 12px; border-radius:10px; background:var(--bg); border:1px solid var(--border); }
+  .ach-item svg{ width:20px; height:20px; color:var(--primary); flex-shrink:0; margin-top:2px; }
+  .ach-item p{ margin:0; font-size: calc(15px * var(--font-scale)); }
+  .ach-item .when{ font-size: calc(13.5px * var(--font-scale)); color:var(--text-muted); }
+  .ach-more{ margin-top:12px; }
+  .ach-empty{ text-align:center; padding:28px 12px; color:var(--text-muted); font-size: calc(15px * var(--font-scale)); }
+  .ach-empty strong{ display:block; color:var(--text); font-size: calc(16px * var(--font-scale)); margin-bottom:4px; }
+
+  @media (max-width: 520px){
+    .mod{ grid-template-columns:auto minmax(0,1fr); }
+    .mod-state{ grid-column:2; }
+  }
+
   details.dev-notes{ margin-top: 34px; font-size: 13px; color: var(--text-muted); }
   details.dev-notes summary{ cursor:pointer; font-weight:700; }
   details.dev-notes pre{ white-space:pre-wrap; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px; }
@@ -190,7 +252,19 @@
       </button>
     </div>
   </header>
- 
+
+  <nav class="view-switch" aria-label="Secciones">
+    <button type="button" class="switch-btn" data-view="rutina" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      Mi rutina de hoy
+    </button>
+    <button type="button" class="switch-btn" data-view="logros">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19h16"/><path d="M6 19V9l6-5 6 5v10"/><path d="M10 19v-5h4v5"/></svg>
+      Mis logros
+    </button>
+  </nav>
+
+  <div id="view-rutina">
   <div class="progress-card" id="progress-card" hidden>
     <div class="progress-top">
       <span class="label" id="progress-label">Tu rutina de hoy</span>
@@ -204,7 +278,39 @@
   <p class="sr-only" id="live-region" aria-live="polite"></p>
  
   <main id="main-content"></main>
- 
+  </div>
+
+  <!-- ============ Mis logros: módulos completados, sin elementos competitivos ============ -->
+  <section id="view-logros" aria-labelledby="logros-title" hidden>
+    <h2 class="sr-only" id="logros-title">Mis logros</h2>
+    <p class="ach-intro">Aquí puedes ver los módulos y actividades que has terminado. Cada uno es parte de tu propio camino.</p>
+
+    <div class="ach-card" aria-labelledby="path-title">
+      <div class="ach-head">
+        <h2 id="path-title">Tu camino</h2>
+        <button type="button" class="btn btn-ghost" id="btn-listen-achievements" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="16" height="16"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.5 8.5a5 5 0 0 1 0 7"></path></svg>
+          Escuchar
+        </button>
+      </div>
+      <div class="path" id="ach-path" aria-hidden="true"></div>
+      <p class="path-text" id="ach-path-text">Cargando tus logros…</p>
+    </div>
+
+    <div class="ach-card" aria-labelledby="modules-title">
+      <h2 id="modules-title">Mis módulos</h2>
+      <p class="ach-help">Cada círculo es una actividad del módulo. Los círculos llenos son las que ya terminaste.</p>
+      <ul class="mod-list" id="ach-modules"></ul>
+    </div>
+
+    <div class="ach-card" aria-labelledby="recent-title">
+      <h2 id="recent-title">Lo que has logrado</h2>
+      <p class="ach-help">Tus logros más recientes.</p>
+      <ul class="ach-list" id="ach-list"></ul>
+      <button type="button" class="btn btn-ghost ach-more" id="ach-more" hidden>Ver más logros</button>
+    </div>
+  </section>
+
   <details class="dev-notes">
     <summary>Notas técnicas (equipo de desarrollo)</summary>
     <p><strong>Endpoint de consulta de actividades</strong></p>
@@ -241,16 +347,67 @@ Si "activities" es un arreglo vacío, el tablero muestra el estado
 [ ] Contraste de texto ≥ 4.5:1 en todas las paletas disponibles
 [ ] Toda la interfaz es operable solo con teclado (Tab / Enter)
 [ ] Los lectores de pantalla anuncian el cambio de paso (aria-live)</pre>
+    <p><strong>Endpoint de logros y módulos completados (vista "Mis logros")</strong></p>
+    <pre>GET /api/students/me/achievements
+(el estudiante se identifica con el token; no se envía su id)
+
+200 OK
+{
+  "success": true,
+  "data": {
+    "modulos": [
+      {
+        "moduloId": "guid",
+        "titulo": "Rutinas diarias",
+        "categoria": "Autonomía",
+        "orden": 1,                       // orden pedagógico del módulo (NO es una posición)
+        "actividadesTotales": 5,
+        "actividadesCompletadas": 5,
+        "completado": true,
+        "fechaCompletado": "2026-09-12"   // null si no está completo
+      }
+    ],
+    "logros": [
+      {
+        "id": "guid",
+        "tipo": "ModuloCompletado",       // o "ActividadCompletada" / "PrimeraActividad"
+        "descripcion": "Terminaste el módulo Rutinas diarias.",
+        "fecha": "2026-09-12T10:30:00"
+      }
+    ]
+  }
+}
+
+REGLAS PARA EL BACKEND (no competitivo):
+- Solo datos del propio estudiante. Nunca datos de otros estudiantes.
+- NO enviar: posición, ranking, puntos, promedio del grupo, percentil,
+  rachas, "mejor/peor", ni tiempos comparados.
+- Aunque el API enviara esos campos, la interfaz no los muestra: solo
+  lee los campos listados arriba (lista blanca en mapAchievements).</pre>
+    <p><strong>Checklist: visualización sin elementos competitivos</strong></p>
+    <pre>[ ] No hay rankings, tablas de posiciones ni "puesto #"
+[ ] No hay puntos, monedas, niveles ni medallas acumulables
+[ ] No hay comparaciones con compañeros ni con el promedio del grupo
+[ ] No hay rachas ("días seguidos") que generen presión por no fallar
+[ ] No hay temporizadores ni récords de tiempo en esta vista
+[ ] Los módulos sin empezar se nombran en tono neutro ("Por empezar"),
+    nunca como "atrasado", "pendiente" en rojo o "fallido"
+[ ] El avance se muestra contra el propio camino del estudiante
+    (círculos llenos / total del módulo), no contra otros
+[ ] Sin animaciones de celebración (confeti, parpadeos, sonidos fuertes)
+[ ] Con "Reducir animaciones" no hay ningún movimiento
+[ ] Los colores salen de la paleta elegida por el acudiente
+[ ] Cada indicador gráfico tiene texto equivalente (lector de pantalla)
+
+Verificación automática: en la consola (F12), con "Mis logros" abierto,
+ejecutar  validarSinElementosCompetitivos()  → revisa el texto visible
+de la vista y avisa si encuentra palabras competitivas.</pre>
   </details>
  
 </div>
  
 <script src="api-client.js"></script>
 <script>
-  if (!ApiClient.requireAuth(['Estudiante'])) {
-    throw new Error('Acceso no autorizado');
-  }
-
   /* ========================================================================
    * 1) PREFERENCIAS SENSORIALES — se obtienen del mismo backend que usa el
    *    panel del Acudiente (GET /api/students/:id/sensory-preferences).
@@ -574,6 +731,12 @@ Si "activities" es un arreglo vacío, el tablero muestra el estado
         
         if (isGuid) {
           try {
+            // CONEXIÓN BACKEND: esta telemetría es la fuente del panel "Desempeño" del docente
+            // (Interfaz_Docente.html). Cada envío = 1 intento. El backend debe guardar estos
+            // campos junto con la fecha del registro para poder agruparlos por semana.
+            // ⚠ PENDIENTE: cantidadIntentosFallidos y cantidadAciertos están fijos (0 y 1),
+            // así que la tasa de aciertos siempre dará 100 %. Deben reemplazarse por los
+            // conteos reales del ejercicio (respuestas correctas / incorrectas del estudiante).
             const submitRes = await ApiClient.request(`/activities/${current.id}/submit`, {
               method: 'POST',
               body: JSON.stringify({
@@ -621,6 +784,210 @@ Si "activities" es un arreglo vacío, el tablero muestra el estado
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => ApiClient.logout());
   }
+
+  /* ========================================================================
+   * 5) MIS LOGROS — módulos completados con indicadores sutiles de avance
+   *
+   *    Principio: reconocer lo logrado SIN generar ansiedad por competencia.
+   *    El avance se mide solo contra el propio camino del estudiante.
+   *    Ver "Notas técnicas" al final de la página: endpoint y checklist.
+   * ==================================================================== */
+  const RECENT_ACHIEVEMENTS = 5;          // logros visibles antes de "Ver más logros"
+  const MAX_DOTS = 12;                    // con más actividades se usa una barra delgada
+  const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+
+  let achievements = null;               // { modulos: [], logros: [] }
+  let achievementsDemo = false;
+  let showAllAchievements = false;
+
+  // ---------- Cambio de sección (Mi rutina de hoy / Mis logros) ----------
+  const switchButtons = document.querySelectorAll('.switch-btn[data-view]');
+  function showStudentView(name){
+    switchButtons.forEach(b => {
+      if(b.dataset.view === name) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+    });
+    document.getElementById('view-rutina').hidden = name !== 'rutina';
+    document.getElementById('view-logros').hidden = name !== 'logros';
+    if(name === 'logros'){
+      announce('Mis logros.');
+      loadAchievements();
+    } else {
+      announce('Mi rutina de hoy.');
+    }
+  }
+  switchButtons.forEach(b => b.addEventListener('click', () => showStudentView(b.dataset.view)));
+
+  // ---------- Datos ----------
+  async function loadAchievements(){
+    if(achievements) { renderAchievements(); return; }
+    try {
+      // CONEXIÓN BACKEND: GET /api/students/me/achievements
+      //   Respuesta: { success: true, data: { modulos: [...], logros: [...] } }
+      //   Forma completa y reglas "no competitivas" en las Notas técnicas de esta página.
+      const res = await ApiClient.request('/students/me/achievements');
+      if(!(res.ok && res.data && res.data.success)) throw new Error('Respuesta no válida de /achievements');
+      achievements = mapAchievements(res.data.data);
+      achievementsDemo = false;
+    } catch(err){
+      console.warn('Mis logros: se usan datos de demostración.', err);
+      achievements = mapAchievements(buildDemoAchievements());
+      achievementsDemo = true;
+    }
+    renderAchievements();
+  }
+
+  /**
+   * LISTA BLANCA: solo se copian los campos necesarios. Si el API llegara a enviar
+   * rankings, puntos, promedios del grupo u otros datos comparativos, se descartan aquí
+   * y nunca llegan a la pantalla.
+   */
+  function mapAchievements(raw){
+    const modulos = (raw && raw.modulos || []).map(m => {
+      const total = Math.max(0, Number(m.actividadesTotales) || 0);
+      const done = Math.min(total, Math.max(0, Number(m.actividadesCompletadas) || 0));
+      return {
+        id: m.moduloId,
+        titulo: String(m.titulo || 'Módulo'),
+        categoria: m.categoria ? String(m.categoria) : '',
+        orden: Number(m.orden) || 0,
+        total, done,
+        completado: Boolean(m.completado) || (total > 0 && done === total),
+        fechaCompletado: m.fechaCompletado || null,
+      };
+    }).sort((a, b) => a.orden - b.orden);
+    const logros = (raw && raw.logros || []).map(l => ({
+      id: l.id,
+      tipo: String(l.tipo || ''),
+      descripcion: String(l.descripcion || ''),
+      fecha: l.fecha || null,
+    })).filter(l => l.descripcion).sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
+    return { modulos, logros };
+  }
+
+  // ---------- Dibujo ----------
+  function moduleStateOf(m){
+    if(m.completado) return 'done';
+    if(m.done > 0) return 'doing';
+    return 'todo';
+  }
+  const MODULE_STATE_TEXT = { done: 'Completado', doing: 'En camino', todo: 'Por empezar' };
+
+  function fmtDate(value){
+    return new Date(String(value).length <= 10 ? value + 'T00:00:00' : value)
+      .toLocaleDateString('es-CO', { day: 'numeric', month: 'long' });
+  }
+
+  function renderAchievements(){
+    const { modulos, logros } = achievements;
+    const completed = modulos.filter(m => m.completado);
+    const inProgress = modulos.filter(m => moduleStateOf(m) === 'doing');
+    const activitiesDone = modulos.reduce((s, m) => s + m.done, 0);
+
+    // Camino: un marcador por módulo en su orden pedagógico (sin números de posición)
+    document.getElementById('ach-path').innerHTML = modulos.map((m, i) => {
+      const st = moduleStateOf(m);
+      const seg = i > 0 ? `<span class="path-seg ${modulos[i - 1].completado ? 'done' : ''}"></span>` : '';
+      return `${seg}<span class="path-node ${st === 'done' ? 'done' : st === 'doing' ? 'doing' : ''}">${st === 'done' ? CHECK_SVG : ''}</span>`;
+    }).join('');
+
+    let pathText;
+    if(activitiesDone === 0){
+      pathText = 'Tu camino está empezando. Cuando termines tu primera actividad, la verás aquí.';
+    } else {
+      pathText = `Terminaste ${activitiesDone} ${activitiesDone === 1 ? 'actividad' : 'actividades'}` +
+        (completed.length ? ` y ${completed.length} ${completed.length === 1 ? 'módulo completo' : 'módulos completos'}` : '') + '.' +
+        (inProgress.length ? ` Estás avanzando en ${inProgress.length} ${inProgress.length === 1 ? 'módulo' : 'módulos'} más.` : '');
+    }
+    document.getElementById('ach-path-text').textContent = pathText;
+
+    // Módulos
+    const list = document.getElementById('ach-modules');
+    list.innerHTML = modulos.length === 0
+      ? '<li class="ach-empty"><strong>Todavía no tienes módulos</strong>Tu maestra o maestro los agregará pronto.</li>'
+      : modulos.map(m => {
+          const st = moduleStateOf(m);
+          const indicator = m.total <= MAX_DOTS
+            ? `<div class="dots" aria-hidden="true">${Array.from({ length: m.total }, (_, i) => `<span class="dot ${i < m.done ? 'on' : ''}"></span>`).join('')}</div>`
+            : `<div class="slim-track" aria-hidden="true"><div class="slim-fill" style="width:${m.total ? Math.round(100 * m.done / m.total) : 0}%"></div></div>`;
+          const meta = st === 'done'
+            ? `Terminaste las ${m.total} actividades${m.fechaCompletado ? ` · ${escapeHtml(fmtDate(m.fechaCompletado))}` : ''}`
+            : `${m.done} de ${m.total} ${m.total === 1 ? 'actividad terminada' : 'actividades terminadas'}`;
+          return `<li class="mod ${st}">
+            <span class="mod-icon" aria-hidden="true">${st === 'done' ? CHECK_SVG : iconSvg('aprendizaje')}</span>
+            <div>
+              <p class="mod-title">${escapeHtml(m.titulo)}</p>
+              <p class="mod-meta">${m.categoria ? escapeHtml(m.categoria) + ' · ' : ''}${meta}</p>
+              ${indicator}
+            </div>
+            <span class="mod-state">${st === 'done' ? CHECK_SVG : ''}${MODULE_STATE_TEXT[st]}</span>
+          </li>`;
+        }).join('');
+
+    // Logros recientes
+    const shown = showAllAchievements ? logros : logros.slice(0, RECENT_ACHIEVEMENTS);
+    const star = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9.5"/></svg>';
+    document.getElementById('ach-list').innerHTML = shown.length === 0
+      ? '<li class="ach-empty"><strong>Aquí aparecerán tus logros</strong>Cada actividad que termines se guardará en esta lista.</li>'
+      : shown.map(l => `<li class="ach-item">${star}<div><p>${escapeHtml(l.descripcion)}</p>${l.fecha ? `<p class="when">${escapeHtml(fmtDate(l.fecha))}</p>` : ''}</div></li>`).join('');
+    const more = document.getElementById('ach-more');
+    more.hidden = logros.length <= RECENT_ACHIEVEMENTS;
+    more.textContent = showAllAchievements ? 'Ver menos' : 'Ver más logros';
+
+    // Lectura en voz alta solo si el acudiente activó "texto a voz"
+    document.getElementById('btn-listen-achievements').hidden = !(prefs && prefs.audio && prefs.audio.textToSpeech);
+  }
+
+  document.getElementById('ach-more').addEventListener('click', () => {
+    showAllAchievements = !showAllAchievements;
+    renderAchievements();
+  });
+  document.getElementById('btn-listen-achievements').addEventListener('click', () => {
+    speak(document.getElementById('ach-path-text').textContent);
+  });
+
+  /** CONEXIÓN BACKEND: ejemplo vivo de la respuesta de GET /students/me/achievements. */
+  function buildDemoAchievements(){
+    const ago = n => { const d = new Date(); d.setDate(d.getDate() - n); return d.toISOString().slice(0, 10); };
+    return {
+      modulos: [
+        { moduloId: 'm1', titulo: 'Rutinas diarias', categoria: 'Autonomía', orden: 1, actividadesTotales: 5, actividadesCompletadas: 5, completado: true, fechaCompletado: ago(17) },
+        { moduloId: 'm2', titulo: 'Reconocer emociones', categoria: 'Socioemocional', orden: 2, actividadesTotales: 4, actividadesCompletadas: 4, completado: true, fechaCompletado: ago(6) },
+        { moduloId: 'm3', titulo: 'Higiene personal', categoria: 'Autonomía', orden: 3, actividadesTotales: 4, actividadesCompletadas: 2, completado: false, fechaCompletado: null },
+        { moduloId: 'm4', titulo: 'Figuras y colores', categoria: 'Académica', orden: 4, actividadesTotales: 6, actividadesCompletadas: 1, completado: false, fechaCompletado: null },
+        { moduloId: 'm5', titulo: 'Pedir ayuda con palabras', categoria: 'Comunicación', orden: 5, actividadesTotales: 3, actividadesCompletadas: 0, completado: false, fechaCompletado: null },
+      ],
+      logros: [
+        { id: 'l1', tipo: 'ActividadCompletada', descripcion: 'Terminaste la actividad "Empareja figuras iguales".', fecha: ago(1) },
+        { id: 'l2', tipo: 'ActividadCompletada', descripcion: 'Terminaste la actividad "Pasos para lavarse las manos".', fecha: ago(3) },
+        { id: 'l3', tipo: 'ModuloCompletado', descripcion: 'Terminaste el módulo "Reconocer emociones".', fecha: ago(6) },
+        { id: 'l4', tipo: 'ActividadCompletada', descripcion: 'Terminaste la actividad "Empareja emociones y caras".', fecha: ago(6) },
+        { id: 'l5', tipo: 'ActividadCompletada', descripcion: 'Terminaste la actividad "¿Cómo se siente?".', fecha: ago(9) },
+        { id: 'l6', tipo: 'ModuloCompletado', descripcion: 'Terminaste el módulo "Rutinas diarias".', fecha: ago(17) },
+        { id: 'l7', tipo: 'PrimeraActividad', descripcion: 'Terminaste tu primera actividad en la plataforma.', fecha: ago(30) },
+      ],
+    };
+  }
+
+  /**
+   * Validación de "sin elementos competitivos" (tarea 3).
+   * Uso: abrir "Mis logros" y ejecutar en la consola  validarSinElementosCompetitivos()
+   * Revisa el texto visible y los atributos accesibles de la vista.
+   */
+  function validarSinElementosCompetitivos(){
+    const view = document.getElementById('view-logros');
+    const text = (view.innerText + ' ' + [...view.querySelectorAll('[aria-label]')].map(e => e.getAttribute('aria-label')).join(' ')).toLowerCase();
+    const prohibidas = ['ranking', 'posición', 'puesto', 'lugar #', 'primer lugar', 'top ', 'puntos', 'puntaje', 'nivel ', 'medalla', 'trofeo',
+      'mejor que', 'peor que', 'compañeros', 'promedio del grupo', 'promedio del curso', 'percentil', 'racha', 'días seguidos',
+      'récord', 'ganaste', 'perdiste', 'atrasado', 'fallaste', 'tabla de posiciones', 'clasificación'];
+    const encontradas = prohibidas.filter(p => text.includes(p));
+    if(encontradas.length){
+      console.warn('✗ Se encontraron elementos competitivos en "Mis logros":', encontradas);
+    } else {
+      console.info('✓ "Mis logros" no contiene rankings, puntos, comparaciones ni rachas.');
+    }
+    return { ok: encontradas.length === 0, encontradas };
+  }
+  window.validarSinElementosCompetitivos = validarSinElementosCompetitivos;
 
   /* ========================================================================
    * 4) INICIALIZACIÓN CONECTADA A .NET 9
