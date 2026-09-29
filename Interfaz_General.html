@@ -29,7 +29,7 @@
     --ease: cubic-bezier(.22,1,.36,1);
   }
   *{ box-sizing:border-box; }
-  html{ scroll-behavior:smooth; }
+  html{ scroll-behavior:smooth; scroll-padding-top:var(--nav-h, 72px); }
   @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
   html,body{ margin:0; padding:0; }
   body{
@@ -55,32 +55,38 @@
   .brand{ display:flex; align-items:center; gap:9px; text-decoration:none; }
   .brand-mark{ width:28px; height:28px; border-radius:7px; background:var(--primary); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .brand-mark svg{ width:16px; height:16px; color:#fff; }
-  .brand-name{ font-weight:700; font-size:16px; color:var(--text); }
+  .brand-name{ font-weight:700; font-size:18px; color:var(--text); }
 
   nav.links{ display:flex; gap:24px; margin-left:8px; }
-  nav.links a{ font-size:14.5px; font-weight:700; text-decoration:none; color:var(--text); padding:6px 2px; }
+  nav.links a{ font-size:16px; font-weight:700; text-decoration:none; color:var(--text); padding:6px 2px; }
   nav.links a:hover{ color:var(--primary); }
 
   .nav-actions{ margin-left:auto; display:flex; align-items:center; gap:18px; }
-  .signin{ display:flex; align-items:center; gap:7px; font-size:14px; font-weight:700; text-decoration:none; color:var(--text); }
+  .signin{
+    display:inline-flex; align-items:center; gap:8px; font-size:16px; font-weight:700; text-decoration:none;
+    color:#fff; background:var(--primary); border:2px solid var(--primary); border-radius:8px;
+    padding:10px 20px; margin:4px 8px; min-height:44px;
+    transition:background .15s var(--ease), border-color .15s var(--ease);
+  }
+  .signin:hover{ background:var(--primary-hover); border-color:var(--primary-hover); }
   .signin svg{ width:18px; height:18px; }
 
   .menu-toggle{ display:none; margin-left:auto; background:none; border:1.5px solid var(--border); border-radius:8px; width:40px; height:40px; align-items:center; justify-content:center; }
   .menu-toggle svg{ width:20px; height:20px; }
   #mobile-menu{ display:none; flex-direction:column; gap:2px; padding:8px 24px 16px; border-top:1px solid var(--border); background:#fff; }
   #mobile-menu.open{ display:flex; }
-  #mobile-menu a{ padding:12px 6px; font-weight:700; font-size:15px; text-decoration:none; color:var(--text); border-bottom:1px solid var(--border); }
+  #mobile-menu a{ padding:12px 6px; font-weight:700; font-size:16px; text-decoration:none; color:var(--text); border-bottom:1px solid var(--border); }
 
   /* ---------------- Hero tipo NVIDIA: carrusel de categorías ---------------- */
   .hero{ background:var(--hero-bg); position:relative; overflow:hidden; }
   .hero-inner{ display:grid; grid-template-columns:1fr 1fr; align-items:center; min-height:560px; position:relative; }
   .hero-copy{ padding:64px 0 64px; position:relative; z-index:2; }
-  .hero-eyebrow{ font-size:14px; font-weight:700; color:var(--primary); margin:0 0 10px; }
+  .hero-eyebrow{ font-size:15px; font-weight:700; color:var(--primary); margin:0 0 10px; }
   .hero-title{ font-size:clamp(34px,4.6vw,54px); line-height:1.06; font-weight:700; margin:0 0 18px; letter-spacing:-.01em; max-width:11ch; }
-  .hero-sub{ font-size:16.5px; color:var(--text-muted); margin:0 0 28px; max-width:38ch; }
+  .hero-sub{ font-size:18px; color:var(--text-muted); margin:0 0 28px; max-width:38ch; }
   .btn-lime{
     display:inline-flex; align-items:center; gap:9px; background:var(--lime); color:#12210b; font-weight:700;
-    font-size:14.5px; padding:13px 22px; border-radius:4px; text-decoration:none; border:none; cursor:pointer;
+    font-size:16px; padding:13px 22px; border-radius:4px; text-decoration:none; border:none; cursor:pointer;
     transition:transform .15s var(--ease), background .15s var(--ease);
   }
   .btn-lime:hover{ background:#a5c221; transform:translateY(-1px); }
@@ -101,7 +107,7 @@
     border-right:1px solid rgba(23,27,25,.12);
   }
   .tab-btn:last-child{ border-right:none; }
-  .tab-btn .tab-label{ font-size:12.5px; font-weight:700; color:var(--text-muted); }
+  .tab-btn .tab-label{ font-size:15px; font-weight:700; color:var(--text-muted); }
   .tab-btn.active .tab-label{ color:var(--text); }
   .tab-track{ height:3px; background:rgba(23,27,25,.12); margin-top:12px; overflow:hidden; }
   .tab-track i{ display:block; height:100%; width:0%; background:var(--primary); }
@@ -122,9 +128,9 @@
   /* ---------------- Franja "cómo funciona" ---------------- */
   section.how{ padding:70px 0; background:var(--surface); border-bottom:1px solid var(--border); }
   .section-head{ max-width:60ch; margin:0 0 44px; }
-  .section-kicker{ font-size:13px; font-weight:700; color:var(--primary); margin:0 0 8px; }
+  .section-kicker{ font-size:15px; font-weight:700; color:var(--primary); margin:0 0 8px; }
   .section-head h2{ font-size:clamp(24px,3vw,32px); margin:0 0 10px; }
-  .section-head p{ color:var(--text-muted); font-size:15.5px; margin:0; }
+  .section-head p{ color:var(--text-muted); font-size:17px; margin:0; }
 
   .steps-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:0; position:relative; }
   .steps-row .step{ position:relative; padding:0 22px; text-align:left; }
@@ -139,8 +145,8 @@
   .steps-row .step:first-child .step-connector{ display:none; }
   .step-connector i{ display:block; height:100%; width:0%; background:var(--primary); transition:width 1s var(--ease); }
   .step-connector.in i{ width:100%; }
-  .steps-row h3{ font-size:17px; margin:0 0 8px; }
-  .steps-row p{ font-size:14.5px; color:var(--text-muted); margin:0; }
+  .steps-row h3{ font-size:18px; margin:0 0 8px; }
+  .steps-row p{ font-size:16px; color:var(--text-muted); margin:0; }
 
   /* ---------------- Features ---------------- */
   section.features{ padding:76px 0; }
@@ -152,29 +158,21 @@
   .feat-card:hover{ transform:translateY(-3px); box-shadow:0 16px 34px -18px rgba(23,27,25,.25); border-color:var(--primary); }
   .feat-icon{ width:42px; height:42px; border-radius:10px; background:var(--primary-soft); color:var(--primary); display:flex; align-items:center; justify-content:center; margin-bottom:14px; }
   .feat-icon svg{ width:21px; height:21px; }
-  .feat-card h3{ font-size:16px; margin:0 0 6px; }
-  .feat-card p{ font-size:14px; color:var(--text-muted); margin:0; }
+  .feat-card h3{ font-size:18px; margin:0 0 6px; }
+  .feat-card p{ font-size:16px; color:var(--text-muted); margin:0; }
 
   /* ---------------- Para quién es ---------------- */
-  section.roles{ padding:70px 0; background:var(--surface-alt); }
+  section.roles{ padding:70px 0; background:var(--surface-alt); min-height:calc(100vh - var(--nav-h, 72px)); }
   .roles-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
   .role-card{ background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:24px; }
-  .role-tag{ display:inline-flex; align-items:center; gap:7px; font-size:12px; font-weight:700; color:var(--accent); background:var(--accent-soft); border-radius:999px; padding:4px 10px; margin-bottom:12px; }
+  .role-tag{ display:inline-flex; align-items:center; gap:7px; font-size:15px; font-weight:700; color:var(--accent); background:var(--accent-soft); border-radius:999px; padding:4px 10px; margin-bottom:12px; }
   .role-tag svg{ width:13px; height:13px; }
-  .role-card h3{ font-size:16.5px; margin:0 0 8px; }
-  .role-card p{ font-size:14px; color:var(--text-muted); margin:0; }
+  .role-card h3{ font-size:18px; margin:0 0 8px; }
+  .role-card p{ font-size:16px; color:var(--text-muted); margin:0; }
 
   /* ---------------- CTA de cierre ---------------- */
-  section.cta{ padding:80px 0; }
-  .cta-box{
-    background:var(--primary); color:#fff; border-radius:24px; padding:52px 44px;
-    display:flex; align-items:center; justify-content:space-between; gap:30px; flex-wrap:wrap;
-  }
-  .cta-box h2{ font-size:clamp(22px,2.6vw,28px); margin:0 0 8px; }
-  .cta-box p{ margin:0; color:rgba(255,255,255,.85); font-size:15px; max-width:48ch; }
-  .cta-actions{ display:flex; gap:12px; flex-wrap:wrap; }
   .btn{
-    font-family:inherit; font-size:14.5px; font-weight:700; border-radius:999px; padding:10px 18px;
+    font-family:inherit; font-size:16px; font-weight:700; border-radius:999px; padding:10px 18px;
     cursor:pointer; border:1.5px solid transparent; display:inline-flex; align-items:center; gap:8px;
     text-decoration:none; transition: transform .15s var(--ease), background .15s var(--ease), box-shadow .15s var(--ease);
   }
@@ -187,9 +185,9 @@
   .footer-inner{ display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; }
   .footer-inner .brand{ opacity:.9; border-left:none; padding-left:0; }
   .footer-links{ display:flex; gap:20px; flex-wrap:wrap; }
-  .footer-links a{ font-size:13.5px; color:var(--text-muted); text-decoration:none; }
+  .footer-links a{ font-size:15px; color:var(--text-muted); text-decoration:none; }
   .footer-links a:hover{ color:var(--text); }
-  .footer-note{ font-size:12.5px; color:var(--text-muted); margin-top:18px; }
+  .footer-note{ font-size:15px; color:var(--text-muted); margin-top:18px; }
 
   @media (max-width: 880px){
     nav.links{ display:none; }
@@ -201,7 +199,6 @@
   }
   @media (max-width: 560px){
     .feat-grid{ grid-template-columns:1fr; }
-    .cta-box{ flex-direction:column; align-items:flex-start; }
     .brand{ display:none; }
   }
 </style>
@@ -239,7 +236,6 @@
     <a href="#como-funciona">Cómo funciona</a>
     <a href="#funciones">Funciones</a>
     <a href="#para-quien">Para quién es</a>
-    <a href="#contacto">Contacto</a>
     <a href="login_Rework.html">Iniciar sesión</a>
   </div>
 </header>
@@ -428,21 +424,6 @@
     </div>
   </section>
 
-  <section class="cta" id="contacto">
-    <div class="wrap">
-      <div class="cta-box">
-        <div>
-          <h2>¿Quieres conocer más sobre Sendero?</h2>
-          <p>Escríbenos y te contamos cómo llevar la plataforma a tu institución o a la rutina de tu estudiante.</p>
-        </div>
-        <div class="cta-actions">
-          <a class="btn btn-outline-light" href="#funciones">Ver funciones</a>
-          <a class="btn btn-outline-light" href="#inicio">Volver arriba</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
 </main>
 
 <footer class="site">
@@ -457,7 +438,6 @@
       <a href="#como-funciona">Cómo funciona</a>
       <a href="#funciones">Funciones</a>
       <a href="#para-quien">Para quién es</a>
-      <a href="#contacto">Contacto</a>
     </nav>
   </div>
   <div class="wrap footer-note">Página informativa general. No requiere inicio de sesión para consultarla.</div>
@@ -475,6 +455,46 @@
     mobileMenu.classList.remove('open');
     menuToggle.setAttribute('aria-expanded', 'false');
   }));
+
+  // Navegación a secciones: compensa la altura de la barra fija y corrige
+  // el destino si el contenido cambia de alto durante el desplazamiento.
+  const siteNav = document.getElementById('site-nav');
+  function navHeight(){ return siteNav ? siteNav.getBoundingClientRect().height : 0; }
+  function setNavVar(){ document.documentElement.style.setProperty('--nav-h', navHeight() + 'px'); }
+  setNavVar();
+  window.addEventListener('resize', setNavVar);
+
+  function targetTop(el){ return Math.max(0, el.getBoundingClientRect().top + window.scrollY - navHeight()); }
+  function scrollToSection(el){
+    const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: targetTop(el), behavior: smooth ? 'smooth' : 'auto' });
+    // Corrección final por si algo cambió de alto mientras se desplazaba
+    let done = false;
+    const fix = () => {
+      if(done) return; done = true;
+      const t = targetTop(el);
+      if(Math.abs(window.scrollY - t) > 2) window.scrollTo({ top: t, behavior: 'auto' });
+    };
+    if('onscrollend' in window) window.addEventListener('scrollend', fix, { once:true });
+    setTimeout(fix, 900);
+  }
+
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const id = link.getAttribute('href').slice(1);
+      if(!id) return;
+      const el = document.getElementById(id);
+      if(!el) return;
+      e.preventDefault();
+      // Cerrar el menú móvil primero para que la altura de la barra sea la correcta
+      if(typeof mobileMenu !== 'undefined' && mobileMenu.classList.contains('open')){
+        mobileMenu.classList.remove('open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+      }
+      scrollToSection(el);
+      history.pushState(null, '', '#' + id);
+    });
+  });
 
   // Revelado de secciones al hacer scroll
   const revealTargets = document.querySelectorAll('[data-reveal]');
