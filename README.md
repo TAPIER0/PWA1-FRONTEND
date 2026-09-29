@@ -6,25 +6,27 @@ Plataforma web de apoyo pedagógico adaptativo orientada a estudiantes diagnosti
 
 ## 📌 Visión General y Estado del Proyecto
 
-**Sendero (TeaLearning)** es un ecosistema tecnológico inclusivo creado para estructurar rutinas pedagógicas predecibles, reducir la sobrecarga sensorial y mitigar la ansiedad ante transiciones de actividad en estudiantes con TEA Nivel 1.
+**Sendero (TeaLearning)** es un ecosistema tecnológico inclusivo creado para estructurar rutinas pedagógicas predecibles, reducir la sobrecarga sensorial, mitigar la ansiedad ante transiciones de actividad y proporcionar herramientas analíticas y de seguimiento cualitativo a docentes y familias.
 
-El proyecto ha completado exitosamente las metas de los **Sprints 1 y 2**, integrando arquitectura desacoplada, diseño accesible bajo estándares **WCAG 2.1 (AA/AAA)**, parametrización pedagógica con modelos de datos híbridos (JSON dinámico en SQL Server) y telemetría de ejecución en tiempo real.
+El proyecto ha completado exitosamente las metas de los **Sprints 1, 2 y 3**, consolidando una arquitectura web desacoplada, diseño accesible bajo estándares **WCAG 2.1 (AA/AAA)**, parametrización pedagógica con modelos híbridos (relacional + JSON dinámico), telemetría de ejecución, analítica cognitiva agregada, bitácora pedagógica compartida y gamificación personal libre de competencia.
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                             SENDERO FRONTEND                                │
-│                                                                             │
-│  [ Landing General ] ──> [ Login Adaptativo ] ──> [ Control de Roles RBAC ] │
-│  (Interfaz_General)       (login_Rework)                  │                 │
-│                                                           │                 │
-│         ┌───────────────────┬───────────────────┬─────────┴─────────┐       │
-│         ▼                   ▼                   ▼                   ▼       │
-│   [Estudiante]         [Acudiente]          [Docente]         [Admin]       │
-│  Rutina Visual &    Perfil Sensorial &    Actividades &     Catálogo &      │
-│  Telemetría HU-006     Preview HU-003    Asignación HU-004  Módulos HU-007  │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                      │
-                         REST API (.NET 9) + SQL Server
+┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│                                    SENDERO FRONTEND                                     │
+│                                                                                         │
+│  [ Landing General ] ──> [ Login Adaptativo ] ──> [ Control RBAC & BFCache Protection ] │
+│  (Interfaz_General2)      (login_Rework)                      │                         │
+│                                                               │                         │
+│         ┌─────────────────────┬───────────────────────┬───────┴───────────────┐         │
+│         ▼                     ▼                       ▼                       ▼         │
+│   [Estudiante]           [Acudiente]              [Docente]                [Admin]      │
+│  Rutina Visual           Perfil Sensorial        Actividades &           Catálogo,      │
+│  Telemetría HU-006       Progreso HU-009         Asignación HU-004       Módulos &      │
+│  Logros HU-011           Notas Docente HU-010    Analítica HU-008        Usuarios       │
+│                                                  Bitácora HU-010         HU-001/007     │
+└─────────────────────────────────────────────────────────────────────────────────────────┘
+                                             │
+                   REST API (.NET 9) + Microsoft SQL Server (http://localhost:5264)
 ```
 
 ---
@@ -36,7 +38,7 @@ El proyecto ha completado exitosamente las metas de los **Sprints 1 y 2**, integ
 | Historia de Usuario | Pts | Módulo / Funcionalidad | Descripción e Implementación Frontend |
 | :--- | :---: | :--- | :--- |
 | **HU-001** | 5 | **Gestión de Usuarios y Roles (RBAC)** | Autenticación y registro con `UserManager<ApplicationUser>` y `RoleManager<IdentityRole>`. Endpoints: `POST /api/auth/login`, `POST /api/auth/register`, `POST /api/auth/refresh-token`, `GET /api/users` y `PUT /api/users/{id}/roles`. Implementado en [`login_Rework.html`](login_Rework.html) y [`Interfaz_Admin2.html`](Interfaz_Admin2.html). |
-| **HU-002** | 5 | **Rutina Visual de Actividades** | Visualización cronológica y estructurada de la jornada (`GET /api/students/me/daily-routine`). Actividades ordenadas estrictamente por su `OrdenSecuencial` con estados (`Pendiente`, `EnProgreso`, `Completada`). Implementado en [`Interfaz_Estudiante.html`](Interfaz_Estudiante.html). |
+| **HU-002** | 5 | **Rutina Visual de Actividades** | Visualización cronológica y secuencial de la jornada (`GET /api/students/me/daily-routine`). Actividades ordenadas estrictamente por su `OrdenSecuencial` con estados (`Pendiente`, `EnProgreso`, `Completada`). Implementado en [`Interfaz_Estudiante.html`](Interfaz_Estudiante.html). |
 | **HU-003** | 5 | **Configuración Sensorial Adaptativa** | Configuración de la entidad `SensoryPreference` (`GET` y `PUT /api/students/{id}/sensory-preferences`): paleta cromática, tipografía legible/dislexia, escala tipográfica (1-4), audio/TTS, reducción de movimiento y temporizadores. Implementado en [`Interfaz_Acudiente.html`](Interfaz_Acudiente.html) con propagación dinámica a la vista del estudiante. |
 
 ---
@@ -45,10 +47,21 @@ El proyecto ha completado exitosamente las metas de los **Sprints 1 y 2**, integ
 
 | Historia de Usuario | Pts | Módulo / Funcionalidad | Descripción e Implementación Frontend |
 | :--- | :---: | :--- | :--- |
-| **HU-007** | 3 | **Configuración de Módulos Temáticos** | CRUD administrativo de Categorías y Módulos de aprendizaje (`GET, POST, PUT, DELETE /api/categories` y `/api/modules`). Incluye control de integridad referencial (bloqueo de eliminación si existen dependencias vinculadas) y ordenación pedagógica. Implementado en [`Interfaz_Admin2.html`](Interfaz_Admin2.html). |
-| **HU-004** | 8 | **Creación y Parametrización de Actividades** | Panel docente para crear actividades (`POST, PUT, DELETE /api/activities`). **Modelo de datos híbrido**: metadatos relacionales (`Titulo`, `Descripcion`, `TipoActividad`, `ObjetivoPedagogico`, `ModuloId`) combinados con la columna dinámica **`ConfigJson`** (`NVARCHAR(MAX)`) para almacenar secuencias lógicas o pares de emparejamiento sin modificar el esquema relacional. Incluye un **detector de lenguaje figurado/metafórico** en tiempo real para preservar literalidad cognitiva. Implementado en [`Interfaz_Docente.html`](Interfaz_Docente.html). |
-| **HU-005** | 3 | **Asignación de Actividades** | Asignación directa e individual o en lote (`POST /api/assignments`), definiendo `fechaInicio`, `fechaLimite`, `ordenSecuencial` y `prioridad`. Gestión integrada en el modal de guardado de actividades en [`Interfaz_Docente.html`](Interfaz_Docente.html). |
-| **HU-006** | 8 | **Ejecución y Registro de Intentos** | Flujo completo de ejecución del estudiante: inicio de actividad (`POST /api/activities/{assignmentId}/start`), renderizado del ejercicio basado en `ConfigJson` y envío de **telemetría de rendimiento** al completar (`POST /api/activities/{assignmentId}/submit`): `tiempoRespuestaSegundos` (cronometrado), `cantidadIntentosFallidos`, `cantidadAciertos` y `completadaExitosamente`. Implementado en [`Interfaz_Estudiante.html`](Interfaz_Estudiante.html). |
+| **HU-004** | 8 | **Creación y Parametrización de Actividades** | Panel docente para parametrizar actividades (`POST, PUT, DELETE /api/activities`). **Modelo híbrido**: metadatos relacionales (`Titulo`, `Descripcion`, `TipoActividad`, `ObjetivoPedagogico`, `ModuloId`) combinados con la columna **`ConfigJson`** (`NVARCHAR(MAX)`) para secuencias y parejas. Incluye un **detector de lenguaje figurado/metafórico** en tiempo real. Implementado en [`Interfaz_Docente2.html`](Interfaz_Docente2.html). |
+| **HU-005** | 3 | **Asignación de Actividades** | Asignación directa e individual o en lote (`POST /api/assignments`), definiendo `fechaInicio`, `fechaLimite`, `ordenSecuencial` y `prioridad`. Gestión integrada en [`Interfaz_Docente2.html`](Interfaz_Docente2.html). |
+| **HU-006** | 8 | **Ejecución y Registro de Intentos** | Flujo completo de ejecución: inicio de actividad (`POST /api/activities/{assignmentId}/start`), renderizado dinámico según `ConfigJson` y envío de **telemetría de rendimiento** al completar (`POST /api/activities/{assignmentId}/submit`): `tiempoRespuestaSegundos` (cronometrado), `cantidadIntentosFallidos`, `cantidadAciertos` y `completadaExitosamente`. Implementado en [`Interfaz_Estudiante.html`](Interfaz_Estudiante.html). |
+| **HU-007** | 3 | **Configuración de Módulos Temáticos** | CRUD administrativo de Categorías y Módulos de aprendizaje (`GET, POST, PUT, DELETE /api/categories` y `/api/modules`). Incluye control de integridad referencial (bloqueo de eliminación ante dependencias vinculadas). Implementado en [`Interfaz_Admin2.html`](Interfaz_Admin2.html). |
+
+---
+
+### 📊 SPRINT 3: Analítica Cognitiva, Monitoreo y Bitácora Pedagógica
+
+| Historia de Usuario | Pts | Módulo / Funcionalidad | Descripción e Implementación Frontend |
+| :--- | :---: | :--- | :--- |
+| **HU-008** | 5 | **Panel Analítico del Docente** | Tablero analítico con métricas agregadas por estudiante y por aula (`GET /api/analytics/teacher/students/{id}/summary` y `GET /api/analytics/teacher/classes/{classId}`): cálculo de tasa de aciertos global, promedio de tiempo de respuesta por tipo de actividad, curva de intentos y evolución semanal. Visualización en gráficos SVG accesibles, sparklines y sistema de alerta temprana ("Necesita apoyo" si tasa < 60%). Implementado en [`Interfaz_Docente2.html`](Interfaz_Docente2.html). |
+| **HU-009** | 5 | **Monitoreo del Acudiente** | Vista de progreso y consolidado (`GET /api/guardian/students/{studentId}/progress`): actividades completadas vs. pendientes, porcentaje de avance, tiempo invertido y evolución semanal. Incluye historial paginado (`/activity-history`) con badges no punitivos ("Lo logró", "Necesitó varios intentos", "Sin terminar") y recomendaciones prácticas para casa. Implementado en [`Interfaz_Acudiente.html`](Interfaz_Acudiente.html). |
+| **HU-010** | 3 | **Bitácora Pedagógica y Calificaciones** | CRUD de notas cualitativas del docente sobre el estudiante (`POST, GET /api/students/{id}/pedagogical-notes`, con edición/eliminación). Clasificación por tipo (`Avance`, `Recomendación`, `Observación`, `Aspecto a reforzar`), área y visibilidad al acudiente (`VisibleAcudiente = true`). Pestaña de calificaciones (escala 1.0 - 5.0 con nota aprobatoria 3.0 vía `PUT /assignments/{id}/grade`). Consulta en tiempo real por el acudiente en [`Interfaz_Acudiente.html`](Interfaz_Acudiente.html). |
+| **HU-011** | 3 | **Visualización de Logros del Estudiante** | Vista personal de hitos y módulos concluidos (`GET /api/students/me/achievements`). **Gamificación ética no competitiva**: sin rankings, sin puntos, sin comparaciones con compañeros, sin rachas ni penalizaciones. Incluye función de auditoría automatizada en consola `validarSinElementosCompetitivos()` y soporte TTS. Implementado en [`Interfaz_Estudiante.html`](Interfaz_Estudiante.html). |
 
 ---
 
@@ -56,70 +69,61 @@ El proyecto ha completado exitosamente las metas de los **Sprints 1 y 2**, integ
 
 1. **Previsibilidad y Reducción de Ansiedad**:
    - Secuencia visual paso a paso de actividades del día.
-   - Temporizadores preventivos con alertas auditivas y visuales configurables ("Esta actividad cambiará en X segundos") o modo "sin temporizador" para evitar la ansiedad por competencia.
+   - Temporizadores preventivos con alertas auditivas y visuales configurables ("Esta actividad cambiará en X segundos") o modo "sin temporizador" para evitar ansiedad por velocidad.
 2. **Estimulación Visual Equilibrada y Paletas Sensoriales**:
    - **Verde / Pastel Suave** (`#2F6E5C` / `#F4F6F5`): Foco, tranquilidad y concentración.
    - **Neutro Calmante** (`#55605A` / `#F6F7F6`): Cero interferencias cromáticas.
    - **Lavanda Suave** (`#5B4E8C` / `#F5F3F7`): Relajación sensorial.
    - **Arena Cálida** (`#9C7A4C` / `#FBF6EF`): Calidez y confort.
-   - **Modo Alto Contraste** conforme a directrices WCAG.
+   - **Modo Alto Contraste** conforme a directrices WCAG 2.1.
 3. **Legibilidad y Decodificación Tipográfica**:
    - **Atkinson Hyperlegible** (Braille Institute) por defecto, diferenciando caracteres homólogos (ej. `I`, `l`, `1`).
    - Soporte para **OpenDyslexic**.
    - Ajustes de escala de fuente (Pequeño, Normal, Grande, Muy Grande) y espaciado de letras aumentado (*letter-spacing*).
 4. **Claridad Pragmática del Lenguaje**:
-   - Detector heurístico en el panel docente que alerta sobre modismos o lenguaje figurado (ej. *"a toda máquina"*, *"pan comido"*, *"en un abrir y cerrar de ojos"*), sugiriendo instrucciones literales y directas.
-5. **Síntesis de Voz y Control Auditivo**:
-   - Lectura de instrucciones mediante síntesis de voz (*Web Speech API*).
+   - Detector heurístico en el panel docente que alerta sobre modismos o lenguaje figurado (ej. *"a toda máquina"*, *"pan comido"*), sugiriendo instrucciones literales y directas.
+5. **Gamificación Positiva y No Competitiva (Ética para TEA)**:
+   - Medición centrada en el propio camino y progreso individual.
+   - Prohibición estricta de tablas de clasificación, rankings, rachas (*streaks*), puntajes comparativos o penalizaciones.
+6. **Síntesis de Voz y Control Auditivo**:
+   - Lectura de instrucciones y logros mediante síntesis de voz (*Web Speech API*).
    - Interruptor global accesible para silenciar o activar estímulos sonoros.
-6. **Movimiento y Enfoque Controlado**:
-   - Respeta de forma estricta la directiva del sistema operativo `prefers-reduced-motion`.
-   - Anillos de foco visibles (`:focus-visible`) para navegación 100% asistida por teclado.
+7. **Control de Errores y Navegación Segura**:
+   - Pantalla de contingencia amigable [`error.html`](error.html) que atiende errores 404, 403, 401, 500 y desconexión sin generar frustración, reconduciendo al usuario a su panel.
 
 ---
 
 ## 🖥️ Módulos e Interfaces del Frontend
 
-### 1. `Interfaz_General.html` — Portal General "Sendero"
-- **Propósito**: Landing page pública orientada a la comunidad educativa, familias y docentes.
-- **Diseño**: Estilo de vanguardia tecnológica (inspirado en NVIDIA/Apple), con carrusel interactivo por categorías, menú adaptativo, gráficos vectoriales originales y enlace directo a la plataforma. No requiere inicio de sesión.
+### 1. `Interfaz_General2.html` / `Interfaz_General.html` — Portal Institucional "Sendero"
+- **Propósito**: Puerta de entrada pública orientada a familias, docentes y directivos.
+- **Diseño**: Inspirado en interfaces modernas de alto rendimiento tecnológico (estilo NVIDIA/Apple), carrusel interactivo por categorías temáticas, navegación anclada suave, arte vectorial sin bancos de imágenes externos y acceso rápido al inicio de sesión.
 - **Ruta por defecto**: Servida como raíz `/` en `server.js`.
 
 ### 2. `login_Rework.html` / `login.html` — Inicio de Sesión Adaptativo
 - **Propósito**: Acceso centralizado con validación en tiempo real y pre-ajustes sensoriales (contraste y escala tipográfica utilizables antes de ingresar credenciales).
-- **Seguridad**: Autenticación JWT (`POST /api/auth/login`), conmutador de visibilidad de contraseña y redirección dinámica según el rol del usuario autenticado.
+- **Seguridad**: Autenticación JWT (`POST /api/auth/login`), conmutador de visibilidad de contraseña y redirección automática según el rol asignado.
 
-### 3. `Interfaz_Estudiante.html` — Portal del Estudiante ("Mi rutina de hoy")
-- **Propósito**: Interfaz de baja carga cognitiva para la ejecución de la rutina pedagógica diaria (HU-002, HU-006).
-- **Funcionalidades**:
-  - Saludo amigable y fecha contextualizada.
-  - Barra de progreso diaria (porcentaje y contador de actividades).
-  - Rutina secuencial paso a paso con renderizado dinámico del `ConfigJson` (secuencias lógicas o emparejamiento visual).
-  - Notificación de inicio de actividad (`/start`) y telemetría de respuesta al enviar (`/submit`).
-  - Lector por voz (*Text-to-Speech*) y temporizadores adaptables.
+### 3. `Interfaz_Estudiante.html` — Portal del Estudiante ("Mi rutina de hoy" & "Mis logros")
+- **Sección Rutina Diaria (HU-002, HU-006)**: Secuencia visual estructurada, barra de progreso interactiva, renderizado del ejercicio basado en `ConfigJson` (secuencia lógica o emparejamiento visual), aviso sonoro/visual de transición y telemetría de ejecución (`/start` y `/submit`).
+- **Sección Mis Logros (HU-011)**: Camino visual personal de módulos concluidos, actividades terminadas y logros acumulados, completamente desprovisto de mecánicas competitivas y con soporte de lectura por voz.
 
-### 4. `Interfaz_Docente.html` — Gestión Pedagógica de Actividades
-- **Propósito**: Creación, configuración y asignación de ejercicios interactivos para estudiantes con TEA (HU-004, HU-005).
-- **Funcionalidades**:
-  - Tabla de actividades con filtros por tipo (`Secuencia Lógica` o `Emparejamiento Visual`) y búsqueda.
-  - Editor visual e interactivo de pasos/parejas con previsualización en vivo.
-  - Asistente de lenguaje no figurado: advierte al docente si usa metáforas.
-  - Asignación individual o múltiple a estudiantes con control de `ordenSecuencial` y `prioridad`.
-  - Serialización automática en `ConfigJson` y consumo de endpoints `/api/activities` y `/api/assignments`.
+### 4. `Interfaz_Docente2.html` — Centro de Gestión y Analítica Pedagógica
+- **Vista Actividades (HU-004, HU-005)**: Editor visual interactivo de ejercicios con previsualización en vivo, detector de expresiones metafóricas y asignación individual o grupal con prioridad y orden secuencial.
+- **Vista Desempeño (HU-008)**: Tablero de métricas con filtros de periodo (4, 8, 12 semanas), gráficos SVG reactivos (tasa de aciertos con promedio de aula, tiempos de respuesta, cantidad de intentos), tabla con *sparklines* y alertas automáticas de apoyo pedagógico.
+- **Vista Bitácora (HU-010)**: Registro cronológico de notas cualitativas con control de visibilidad al acudiente, filtros por área/tipo y panel de calificaciones por actividad en escala de 1.0 a 5.0 (nota aprobatoria 3.0).
 
-### 5. `Interfaz_Acudiente.html` — Preferencias Sensoriales del Estudiante
-- **Propósito**: Ajuste y calibración del entorno sensorial de cada estudiante a cargo (HU-003).
-- **Funcionalidades**:
-  - Selección de estudiante asignado.
-  - Personalización en tiempo real con previsualizador interactivo: paletas cromáticas, tipografía, escala, audio/TTS, reducción de movimiento y temporizadores.
-  - Guardado asíncrono hacia el backend (`PUT /api/students/{id}/sensory-preferences`).
+### 5. `Interfaz_Acudiente.html` — Portal del Acudiente
+- **Vista Preferencias Sensoriales (HU-003)**: Calibración en tiempo real de paletas cromáticas, tipografía, volumen, TTS, reducción de movimiento y temporizadores con vista previa interactiva sincronizada con el backend.
+- **Vista Progreso (HU-009)**: Indicadores de cumplimiento global, tiempo total invertido, evolución semanal, historial cronológico de actividades con resultados claros ("Lo logró", "Necesitó varios intentos", "Sin terminar") y consejos prácticos para el hogar.
+- **Vista Notas del Docente (HU-010)**: Consulta de las observaciones y recomendaciones pedagógicas compartidas por los profesores de sus estudiantes a cargo.
 
-### 6. `Interfaz_Admin2.html` — Administración y Catálogo Pedagógico
-- **Propósito**: Panel administrativo global (HU-001, HU-007).
-- **Funcionalidades**:
-  - **Usuarios**: Gestión completa de cuentas (Estudiantes, Acudientes, Docentes, Administradores), filtros por rol y estado, asignación de roles (`/api/users/{id}/roles`) y registro (`/api/auth/register`).
-  - **Categorías de Aprendizaje**: CRUD completo con paleta de color identificador y ordenación.
-  - **Módulos Temáticos**: CRUD completo vinculado a categorías, contador de actividades y validaciones de eliminación protegida.
+### 6. `Interfaz_Admin2.html` — Panel de Administración Global
+- **Usuarios (HU-001)**: Creación de cuentas sincronizadas con ASP.NET Core Identity y SQL Server, modificación de roles y activación/inactivación.
+- **Categorías y Módulos Temáticos (HU-007)**: Gestión del catálogo pedagógico con ordenación secuencial, selector de colores identificadores y validaciones de eliminación protegida.
+
+### 7. `error.html` / `404.html` — Centro de Manejo Accesible de Errores
+- Tratamiento visual no invasivo de códigos HTTP `404 Not Found`, `403 Forbidden`, `401 Unauthorized`, `500 Server Error` y modo fuera de línea (`offline`), con botón contextual que redirige automáticamente al usuario autenticado hacia su panel principal según sus roles almacenados en sesión.
 
 ---
 
@@ -129,38 +133,36 @@ El proyecto ha completado exitosamente las metas de los **Sprints 1 y 2**, integ
 Backend Base URL: http://localhost:5264/api
 ```
 
-| Módulo | Método | Endpoint | Historia de Usuario | Descripción |
+| Módulo | Método | Endpoint | Historia | Descripción |
 | :--- | :---: | :--- | :---: | :--- |
 | **Auth** | `POST` | `/auth/login` | HU-001 | Autenticación y expedición de tokens JWT |
 | **Auth** | `POST` | `/auth/register` | HU-001 | Registro de nuevos usuarios desde administración |
 | **Usuarios** | `GET` | `/users` | HU-001 | Obtención de usuarios y roles registrados |
 | **Usuarios** | `PUT` | `/users/{id}/roles` | HU-001 | Modificación de roles asignados a un usuario |
-| **Categorías** | `GET` | `/categories` | HU-007 | Listado de categorías de aprendizaje |
-| **Categorías** | `POST` | `/categories` | HU-007 | Creación de nueva categoría |
-| **Categorías** | `PUT` | `/categories/{id}` | HU-007 | Edición de categoría |
-| **Categorías** | `DELETE` | `/categories/{id}` | HU-007 | Eliminación protegida de categoría |
-| **Módulos** | `GET` | `/modules?onlyActive={bool}` | HU-007 | Listado de módulos temáticos |
-| **Módulos** | `POST` | `/modules` | HU-007 | Creación de módulo temático |
-| **Módulos** | `PUT` | `/modules/{id}` | HU-007 | Edición de módulo temático |
-| **Módulos** | `DELETE` | `/modules/{id}` | HU-007 | Eliminación de módulo temático |
-| **Actividades**| `GET` | `/activities` | HU-004 | Catálogo de actividades docentes |
-| **Actividades**| `POST` | `/activities` | HU-004 | Creación de actividad con metadata y `ConfigJson` |
-| **Actividades**| `PUT` | `/activities/{id}` | HU-004 | Actualización de actividad y `ConfigJson` |
-| **Actividades**| `DELETE`| `/activities/{id}` | HU-004 | Eliminación de actividad |
-| **Asignaciones**| `GET` | `/assignments` | HU-005 | Asignaciones de actividades a estudiantes |
-| **Asignaciones**| `POST`| `/assignments` | HU-005 | Asignación con orden secuencial y prioridad |
+| **Categorías** | `GET, POST, PUT, DELETE` | `/categories` | HU-007 | CRUD de categorías de aprendizaje |
+| **Módulos** | `GET, POST, PUT, DELETE` | `/modules` | HU-007 | CRUD de módulos temáticos |
+| **Actividades**| `GET, POST, PUT, DELETE` | `/activities` | HU-004 | CRUD de actividades con metadata y `ConfigJson` |
+| **Asignaciones**| `GET, POST` | `/assignments` | HU-005 | Asignaciones de actividades a estudiantes |
 | **Ejecución** | `POST` | `/activities/{id}/start` | HU-006 | Notificación de inicio de actividad |
 | **Ejecución** | `POST` | `/activities/{id}/submit` | HU-006 | Envío de telemetría de intento y tiempo |
 | **Estudiante** | `GET` | `/students/me/profile` | HU-001 | Perfil del estudiante en sesión |
 | **Estudiante** | `GET` | `/students/me/daily-routine`| HU-002 | Rutina secuencial del día |
-| **Sensorial** | `GET` | `/students/{id}/sensory-preferences` | HU-003 | Consulta de preferencias sensoriales |
-| **Sensorial** | `PUT` | `/students/{id}/sensory-preferences` | HU-003 | Actualización de preferencias sensoriales |
+| **Sensorial** | `GET, PUT` | `/students/{id}/sensory-preferences` | HU-003 | Consulta y actualización de preferencias sensoriales |
+| **Analítica Aula** | `GET` | `/analytics/teacher/classes/{classId}` | HU-008 | Métricas de rendimiento consolidadas del aula |
+| **Analítica Estudiante**| `GET` | `/analytics/teacher/students/{id}/summary` | HU-008 | Resumen analítico individual (aciertos, tiempos, evolución) |
+| **Progreso Acudiente** | `GET` | `/guardian/students/{id}/progress` | HU-009 | Resumen de avance para el acudiente |
+| **Historial Acudiente** | `GET` | `/guardian/students/{id}/activity-history` | HU-009 | Historial detallado y paginado de actividades |
+| **Bitácora** | `GET, POST` | `/students/{id}/pedagogical-notes` | HU-010 | Consulta y registro de observaciones pedagógicas |
+| **Bitácora Edición** | `PUT, DELETE`| `/log-entries/{id}` | HU-010 | Edición y eliminación de notas del docente |
+| **Calificaciones** | `GET` | `/students/{id}/grades` | HU-010 | Listado de actividades y notas asignadas |
+| **Calificaciones** | `PUT` | `/assignments/{id}/grade` | HU-010 | Upsert de calificación (1.0 a 5.0) y retroalimentación |
+| **Logros Estudiante** | `GET` | `/students/me/achievements` | HU-011 | Módulos concluidos e hitos alcanzados (gamificación no competitiva) |
 
 ---
 
 ## 🧱 Modelo de Datos Híbrido (`ConfigJson`)
 
-Para permitir que el docente cree dinámicamente ejercicios de **Secuencia Lógica** o **Emparejamiento Visual** sin alterar el esquema relacional en SQL Server, el frontend genera y parsea estructuras JSON estandarizadas en la columna `ConfigJson` de la tabla `Actividades`:
+Para permitir que el docente cree dinámicamente ejercicios de **Secuencia Lógica** o **Emparejamiento Visual** sin alterar el esquema relacional en SQL Server, el frontend serializa estructuras JSON estandarizadas en la columna `ConfigJson` de la tabla `Actividades`:
 
 #### Estructura para Secuencia Lógica:
 ```json
@@ -198,17 +200,21 @@ Para permitir que el docente cree dinámicamente ejercicios de **Secuencia Lógi
 
 ```text
 PWA1-FRONTEND/
-├── .gitignore                  # Reglas de exclusión de Git
-├── README.md                   # Documentación técnica completa (Sprint 1 + Sprint 2)
-├── api-client.js               # Cliente HTTP unificado, gestión de JWT y roles RBAC
-├── server.js                   # Servidor HTTP nativo en Node.js (puerto 5500)
-├── Interfaz_General.html       # Landing page institucional "Sendero" (ruta '/')
-├── login_Rework.html           # Login con micro-interacciones y pre-ajustes sensoriales
-├── login.html                  # Copia de respaldo / compatibilidad de login
-├── Interfaz_Estudiante.html    # Portal del Estudiante: rutina visual y telemetría (HU-002, HU-006)
-├── Interfaz_Docente.html       # Portal del Docente: actividades y asignaciones (HU-004, HU-005)
-├── Interfaz_Acudiente.html     # Portal del Acudiente: configuración sensorial (HU-003)
-├── Interfaz_Admin2.html        # Portal del Administrador: usuarios, módulos y categorías (HU-001, HU-007)
+├── .gitignore                  # Exclusiones de control de versiones Git
+├── README.md                   # Documentación técnica completa (Sprints 1, 2 y 3)
+├── api-client.js               # Cliente HTTP centralizado, RBAC, JWT, BFCache y 403 handling
+├── server.js                   # Servidor HTTP en Node.js (puerto 5500) con fallback a error.html
+├── error.html                  # Pantalla accesible de gestión de errores (404, 403, 401, 500, offline)
+├── 404.html                    # Redirección espejo a error.html para hosts estáticos
+├── Interfaz_General2.html      # Landing page moderna institucional "Sendero" (ruta '/')
+├── Interfaz_General.html       # Versión base de la landing page
+├── login_Rework.html           # Login adaptativo con pre-ajustes sensoriales
+├── login.html                  # Versión de compatibilidad de inicio de sesión
+├── Interfaz_Estudiante.html    # Portal del Estudiante: Rutina (HU-002, 006) y Logros éticos (HU-011)
+├── Interfaz_Docente2.html      # Portal Docente: Actividades (HU-004, 005), Desempeño (HU-008), Bitácora (HU-010)
+├── Interfaz_Docente.html       # Versión previa del portal docente
+├── Interfaz_Acudiente.html     # Portal Acudiente: Sensorial (HU-003), Progreso (HU-009), Notas (HU-010)
+├── Interfaz_Admin2.html        # Portal Administrador: Usuarios (HU-001) y Módulos/Categorías (HU-007)
 └── Interfaz_Admin.html         # Versión previa del portal de administración
 ```
 
@@ -217,8 +223,8 @@ PWA1-FRONTEND/
 ## 🚀 Guía de Instalación y Ejecución
 
 ### Prerrequisitos
-- [Node.js](https://nodejs.org/) v16 o superior (para ejecutar el servidor ligero local).
-- Opcional: Backend de TeaLearning en **.NET 9** (`http://localhost:5264`) conectado a SQL Server. *(Todas las vistas frontend cuentan con fallback y datos en memoria para operar de forma autónoma en modo demostración si el backend no está iniciado).*
+- [Node.js](https://nodejs.org/) (versión 16 o superior).
+- *(Opcional)* Backend de TeaLearning en **.NET 9** (`http://localhost:5264`) conectado a SQL Server. *(Todas las vistas frontend integran datos de contingencia/demostración para operar de forma autónoma en modo pruebas y evaluación de diseño).*
 
 ### Pasos
 
@@ -245,10 +251,10 @@ Al autenticarse en `login_Rework.html`, el cliente extrae los roles del token/pa
 
 - **Estudiante** $\rightarrow$ `Interfaz_Estudiante.html`
 - **Acudiente** $\rightarrow$ `Interfaz_Acudiente.html`
-- **Docente / Profesor** $\rightarrow$ `Interfaz_Docente.html`
+- **Docente / Profesor** $\rightarrow$ `Interfaz_Docente2.html`
 - **Administrador** $\rightarrow$ `Interfaz_Admin2.html`
 
-Cada interfaz cuenta con guardas de autenticación mediante `ApiClient.requireAuth(['RolPermitido'])`, impidiendo el acceso a usuarios sin el rol correspondiente o con sesión expirada.
+Cada interfaz cuenta con guardas de autenticación mediante `ApiClient.requireAuth(['RolPermitido'])`, impidiendo el acceso a usuarios sin el rol correspondiente (redirigiendo a `error.html?code=403`) o con sesión expirada (`login_Rework.html`).
 
 ---
 
