@@ -875,7 +875,7 @@
       userIdInput.value = user.id;
       nameInput.value = user.name;
       emailInput.value = user.email;
-      emailInput.disabled = true;
+      emailInput.disabled = false;
       roleInput.value = (user.role === 'Profesor' ? 'Docente' : user.role);
       statusInput.value = user.status;
       if(passwordField) passwordField.style.display = 'none';
@@ -971,6 +971,7 @@
           body: {
             nombres,
             apellidos,
+            email: emailInput.value.trim(),
             isActive,
             roles: [rol]
           }
