@@ -1799,13 +1799,17 @@
 
     let entries, demo = false;
     try {
-      // CONEXIÓN BACKEND (HU-010): consulta cronológica de la bitácora (solo lectura para el acudiente).
-      let res = await ApiClient.request(`/students/${encodeURIComponent(studentId)}/pedagogical-notes`);
+      // CONEXIÓN BACKEND (HU-010 & HU-012): consulta cronológica de observaciones y notas pedagógicas
+      let res = await ApiClient.request(`/guardian/students/${encodeURIComponent(studentId)}/observations?pageSize=50`);
+      if (!(res.ok && res.data && res.data.success)) {
+        res = await ApiClient.request(`/students/${encodeURIComponent(studentId)}/pedagogical-notes`);
+      }
       if (!(res.ok && res.data && res.data.success)) {
         res = await ApiClient.request(`/students/${encodeURIComponent(studentId)}/log-entries`);
       }
-      if(!(res.ok && res.data && res.data.success)) throw new Error('Respuesta no válida de /pedagogical-notes');
-      entries = (res.data.data || []).map(n => ({
+      if(!(res.ok && res.data && res.data.success)) throw new Error('Respuesta no válida de /observations o /pedagogical-notes');
+      const rawList = res.data.data?.items || res.data.data || [];
+      entries = (Array.isArray(rawList) ? rawList : []).map(n => ({
         id: n.id,
         fecha: n.fecha || (n.fechaRegistro ? String(n.fechaRegistro).slice(0, 10) : isoDate(new Date())),
         tipo: n.tipo || 'Observacion',

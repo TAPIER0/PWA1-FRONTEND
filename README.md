@@ -152,6 +152,7 @@ Backend Base URL: http://localhost:5264/api
 | **Analítica Estudiante**| `GET` | `/analytics/teacher/students/{id}/summary` | HU-008 | Resumen analítico individual (aciertos, tiempos, evolución) |
 | **Progreso Acudiente** | `GET` | `/guardian/students/{id}/progress` | HU-009 | Resumen de avance para el acudiente |
 | **Historial Acudiente** | `GET` | `/guardian/students/{id}/activity-history` | HU-009 | Historial detallado y paginado de actividades |
+| **Observaciones Acudiente** | `GET` | `/guardian/students/{id}/observations` | HU-012 | Consulta paginada y filtrada de observaciones para familias |
 | **Bitácora** | `GET, POST` | `/students/{id}/pedagogical-notes` | HU-010 | Consulta y registro de observaciones pedagógicas |
 | **Bitácora Edición** | `PUT, DELETE`| `/log-entries/{id}` | HU-010 | Edición y eliminación de notas del docente |
 | **Calificaciones** | `GET` | `/students/{id}/grades` | HU-010 | Listado de actividades y notas asignadas |
