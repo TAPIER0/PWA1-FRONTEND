@@ -6,44 +6,51 @@ Plataforma web de apoyo pedagógico adaptativo orientada a estudiantes diagnosti
 
 ## 📌 Visión General y Estado del Proyecto
 
-**Sendero (TeaLearning)** es un ecosistema tecnológico inclusivo creado para estructurar rutinas pedagógicas predecibles, reducir la sobrecarga sensorial, mitigar la ansiedad ante transiciones de actividad y proporcionar herramientas analíticas y de seguimiento cualitativo a docentes y familias.
+**Sendero (TeaLearning)** es un ecosistema tecnológico inclusivo creado para estructurar rutinas pedagógicas predecibles, reducir la sobrecarga sensorial, mitigar la ansiedad ante transiciones de actividad y proporcionar herramientas analíticas, de seguimiento cualitativo y de vinculación a docentes y familias.
 
-El proyecto ha completado exitosamente las metas de los **Sprints 1, 2 y 3**, consolidando una arquitectura web desacoplada, diseño accesible bajo estándares **WCAG 2.1 (AA/AAA)**, parametrización pedagógica con modelos híbridos (relacional + JSON dinámico), telemetría de ejecución, analítica cognitiva agregada, bitácora pedagógica compartida y gamificación personal libre de competencia.
+El proyecto ha completado exitosamente las metas de los **Sprints 1, 2, 3 y 4** (55 puntos de historia implementados), consolidando:
+- Arquitectura web desacoplada en Vanilla HTML5/CSS3/JavaScript (ES6+) con servidor Node.js y consumo de API REST en **.NET 9** con **Microsoft SQL Server**.
+- Diseño accesible estricto bajo directrices **WCAG 2.1 (Niveles AA/AAA)** con relaciones de contraste reforzadas y semántica ARIA completa.
+- Parametrización pedagógica híbrida (relacional + JSON dinámico `ConfigJson`).
+- Telemetría de ejecución cronometrada y tablero analítico cognitivo agregado con alertas tempranas.
+- Bitácora pedagógica compartida, calificaciones formativas (1.0 - 5.0) y consulta paginada de observaciones para familias (**HU-012**).
+- Gamificación personal libre de competencia y sin elementos de presión.
+- **Hardening de seguridad, integridad referencial y rendimiento**: gestión de excepciones bajo el estándar **RFC 7807 (ProblemDetails)** e índices compuestos en base de datos.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────────────┐
 │                                    SENDERO FRONTEND                                     │
 │                                                                                         │
 │  [ Landing General ] ──> [ Login Adaptativo ] ──> [ Control RBAC & BFCache Protection ] │
-│  (Interfaz_General2)      (login_Rework)                      │                         │
+│  (Interfaz_General)       (login_Rework)                      │                         │
 │                                                               │                         │
 │         ┌─────────────────────┬───────────────────────┬───────┴───────────────┐         │
 │         ▼                     ▼                       ▼                       ▼         │
 │   [Estudiante]           [Acudiente]              [Docente]                [Admin]      │
 │  Rutina Visual           Perfil Sensorial        Actividades &           Catálogo,      │
 │  Telemetría HU-006       Progreso HU-009         Asignación HU-004       Módulos &      │
-│  Logros HU-011           Notas Docente HU-010    Analítica HU-008        Usuarios       │
-│                                                  Bitácora HU-010         HU-001/007     │
+│  Logros HU-011           Observaciones HU-012    Analítica HU-008        Hardening      │
+│                          Notas Docente HU-010    Bitácora HU-010         HU-001/007     │
 └─────────────────────────────────────────────────────────────────────────────────────────┘
                                              │
-                   REST API (.NET 9) + Microsoft SQL Server (http://localhost:5264)
+      REST API (.NET 9) + SQL Server + RFC 7807 ProblemDetails (http://localhost:5264)
 ```
 
 ---
 
 ## 📋 Matriz de Requerimientos y Product Backlog
 
-### 🟢 SPRINT 1: Cimientos de Arquitectura, Autenticación RBAC y Perfil Sensorial
+### 🟢 SPRINT 1: Cimientos de Arquitectura, Autenticación RBAC y Perfil Sensorial (15 pts)
 
 | Historia de Usuario | Pts | Módulo / Funcionalidad | Descripción e Implementación Frontend |
 | :--- | :---: | :--- | :--- |
-| **HU-001** | 5 | **Gestión de Usuarios y Roles (RBAC)** | Autenticación y registro con `UserManager<ApplicationUser>` y `RoleManager<IdentityRole>`. Endpoints: `POST /api/auth/login`, `POST /api/auth/register`, `POST /api/auth/refresh-token`, `GET /api/users` y `PUT /api/users/{id}/roles`. Implementado en [`login_Rework.html`](login_Rework.html) y [`Interfaz_Admin2.html`](Interfaz_Admin2.html). |
+| **HU-001** | 5 | **Gestión de Usuarios y Roles (RBAC)** | Autenticación y registro con `UserManager<ApplicationUser>` y `RoleManager<IdentityRole>`. Endpoints: `POST /api/auth/login`, `POST /api/auth/register`, `POST /api/auth/refresh-token`, `GET /api/users` y `PUT /api/users/{id}/roles`. Implementado en [`login_Rework.html`](login_Rework.html) e [`Interfaz_Admin2.html`](Interfaz_Admin2.html). |
 | **HU-002** | 5 | **Rutina Visual de Actividades** | Visualización cronológica y secuencial de la jornada (`GET /api/students/me/daily-routine`). Actividades ordenadas estrictamente por su `OrdenSecuencial` con estados (`Pendiente`, `EnProgreso`, `Completada`). Implementado en [`Interfaz_Estudiante.html`](Interfaz_Estudiante.html). |
 | **HU-003** | 5 | **Configuración Sensorial Adaptativa** | Configuración de la entidad `SensoryPreference` (`GET` y `PUT /api/students/{id}/sensory-preferences`): paleta cromática, tipografía legible/dislexia, escala tipográfica (1-4), audio/TTS, reducción de movimiento y temporizadores. Implementado en [`Interfaz_Acudiente.html`](Interfaz_Acudiente.html) con propagación dinámica a la vista del estudiante. |
 
 ---
 
-### 🚀 SPRINT 2: Gestión Pedagógica, Módulos y Ejecución de Actividades
+### 🚀 SPRINT 2: Gestión Pedagógica, Módulos y Ejecución de Actividades (22 pts)
 
 | Historia de Usuario | Pts | Módulo / Funcionalidad | Descripción e Implementación Frontend |
 | :--- | :---: | :--- | :--- |
@@ -54,7 +61,7 @@ El proyecto ha completado exitosamente las metas de los **Sprints 1, 2 y 3**, co
 
 ---
 
-### 📊 SPRINT 3: Analítica Cognitiva, Monitoreo y Bitácora Pedagógica
+### 📊 SPRINT 3: Analítica Cognitiva, Monitoreo y Bitácora Pedagógica (16 pts)
 
 | Historia de Usuario | Pts | Módulo / Funcionalidad | Descripción e Implementación Frontend |
 | :--- | :---: | :--- | :--- |
@@ -65,39 +72,50 @@ El proyecto ha completado exitosamente las metas de los **Sprints 1, 2 y 3**, co
 
 ---
 
+### 🛡️ SPRINT 4: Observaciones Paginadas, Hardening y Optimización (2 pts + Calidad)
+
+| Historia de Usuario / Tarea | Pts | Módulo / Funcionalidad | Descripción e Implementación Frontend |
+| :--- | :---: | :--- | :--- |
+| **HU-012** | 2 | **Consulta de Observaciones por Acudientes** | Endpoint optimizado de lectura cronológica y filtrado de observaciones docentes con soporte de paginación (`GET /api/guardian/students/{id}/observations?pageSize=50`). Permite consultar colecciones paginadas de forma eficiente con fallback ordenado a `/pedagogical-notes` y `/log-entries`. Tarjetas con fecha, tipo, área formativa, descripción y recomendaciones para el hogar. Implementado en [`Interfaz_Acudiente.html`](Interfaz_Acudiente.html). |
+| **Hardening Admin** | — | **Seguridad & Gestión de Usuarios** | Fortalecimiento del panel administrativo en [`Interfaz_Admin2.html`](Interfaz_Admin2.html): edición habilitada de correo electrónico, actualización de estado activo/inactivo (`PUT /api/users/{id}`) y vinculación relacional persistente de estudiantes a acudientes mediante `PUT /api/users/{id}/students`. |
+| **RFC 7807 ProblemDetails** | — | **Manejo Estandarizado de Errores** | Soporte e integración en [`api-client.js`](api-client.js) y las vistas para procesar respuestas de error en el estándar **RFC 7807 (`application/problem+json`)**, extrayendo de forma segura campos como `title`, `detail`, `status` y diccionarios de `errors` de validación. |
+| **Optimización SQL** | — | **Índices Compuestos de Base de Datos** | Creación y soporte para índices de alto rendimiento en Microsoft SQL Server sobre `BitacoraNotas` (`(StudentProfileId, Fecha DESC, CreatedAt DESC) INCLUDE (VisibleAcudiente)`), `Assignments` y `ExecutionAttempts` para acelerar las consultas analíticas de docentes y acudientes. |
+
+---
+
 ## 🧠 Principios de Neurodiversidad y Accesibilidad (TEA Nivel 1)
 
 1. **Previsibilidad y Reducción de Ansiedad**:
    - Secuencia visual paso a paso de actividades del día.
    - Temporizadores preventivos con alertas auditivas y visuales configurables ("Esta actividad cambiará en X segundos") o modo "sin temporizador" para evitar ansiedad por velocidad.
-2. **Estimulación Visual Equilibrada y Paletas Sensoriales**:
+2. **Estimulación Visual Equilibrada y Paletas Sensoriales (WCAG 2.1 AA/AAA)**:
    - **Verde / Pastel Suave** (`#2F6E5C` / `#F4F6F5`): Foco, tranquilidad y concentración.
    - **Neutro Calmante** (`#55605A` / `#F6F7F6`): Cero interferencias cromáticas.
    - **Lavanda Suave** (`#5B4E8C` / `#F5F3F7`): Relajación sensorial.
-   - **Arena Cálida** (`#9C7A4C` / `#FBF6EF`): Calidez y confort.
-   - **Modo Alto Contraste** conforme a directrices WCAG 2.1.
-3. **Legibilidad y Decodificación Tipográfica**:
+   - **Arena Cálida** (`#705324` / `#FBF6EF`): Contraste reforzado a $\ge 4.5:1$ sobre fondo claro.
+   - **Modo Alto Contraste** conforme a directrices de baja visión.
+3. **Semántica de Controles y Accesibilidad de Formularios**:
+   - Asociación explícita entre etiquetas e interactivos mediante atributos `for`, `id`, `aria-label` y `aria-describedby` en todos los interruptores sensoriales.
+4. **Legibilidad y Decodificación Tipográfica**:
    - **Atkinson Hyperlegible** (Braille Institute) por defecto, diferenciando caracteres homólogos (ej. `I`, `l`, `1`).
    - Soporte para **OpenDyslexic**.
    - Ajustes de escala de fuente (Pequeño, Normal, Grande, Muy Grande) y espaciado de letras aumentado (*letter-spacing*).
-4. **Claridad Pragmática del Lenguaje**:
+5. **Claridad Pragmática del Lenguaje**:
    - Detector heurístico en el panel docente que alerta sobre modismos o lenguaje figurado (ej. *"a toda máquina"*, *"pan comido"*), sugiriendo instrucciones literales y directas.
-5. **Gamificación Positiva y No Competitiva (Ética para TEA)**:
+6. **Gamificación Positiva y No Competitiva (Ética para TEA)**:
    - Medición centrada en el propio camino y progreso individual.
    - Prohibición estricta de tablas de clasificación, rankings, rachas (*streaks*), puntajes comparativos o penalizaciones.
-6. **Síntesis de Voz y Control Auditivo**:
-   - Lectura de instrucciones y logros mediante síntesis de voz (*Web Speech API*).
-   - Interruptor global accesible para silenciar o activar estímulos sonoros.
 7. **Control de Errores y Navegación Segura**:
    - Pantalla de contingencia amigable [`error.html`](error.html) que atiende errores 404, 403, 401, 500 y desconexión sin generar frustración, reconduciendo al usuario a su panel.
+   - Compensación automática de altura de la cabecera fija (`--nav-h`) en el desplazamiento de anclajes.
 
 ---
 
 ## 🖥️ Módulos e Interfaces del Frontend
 
-### 1. `Interfaz_General2.html` / `Interfaz_General.html` — Portal Institucional "Sendero"
+### 1. `Interfaz_General.html` / `Interfaz_General2.html` — Portal Institucional "Sendero"
 - **Propósito**: Puerta de entrada pública orientada a familias, docentes y directivos.
-- **Diseño**: Inspirado en interfaces modernas de alto rendimiento tecnológico (estilo NVIDIA/Apple), carrusel interactivo por categorías temáticas, navegación anclada suave, arte vectorial sin bancos de imágenes externos y acceso rápido al inicio de sesión.
+- **Diseño**: Inspirado en interfaces modernas de alto rendimiento tecnológico (estilo NVIDIA/Apple), carrusel interactivo por categorías temáticas, tipografía optimizada (16px a 18px), arte vectorial original y acceso rápido al inicio de sesión.
 - **Ruta por defecto**: Servida como raíz `/` en `server.js`.
 
 ### 2. `login_Rework.html` / `login.html` — Inicio de Sesión Adaptativo
@@ -116,10 +134,10 @@ El proyecto ha completado exitosamente las metas de los **Sprints 1, 2 y 3**, co
 ### 5. `Interfaz_Acudiente.html` — Portal del Acudiente
 - **Vista Preferencias Sensoriales (HU-003)**: Calibración en tiempo real de paletas cromáticas, tipografía, volumen, TTS, reducción de movimiento y temporizadores con vista previa interactiva sincronizada con el backend.
 - **Vista Progreso (HU-009)**: Indicadores de cumplimiento global, tiempo total invertido, evolución semanal, historial cronológico de actividades con resultados claros ("Lo logró", "Necesitó varios intentos", "Sin terminar") y consejos prácticos para el hogar.
-- **Vista Notas del Docente (HU-010)**: Consulta de las observaciones y recomendaciones pedagógicas compartidas por los profesores de sus estudiantes a cargo.
+- **Vista Notas del Docente (HU-010, HU-012)**: Consulta paginada y filtrada cronológicamente de las observaciones docentes y recomendaciones pedagógicas compartidas para cada estudiante a cargo (`/guardian/students/{id}/observations`).
 
 ### 6. `Interfaz_Admin2.html` — Panel de Administración Global
-- **Usuarios (HU-001)**: Creación de cuentas sincronizadas con ASP.NET Core Identity y SQL Server, modificación de roles y activación/inactivación.
+- **Usuarios & Hardening (HU-001, Sprint 4)**: Creación y edición de cuentas (nombres, apellidos, correo editable, estado activo/inactivo), asignación de roles y vinculación persistente de estudiantes a cargo para el rol Acudiente (`PUT /api/users/{id}/students`).
 - **Categorías y Módulos Temáticos (HU-007)**: Gestión del catálogo pedagógico con ordenación secuencial, selector de colores identificadores y validaciones de eliminación protegida.
 
 ### 7. `error.html` / `404.html` — Centro de Manejo Accesible de Errores
@@ -138,7 +156,9 @@ Backend Base URL: http://localhost:5264/api
 | **Auth** | `POST` | `/auth/login` | HU-001 | Autenticación y expedición de tokens JWT |
 | **Auth** | `POST` | `/auth/register` | HU-001 | Registro de nuevos usuarios desde administración |
 | **Usuarios** | `GET` | `/users` | HU-001 | Obtención de usuarios y roles registrados |
+| **Usuarios** | `PUT` | `/users/{id}` | Sprint 4 | Actualización completa de datos y estado de usuario |
 | **Usuarios** | `PUT` | `/users/{id}/roles` | HU-001 | Modificación de roles asignados a un usuario |
+| **Vínculo Acudiente**| `PUT` | `/users/{id}/students` | Sprint 4 | Vinculación relacional de estudiantes a un acudiente |
 | **Categorías** | `GET, POST, PUT, DELETE` | `/categories` | HU-007 | CRUD de categorías de aprendizaje |
 | **Módulos** | `GET, POST, PUT, DELETE` | `/modules` | HU-007 | CRUD de módulos temáticos |
 | **Actividades**| `GET, POST, PUT, DELETE` | `/activities` | HU-004 | CRUD de actividades con metadata y `ConfigJson` |
@@ -202,20 +222,20 @@ Para permitir que el docente cree dinámicamente ejercicios de **Secuencia Lógi
 ```text
 PWA1-FRONTEND/
 ├── .gitignore                  # Exclusiones de control de versiones Git
-├── README.md                   # Documentación técnica completa (Sprints 1, 2 y 3)
-├── api-client.js               # Cliente HTTP centralizado, RBAC, JWT, BFCache y 403 handling
-├── server.js                   # Servidor HTTP en Node.js (puerto 5500) con fallback a error.html
+├── README.md                   # Documentación técnica completa (Sprints 1, 2, 3 y 4)
+├── api-client.js               # Cliente HTTP centralizado, RBAC, JWT, BFCache, ProblemDetails RFC 7807
+├── server.js                   # Servidor HTTP en Node.js (puerto 5500) con fallback a error.html y no-cache
 ├── error.html                  # Pantalla accesible de gestión de errores (404, 403, 401, 500, offline)
 ├── 404.html                    # Redirección espejo a error.html para hosts estáticos
-├── Interfaz_General2.html      # Landing page moderna institucional "Sendero" (ruta '/')
-├── Interfaz_General.html       # Versión base de la landing page
+├── Interfaz_General.html       # Landing page institucional "Sendero" optimizada (ruta '/')
+├── Interfaz_General2.html      # Variante de la landing page
 ├── login_Rework.html           # Login adaptativo con pre-ajustes sensoriales
 ├── login.html                  # Versión de compatibilidad de inicio de sesión
 ├── Interfaz_Estudiante.html    # Portal del Estudiante: Rutina (HU-002, 006) y Logros éticos (HU-011)
 ├── Interfaz_Docente2.html      # Portal Docente: Actividades (HU-004, 005), Desempeño (HU-008), Bitácora (HU-010)
 ├── Interfaz_Docente.html       # Versión previa del portal docente
-├── Interfaz_Acudiente.html     # Portal Acudiente: Sensorial (HU-003), Progreso (HU-009), Notas (HU-010)
-├── Interfaz_Admin2.html        # Portal Administrador: Usuarios (HU-001) y Módulos/Categorías (HU-007)
+├── Interfaz_Acudiente.html     # Portal Acudiente: Sensorial (HU-003), Progreso (HU-009), Observaciones (HU-012)
+├── Interfaz_Admin2.html        # Portal Administrador: Usuarios, Módulos/Categorías y Hardening (HU-001, 007)
 └── Interfaz_Admin.html         # Versión previa del portal de administración
 ```
 
