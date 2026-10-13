@@ -22,7 +22,7 @@ El proyecto ha completado exitosamente las metas de los **Sprints 1, 2, 3 y 4** 
 │                                    SENDERO FRONTEND                                     │
 │                                                                                         │
 │  [ Landing General ] ──> [ Login Adaptativo ] ──> [ Control RBAC & BFCache Protection ] │
-│  (Interfaz_General)       (login_Rework)                      │                         │
+│  (Interfaz_General)       (login)                             │                         │
 │                                                               │                         │
 │         ┌─────────────────────┬───────────────────────┬───────┴───────────────┐         │
 │         ▼                     ▼                       ▼                       ▼         │
@@ -32,7 +32,7 @@ El proyecto ha completado exitosamente las metas de los **Sprints 1, 2, 3 y 4** 
 │  Logros HU-011           Observaciones HU-012    Analítica HU-008        Hardening      │
 │                          Notas Docente HU-010    Bitácora HU-010         HU-001/007     │
 └─────────────────────────────────────────────────────────────────────────────────────────┘
-                                             │
+                                              │
       REST API (.NET 9) + SQL Server + RFC 7807 ProblemDetails (http://localhost:5264)
 ```
 
@@ -44,7 +44,7 @@ El proyecto ha completado exitosamente las metas de los **Sprints 1, 2, 3 y 4** 
 
 | Historia de Usuario | Pts | Módulo / Funcionalidad | Descripción e Implementación Frontend |
 | :--- | :---: | :--- | :--- |
-| **HU-001** | 5 | **Gestión de Usuarios y Roles (RBAC)** | Autenticación y registro con `UserManager<ApplicationUser>` y `RoleManager<IdentityRole>`. Endpoints: `POST /api/auth/login`, `POST /api/auth/register`, `POST /api/auth/refresh-token`, `GET /api/users` y `PUT /api/users/{id}/roles`. Implementado en [`login_Rework.html`](login_Rework.html) e [`Interfaz_Admin2.html`](Interfaz_Admin2.html). |
+| **HU-001** | 5 | **Gestión de Usuarios y Roles (RBAC)** | Autenticación y registro con `UserManager<ApplicationUser>` y `RoleManager<IdentityRole>`. Endpoints: `POST /api/auth/login`, `POST /api/auth/register`, `POST /api/auth/refresh-token`, `GET /api/users` y `PUT /api/users/{id}/roles`. Implementado en [`login.html`](login.html) e [`Interfaz_Admin.html`](Interfaz_Admin.html). |
 | **HU-002** | 5 | **Rutina Visual de Actividades** | Visualización cronológica y secuencial de la jornada (`GET /api/students/me/daily-routine`). Actividades ordenadas estrictamente por su `OrdenSecuencial` con estados (`Pendiente`, `EnProgreso`, `Completada`). Implementado en [`Interfaz_Estudiante.html`](Interfaz_Estudiante.html). |
 | **HU-003** | 5 | **Configuración Sensorial Adaptativa** | Configuración de la entidad `SensoryPreference` (`GET` y `PUT /api/students/{id}/sensory-preferences`): paleta cromática, tipografía legible/dislexia, escala tipográfica (1-4), audio/TTS, reducción de movimiento y temporizadores. Implementado en [`Interfaz_Acudiente.html`](Interfaz_Acudiente.html) con propagación dinámica a la vista del estudiante. |
 
@@ -54,10 +54,10 @@ El proyecto ha completado exitosamente las metas de los **Sprints 1, 2, 3 y 4** 
 
 | Historia de Usuario | Pts | Módulo / Funcionalidad | Descripción e Implementación Frontend |
 | :--- | :---: | :--- | :--- |
-| **HU-004** | 8 | **Creación y Parametrización de Actividades** | Panel docente para parametrizar actividades (`POST, PUT, DELETE /api/activities`). **Modelo híbrido**: metadatos relacionales (`Titulo`, `Descripcion`, `TipoActividad`, `ObjetivoPedagogico`, `ModuloId`) combinados con la columna **`ConfigJson`** (`NVARCHAR(MAX)`) para secuencias y parejas. Incluye un **detector de lenguaje figurado/metafórico** en tiempo real. Implementado en [`Interfaz_Docente2.html`](Interfaz_Docente2.html). |
-| **HU-005** | 3 | **Asignación de Actividades** | Asignación directa e individual o en lote (`POST /api/assignments`), definiendo `fechaInicio`, `fechaLimite`, `ordenSecuencial` y `prioridad`. Gestión integrada en [`Interfaz_Docente2.html`](Interfaz_Docente2.html). |
+| **HU-004** | 8 | **Creación y Parametrización de Actividades** | Panel docente para parametrizar actividades (`POST, PUT, DELETE /api/activities`). **Modelo híbrido**: metadatos relacionales (`Titulo`, `Descripcion`, `TipoActividad`, `ObjetivoPedagogico`, `ModuloId`) combinados con la columna **`ConfigJson`** (`NVARCHAR(MAX)`) para secuencias y parejas. Incluye un **detector de lenguaje figurado/metafórico** en tiempo real. Implementado en [`Interfaz_Docente.html`](Interfaz_Docente.html). |
+| **HU-005** | 3 | **Asignación de Actividades** | Asignación directa e individual o en lote (`POST /api/assignments`), definiendo `fechaInicio`, `fechaLimite`, `ordenSecuencial` y `prioridad`. Gestión integrada en [`Interfaz_Docente.html`](Interfaz_Docente.html). |
 | **HU-006** | 8 | **Ejecución y Registro de Intentos** | Flujo completo de ejecución: inicio de actividad (`POST /api/activities/{assignmentId}/start`), renderizado dinámico según `ConfigJson` y envío de **telemetría de rendimiento** al completar (`POST /api/activities/{assignmentId}/submit`): `tiempoRespuestaSegundos` (cronometrado), `cantidadIntentosFallidos`, `cantidadAciertos` y `completadaExitosamente`. Implementado en [`Interfaz_Estudiante.html`](Interfaz_Estudiante.html). |
-| **HU-007** | 3 | **Configuración de Módulos Temáticos** | CRUD administrativo de Categorías y Módulos de aprendizaje (`GET, POST, PUT, DELETE /api/categories` y `/api/modules`). Incluye control de integridad referencial (bloqueo de eliminación ante dependencias vinculadas). Implementado en [`Interfaz_Admin2.html`](Interfaz_Admin2.html). |
+| **HU-007** | 3 | **Configuración de Módulos Temáticos** | CRUD administrativo de Categorías y Módulos de aprendizaje (`GET, POST, PUT, DELETE /api/categories` y `/api/modules`). Incluye control de integridad referencial (bloqueo de eliminación ante dependencias vinculadas). Implementado en [`Interfaz_Admin.html`](Interfaz_Admin.html). |
 
 ---
 
@@ -65,7 +65,7 @@ El proyecto ha completado exitosamente las metas de los **Sprints 1, 2, 3 y 4** 
 
 | Historia de Usuario | Pts | Módulo / Funcionalidad | Descripción e Implementación Frontend |
 | :--- | :---: | :--- | :--- |
-| **HU-008** | 5 | **Panel Analítico del Docente** | Tablero analítico con métricas agregadas por estudiante y por aula (`GET /api/analytics/teacher/students/{id}/summary` y `GET /api/analytics/teacher/classes/{classId}`): cálculo de tasa de aciertos global, promedio de tiempo de respuesta por tipo de actividad, curva de intentos y evolución semanal. Visualización en gráficos SVG accesibles, sparklines y sistema de alerta temprana ("Necesita apoyo" si tasa < 60%). Implementado en [`Interfaz_Docente2.html`](Interfaz_Docente2.html). |
+| **HU-008** | 5 | **Panel Analítico del Docente** | Tablero analítico con métricas agregadas por estudiante y por aula (`GET /api/analytics/teacher/students/{id}/summary` y `GET /api/analytics/teacher/classes/{classId}`): cálculo de tasa de aciertos global, promedio de tiempo de respuesta por tipo de actividad, curva de intentos y evolución semanal. Visualización en gráficos SVG accesibles, sparklines y sistema de alerta temprana ("Necesita apoyo" si tasa < 60%). Implementado en [`Interfaz_Docente.html`](Interfaz_Docente.html). |
 | **HU-009** | 5 | **Monitoreo del Acudiente** | Vista de progreso y consolidado (`GET /api/guardian/students/{studentId}/progress`): actividades completadas vs. pendientes, porcentaje de avance, tiempo invertido y evolución semanal. Incluye historial paginado (`/activity-history`) con badges no punitivos ("Lo logró", "Necesitó varios intentos", "Sin terminar") y recomendaciones prácticas para casa. Implementado en [`Interfaz_Acudiente.html`](Interfaz_Acudiente.html). |
 | **HU-010** | 3 | **Bitácora Pedagógica y Calificaciones** | CRUD de notas cualitativas del docente sobre el estudiante (`POST, GET /api/students/{id}/pedagogical-notes`, con edición/eliminación). Clasificación por tipo (`Avance`, `Recomendación`, `Observación`, `Aspecto a reforzar`), área y visibilidad al acudiente (`VisibleAcudiente = true`). Pestaña de calificaciones (escala 1.0 - 5.0 con nota aprobatoria 3.0 vía `PUT /assignments/{id}/grade`). Consulta en tiempo real por el acudiente en [`Interfaz_Acudiente.html`](Interfaz_Acudiente.html). |
 | **HU-011** | 3 | **Visualización de Logros del Estudiante** | Vista personal de hitos y módulos concluidos (`GET /api/students/me/achievements`). **Gamificación ética no competitiva**: sin rankings, sin puntos, sin comparaciones con compañeros, sin rachas ni penalizaciones. Incluye función de auditoría automatizada en consola `validarSinElementosCompetitivos()` y soporte TTS. Implementado en [`Interfaz_Estudiante.html`](Interfaz_Estudiante.html). |
@@ -77,7 +77,7 @@ El proyecto ha completado exitosamente las metas de los **Sprints 1, 2, 3 y 4** 
 | Historia de Usuario / Tarea | Pts | Módulo / Funcionalidad | Descripción e Implementación Frontend |
 | :--- | :---: | :--- | :--- |
 | **HU-012** | 2 | **Consulta de Observaciones por Acudientes** | Endpoint optimizado de lectura cronológica y filtrado de observaciones docentes con soporte de paginación (`GET /api/guardian/students/{id}/observations?pageSize=50`). Permite consultar colecciones paginadas de forma eficiente con fallback ordenado a `/pedagogical-notes` y `/log-entries`. Tarjetas con fecha, tipo, área formativa, descripción y recomendaciones para el hogar. Implementado en [`Interfaz_Acudiente.html`](Interfaz_Acudiente.html). |
-| **Hardening Admin** | — | **Seguridad & Gestión de Usuarios** | Fortalecimiento del panel administrativo en [`Interfaz_Admin2.html`](Interfaz_Admin2.html): edición habilitada de correo electrónico, actualización de estado activo/inactivo (`PUT /api/users/{id}`) y vinculación relacional persistente de estudiantes a acudientes mediante `PUT /api/users/{id}/students`. |
+| **Hardening Admin** | — | **Seguridad & Gestión de Usuarios** | Fortalecimiento del panel administrativo en [`Interfaz_Admin.html`](Interfaz_Admin.html): edición habilitada de correo electrónico, actualización de estado activo/inactivo (`PUT /api/users/{id}`) y vinculación relacional persistente de estudiantes a acudientes mediante `PUT /api/users/{id}/students`. |
 | **RFC 7807 ProblemDetails** | — | **Manejo Estandarizado de Errores** | Soporte e integración en [`api-client.js`](api-client.js) y las vistas para procesar respuestas de error en el estándar **RFC 7807 (`application/problem+json`)**, extrayendo de forma segura campos como `title`, `detail`, `status` y diccionarios de `errors` de validación. |
 | **Optimización SQL** | — | **Índices Compuestos de Base de Datos** | Creación y soporte para índices de alto rendimiento en Microsoft SQL Server sobre `BitacoraNotas` (`(StudentProfileId, Fecha DESC, CreatedAt DESC) INCLUDE (VisibleAcudiente)`), `Assignments` y `ExecutionAttempts` para acelerar las consultas analíticas de docentes y acudientes. |
 
@@ -113,20 +113,20 @@ El proyecto ha completado exitosamente las metas de los **Sprints 1, 2, 3 y 4** 
 
 ## 🖥️ Módulos e Interfaces del Frontend
 
-### 1. `Interfaz_General.html` / `Interfaz_General2.html` — Portal Institucional "Sendero"
+### 1. `Interfaz_General.html` — Portal Institucional "Sendero"
 - **Propósito**: Puerta de entrada pública orientada a familias, docentes y directivos.
 - **Diseño**: Inspirado en interfaces modernas de alto rendimiento tecnológico (estilo NVIDIA/Apple), carrusel interactivo por categorías temáticas, tipografía optimizada (16px a 18px), arte vectorial original y acceso rápido al inicio de sesión.
 - **Ruta por defecto**: Servida como raíz `/` en `server.js`.
 
-### 2. `login_Rework.html` / `login.html` — Inicio de Sesión Adaptativo
+### 2. `login.html` — Inicio de Sesión Adaptativo
 - **Propósito**: Acceso centralizado con validación en tiempo real y pre-ajustes sensoriales (contraste y escala tipográfica utilizables antes de ingresar credenciales).
-- **Seguridad**: Autenticación JWT (`POST /api/auth/login`), conmutador de visibilidad de contraseña y redirección automática según el rol asignado.
+- **Seguridad**: Autenticación JWT (`POST /api/auth/login`), conmutador de visibilidad de contraseña, protección de historial (BFCache / popstate) y redirección automática según el rol asignado.
 
 ### 3. `Interfaz_Estudiante.html` — Portal del Estudiante ("Mi rutina de hoy" & "Mis logros")
 - **Sección Rutina Diaria (HU-002, HU-006)**: Secuencia visual estructurada, barra de progreso interactiva, renderizado del ejercicio basado en `ConfigJson` (secuencia lógica o emparejamiento visual), aviso sonoro/visual de transición y telemetría de ejecución (`/start` y `/submit`).
 - **Sección Mis Logros (HU-011)**: Camino visual personal de módulos concluidos, actividades terminadas y logros acumulados, completamente desprovisto de mecánicas competitivas y con soporte de lectura por voz.
 
-### 4. `Interfaz_Docente2.html` — Centro de Gestión y Analítica Pedagógica
+### 4. `Interfaz_Docente.html` — Centro de Gestión y Analítica Pedagógica
 - **Vista Actividades (HU-004, HU-005)**: Editor visual interactivo de ejercicios con previsualización en vivo, detector de expresiones metafóricas y asignación individual o grupal con prioridad y orden secuencial.
 - **Vista Desempeño (HU-008)**: Tablero de métricas con filtros de periodo (4, 8, 12 semanas), gráficos SVG reactivos (tasa de aciertos con promedio de aula, tiempos de respuesta, cantidad de intentos), tabla con *sparklines* y alertas automáticas de apoyo pedagógico.
 - **Vista Bitácora (HU-010)**: Registro cronológico de notas cualitativas con control de visibilidad al acudiente, filtros por área/tipo y panel de calificaciones por actividad en escala de 1.0 a 5.0 (nota aprobatoria 3.0).
@@ -136,7 +136,7 @@ El proyecto ha completado exitosamente las metas de los **Sprints 1, 2, 3 y 4** 
 - **Vista Progreso (HU-009)**: Indicadores de cumplimiento global, tiempo total invertido, evolución semanal, historial cronológico de actividades con resultados claros ("Lo logró", "Necesitó varios intentos", "Sin terminar") y consejos prácticos para el hogar.
 - **Vista Notas del Docente (HU-010, HU-012)**: Consulta paginada y filtrada cronológicamente de las observaciones docentes y recomendaciones pedagógicas compartidas para cada estudiante a cargo (`/guardian/students/{id}/observations`).
 
-### 6. `Interfaz_Admin2.html` — Panel de Administración Global
+### 6. `Interfaz_Admin.html` — Panel de Administración Global
 - **Usuarios & Hardening (HU-001, Sprint 4)**: Creación y edición de cuentas (nombres, apellidos, correo editable, estado activo/inactivo), asignación de roles y vinculación persistente de estudiantes a cargo para el rol Acudiente (`PUT /api/users/{id}/students`).
 - **Categorías y Módulos Temáticos (HU-007)**: Gestión del catálogo pedagógico con ordenación secuencial, selector de colores identificadores y validaciones de eliminación protegida.
 
@@ -228,15 +228,11 @@ PWA1-FRONTEND/
 ├── error.html                  # Pantalla accesible de gestión de errores (404, 403, 401, 500, offline)
 ├── 404.html                    # Redirección espejo a error.html para hosts estáticos
 ├── Interfaz_General.html       # Landing page institucional "Sendero" optimizada (ruta '/')
-├── Interfaz_General2.html      # Variante de la landing page
-├── login_Rework.html           # Login adaptativo con pre-ajustes sensoriales
-├── login.html                  # Versión de compatibilidad de inicio de sesión
+├── login.html                  # Login adaptativo con pre-ajustes sensoriales y protección bfcache
 ├── Interfaz_Estudiante.html    # Portal del Estudiante: Rutina (HU-002, 006) y Logros éticos (HU-011)
-├── Interfaz_Docente2.html      # Portal Docente: Actividades (HU-004, 005), Desempeño (HU-008), Bitácora (HU-010)
-├── Interfaz_Docente.html       # Versión previa del portal docente
+├── Interfaz_Docente.html       # Portal Docente: Actividades (HU-004, 005), Desempeño (HU-008), Bitácora (HU-010)
 ├── Interfaz_Acudiente.html     # Portal Acudiente: Sensorial (HU-003), Progreso (HU-009), Observaciones (HU-012)
-├── Interfaz_Admin2.html        # Portal Administrador: Usuarios, Módulos/Categorías y Hardening (HU-001, 007)
-└── Interfaz_Admin.html         # Versión previa del portal de administración
+└── Interfaz_Admin.html         # Portal Administrador: Usuarios, Módulos/Categorías y Hardening (HU-001, 007)
 ```
 
 ---
@@ -262,20 +258,20 @@ PWA1-FRONTEND/
 
 3. **Acceder a la aplicación:**
    - **Portal General (Landing Sendero):** [http://127.0.0.1:5500/](http://127.0.0.1:5500/)
-   - **Inicio de Sesión:** [http://127.0.0.1:5500/login_Rework.html](http://127.0.0.1:5500/login_Rework.html)
+   - **Inicio de Sesión:** [http://127.0.0.1:5500/login.html](http://127.0.0.1:5500/login.html)
 
 ---
 
 ## 👥 Flujo de Roles y Redirección en `api-client.js`
 
-Al autenticarse en `login_Rework.html`, el cliente extrae los roles del token/payload y realiza la redirección automática:
+Al autenticarse en `login.html`, el cliente extrae los roles del token/payload y realiza la redirección automática:
 
 - **Estudiante** $\rightarrow$ `Interfaz_Estudiante.html`
 - **Acudiente** $\rightarrow$ `Interfaz_Acudiente.html`
-- **Docente / Profesor** $\rightarrow$ `Interfaz_Docente2.html`
-- **Administrador** $\rightarrow$ `Interfaz_Admin2.html`
+- **Docente / Profesor** $\rightarrow$ `Interfaz_Docente.html`
+- **Administrador** $\rightarrow$ `Interfaz_Admin.html`
 
-Cada interfaz cuenta con guardas de autenticación mediante `ApiClient.requireAuth(['RolPermitido'])`, impidiendo el acceso a usuarios sin el rol correspondiente (redirigiendo a `error.html?code=403`) o con sesión expirada (`login_Rework.html`).
+Cada interfaz cuenta con guardas de autenticación mediante `ApiClient.requireAuth(['RolPermitido'])`, impidiendo el acceso a usuarios sin el rol correspondiente (redirigiendo a `error.html?code=403`) o con sesión expirada (`login.html`).
 
 ---
 
