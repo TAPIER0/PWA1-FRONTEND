@@ -665,6 +665,13 @@
   document.getElementById('welcome-name').textContent = 'Bienvenido(a), ' + currentAdminName;
   document.getElementById('admin-chip-name').textContent = currentAdminName;
 
+  // Inicializar foto de perfil personalizada (forma redondeada / semicírculo)
+  ApiClient.initAvatarFeature({
+    triggerSelector: '.brand .brand-mark',
+    shape: 'rounded',
+    extraSelectors: ['.admin-avatar']
+  });
+
   const logoutBtn = document.getElementById('btn-logout');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => ApiClient.logout());

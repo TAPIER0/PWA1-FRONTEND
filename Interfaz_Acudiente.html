@@ -752,6 +752,13 @@
   document.getElementById('welcome-name').textContent = 'Bienvenido(a), ' + currentGuardianName;
   document.getElementById('guardian-chip-name').textContent = currentGuardianName;
 
+  // Inicializar foto de perfil personalizada (forma redondeada / semicírculo)
+  ApiClient.initAvatarFeature({
+    triggerSelector: '.brand .brand-mark',
+    shape: 'rounded',
+    extraSelectors: ['.admin-avatar']
+  });
+
   const studentSelect = document.getElementById('student-select');
 
   function populateAllStudentSelects() {

@@ -996,6 +996,12 @@ de la vista y avisa si encuentra palabras competitivas.</pre>
     if (!ApiClient.requireAuth(['Estudiante'])) return;
 
     try {
+      // Inicializar foto de perfil personalizada (forma circular)
+      ApiClient.initAvatarFeature({
+        triggerSelector: '.greeting .avatar',
+        shape: 'circle'
+      });
+
       const user = ApiClient.getUser();
       let studentName = user ? (user.nombres || 'Estudiante') : 'Estudiante';
       let studentId = null;
