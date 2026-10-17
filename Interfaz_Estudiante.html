@@ -644,14 +644,14 @@ de la vista y avisa si encuentra palabras competitivas.</pre>
         : `<span class="timer-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>${act.durationMinutes * (prefs.timers.mode === 'tiempo-extendido' ? 2 : 1)} min para esta actividad</span></span>`;
  
       const actionButton = status === 'actual'
-        ? `<button type="button" class="btn btn-primary" id="btn-complete-step" data-complete="${act.id}">
+        ? `<button type="button" class="btn btn-primary" id="btn-complete-step" data-complete="${escapeHtml(act.id)}">
              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>
              Listo, siguiente
            </button>`
         : '';
  
       const listenButton = (status === 'actual' && prefs.audio.textToSpeech)
-        ? `<button type="button" class="btn btn-ghost" data-listen="${act.id}" aria-label="Escuchar instrucciones de ${escapeHtml(act.title)}">
+        ? `<button type="button" class="btn btn-ghost" data-listen="${escapeHtml(act.id)}" aria-label="Escuchar instrucciones de ${escapeHtml(act.title)}">
              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="16" height="16"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.5 8.5a5 5 0 0 1 0 7"></path></svg>
              Escuchar
            </button>`

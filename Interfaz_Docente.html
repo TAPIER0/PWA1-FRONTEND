@@ -950,9 +950,16 @@
   }
  
   function escapeHtml(str){
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function safeIcon(key){
+    return Object.prototype.hasOwnProperty.call(ICONS, key) ? ICONS[key] : ICONS.circulo;
   }
  
   function render(){
@@ -968,14 +975,14 @@
           <div class="act-title">${escapeHtml(a.title)}</div>
           <div class="act-instruction">${escapeHtml(a.instruction)}</div>
         </td>
-        <td><span class="badge badge-${a.type}">${TYPE_LABEL[a.type]}</span></td>
+        <td><span class="badge badge-${escapeHtml(a.type)}">${escapeHtml(TYPE_LABEL[a.type] || a.type)}</span></td>
         <td>${escapeHtml(studentNames(a.assignedStudentIds))}</td>
-        <td><span class="badge ${a.status === 'Activa' ? 'badge-activa' : 'badge-inactiva'}">${a.status}</span></td>
+        <td><span class="badge ${a.status === 'Activa' ? 'badge-activa' : 'badge-inactiva'}">${escapeHtml(a.status)}</span></td>
         <td>${new Date(a.updatedAt).toLocaleDateString('es-CO', { day:'numeric', month:'short', year:'numeric' })}</td>
         <td>
           <div class="row-actions">
-            <button type="button" class="icon-btn" data-action="edit" data-id="${a.id}">Editar</button>
-            <button type="button" class="icon-btn danger" data-action="delete" data-id="${a.id}">Eliminar</button>
+            <button type="button" class="icon-btn" data-action="edit" data-id="${escapeHtml(a.id)}">Editar</button>
+            <button type="button" class="icon-btn danger" data-action="delete" data-id="${escapeHtml(a.id)}">Eliminar</button>
           </div>
         </td>
       `;
@@ -1017,15 +1024,15 @@
       editorHelp.textContent = 'Ordena los pasos con las flechas. El estudiante los verá siempre en este orden.';
       document.getElementById('btn-add-item').textContent = '+ Agregar paso';
       editorList.innerHTML = currentSteps.map((s, idx) => `
-        <div class="editor-item" data-item-id="${s.id}">
+        <div class="editor-item" data-item-id="${escapeHtml(s.id)}">
           <div class="order-num">${idx + 1}</div>
-          <span class="icon-preview">${ICONS[s.icon]}</span>
-          ${iconSelectHtml(s.icon, `data-role="icon" data-id="${s.id}"`)}
-          <input type="text" data-role="label" data-id="${s.id}" value="${escapeHtml(s.label)}" placeholder="Nombre del paso">
+          <span class="icon-preview">${safeIcon(s.icon)}</span>
+          ${iconSelectHtml(s.icon, `data-role="icon" data-id="${escapeHtml(s.id)}"`)}
+          <input type="text" data-role="label" data-id="${escapeHtml(s.id)}" value="${escapeHtml(s.label)}" placeholder="Nombre del paso">
           <div class="item-actions">
-            <button type="button" class="mini-btn" data-action="up" data-id="${s.id}" ${idx === 0 ? 'disabled' : ''}>↑</button>
-            <button type="button" class="mini-btn" data-action="down" data-id="${s.id}" ${idx === currentSteps.length - 1 ? 'disabled' : ''}>↓</button>
-            <button type="button" class="mini-btn danger" data-action="remove" data-id="${s.id}">✕</button>
+            <button type="button" class="mini-btn" data-action="up" data-id="${escapeHtml(s.id)}" ${idx === 0 ? 'disabled' : ''}>↑</button>
+            <button type="button" class="mini-btn" data-action="down" data-id="${escapeHtml(s.id)}" ${idx === currentSteps.length - 1 ? 'disabled' : ''}>↓</button>
+            <button type="button" class="mini-btn danger" data-action="remove" data-id="${escapeHtml(s.id)}">✕</button>
           </div>
         </div>
       `).join('') || '<p class="help">Aún no has agregado pasos.</p>';
@@ -1034,19 +1041,19 @@
       editorHelp.textContent = 'Cada fila es una pareja: una imagen a la izquierda y su pareja correspondiente a la derecha.';
       document.getElementById('btn-add-item').textContent = '+ Agregar pareja';
       editorList.innerHTML = currentPairs.map((p) => `
-        <div class="pair-row" data-item-id="${p.id}">
+        <div class="pair-row" data-item-id="${escapeHtml(p.id)}">
           <div class="pair-side">
-            <span class="icon-preview">${ICONS[p.leftIcon]}</span>
-            ${iconSelectHtml(p.leftIcon, `data-role="leftIcon" data-id="${p.id}"`)}
-            <input type="text" data-role="leftLabel" data-id="${p.id}" value="${escapeHtml(p.leftLabel)}" placeholder="Elemento A">
+            <span class="icon-preview">${safeIcon(p.leftIcon)}</span>
+            ${iconSelectHtml(p.leftIcon, `data-role="leftIcon" data-id="${escapeHtml(p.id)}"`)}
+            <input type="text" data-role="leftLabel" data-id="${escapeHtml(p.id)}" value="${escapeHtml(p.leftLabel)}" placeholder="Elemento A">
           </div>
           <span class="pair-link">↔</span>
           <div class="pair-side">
-            <span class="icon-preview">${ICONS[p.rightIcon]}</span>
-            ${iconSelectHtml(p.rightIcon, `data-role="rightIcon" data-id="${p.id}"`)}
-            <input type="text" data-role="rightLabel" data-id="${p.id}" value="${escapeHtml(p.rightLabel)}" placeholder="Elemento B">
+            <span class="icon-preview">${safeIcon(p.rightIcon)}</span>
+            ${iconSelectHtml(p.rightIcon, `data-role="rightIcon" data-id="${escapeHtml(p.id)}"`)}
+            <input type="text" data-role="rightLabel" data-id="${escapeHtml(p.id)}" value="${escapeHtml(p.rightLabel)}" placeholder="Elemento B">
           </div>
-          <button type="button" class="mini-btn danger" data-action="remove" data-id="${p.id}">✕</button>
+          <button type="button" class="mini-btn danger" data-action="remove" data-id="${escapeHtml(p.id)}">✕</button>
         </div>
       `).join('') || '<p class="help">Aún no has agregado parejas.</p>';
     }
@@ -1155,7 +1162,7 @@
       }
       previewBody.innerHTML = `<div class="preview-sequence">` + validSteps.map((s, i) => `
         ${i > 0 ? '<span class="preview-arrow">→</span>' : ''}
-        <div class="preview-chip">${ICONS[s.icon]}<span>${escapeHtml(s.label)}</span></div>
+        <div class="preview-chip">${safeIcon(s.icon)}<span>${escapeHtml(s.label)}</span></div>
       `).join('') + `</div>`;
     } else {
       const validPairs = currentPairs.filter(p => p.leftLabel.trim() !== '' || p.rightLabel.trim() !== '');
@@ -1167,11 +1174,11 @@
         <div class="preview-matching">
           <div class="preview-col">
             <div class="col-label">Columna A</div>
-            ${validPairs.map(p => `<div class="preview-chip" style="width:auto;">${ICONS[p.leftIcon]}<span>${escapeHtml(p.leftLabel)}</span></div>`).join('')}
+            ${validPairs.map(p => `<div class="preview-chip" style="width:auto;">${safeIcon(p.leftIcon)}<span>${escapeHtml(p.leftLabel)}</span></div>`).join('')}
           </div>
           <div class="preview-col">
             <div class="col-label">Columna B</div>
-            ${validPairs.map(p => `<div class="preview-chip" style="width:auto;">${ICONS[p.rightIcon]}<span>${escapeHtml(p.rightLabel)}</span></div>`).join('')}
+            ${validPairs.map(p => `<div class="preview-chip" style="width:auto;">${safeIcon(p.rightIcon)}<span>${escapeHtml(p.rightLabel)}</span></div>`).join('')}
           </div>
         </div>
       `;
@@ -1188,7 +1195,7 @@
     document.getElementById('figurative-hint').classList.remove('show');
 
     if (moduloSelect && modules.length > 0) {
-      moduloSelect.innerHTML = modules.map(m => `<option value="${m.id}">${escapeHtml(m.titulo)}</option>`).join('');
+      moduloSelect.innerHTML = modules.map(m => `<option value="${escapeHtml(m.id)}">${escapeHtml(m.titulo)}</option>`).join('');
     }
 
     if(activity){

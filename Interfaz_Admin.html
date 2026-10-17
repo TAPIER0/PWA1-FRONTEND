@@ -678,9 +678,30 @@
   }
 
   function escapeHtml(str){
-    const div = document.createElement('div');
-    div.textContent = str == null ? '' : String(str);
-    return div.innerHTML;
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function safeHexColor(val){
+    const trimmed = String(val || '').trim();
+    return /^#[0-9A-Fa-f]{3,6}$/.test(trimmed) ? trimmed : '#2F6E5C';
+  }
+
+  function generateInitialPassword(){
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+    const rand = new Uint32Array(6);
+    if (window.crypto && window.crypto.getRandomValues) {
+      window.crypto.getRandomValues(rand);
+    } else {
+      for (let i = 0; i < 6; i++) rand[i] = Math.floor(Math.random() * 100000);
+    }
+    let suffix = '';
+    for (let i = 0; i < 6; i++) suffix += chars[rand[i] % chars.length];
+    return `Tea${suffix}9!`;
   }
 
   const status = document.getElementById('status');
@@ -892,7 +913,7 @@
       emailInput.value = '';
       emailInput.disabled = false;
       roleInput.value = 'Estudiante';
-      passwordInput.value = 'Usuario123!*';
+      passwordInput.value = generateInitialPassword();
       statusInput.value = 'Activo';
       if(passwordField) {
         passwordField.style.display = 'flex';
@@ -1185,7 +1206,7 @@
       tr.innerHTML = `
         <td>
           <div class="cat-cell">
-            <span class="color-dot" style="background:${escapeHtml(c.color)}" aria-hidden="true"></span>
+            <span class="color-dot" style="background:${safeHexColor(c.color)}" aria-hidden="true"></span>
             <div>
               <div class="user-name">${escapeHtml(c.nombre)}</div>
               <div class="item-desc">${escapeHtml(c.descripcion || 'Sin descripción')}</div>

@@ -87,7 +87,49 @@ const ApiClient = {
     }
   },
 
-  async request(endpoint, options = {}) {
+  _refreshPromise: null,
+
+  getRefreshToken() {
+    return localStorage.getItem('tea_refresh_token');
+  },
+
+  async tryRefreshToken() {
+    if (this._refreshPromise) {
+      return this._refreshPromise;
+    }
+
+    const accessToken = this.getToken();
+    const refreshToken = this.getRefreshToken();
+    if (!accessToken || !refreshToken) {
+      return false;
+    }
+
+    this._refreshPromise = (async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accessToken, refreshToken })
+        });
+        if (!res.ok) return false;
+        const payload = await res.json();
+        const authData = payload && payload.data ? payload.data : null;
+        if (authData && authData.token) {
+          this.saveSession(authData);
+          return true;
+        }
+        return false;
+      } catch (e) {
+        return false;
+      } finally {
+        this._refreshPromise = null;
+      }
+    })();
+
+    return this._refreshPromise;
+  },
+
+  async request(endpoint, options = {}, _isRetry = false) {
     const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
     const token = this.getToken();
 
@@ -115,6 +157,10 @@ const ApiClient = {
       const response = await fetch(url, fetchOptions);
 
       if (response.status === 401) {
+        const isAuthEndpoint = endpoint.includes('/auth/login') || endpoint.includes('/auth/refresh-token');
+        if (!_isRetry && !isAuthEndpoint && await this.tryRefreshToken()) {
+          return this.request(endpoint, options, true);
+        }
         this.clearSession();
         window.location.replace('login.html');
         throw new Error('Sesión expirada o no autorizada.');
@@ -144,10 +190,24 @@ const ApiClient = {
   },
 
   resolveAvatarUrl(url) {
-    if (!url) return '';
-    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    if (!url || typeof url !== 'string') return '';
+    const trimmed = url.trim();
+    if (trimmed.startsWith('/uploads/avatars/')) {
+      const base = this.baseUrl.replace(/\/api\/?$/, '');
+      return `${base}${trimmed}`;
+    }
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      try {
+        const parsed = new URL(trimmed);
+        if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+          return parsed.href;
+        }
+      } catch (e) {
+        return '';
+      }
+    }
     const base = this.baseUrl.replace(/\/api\/?$/, '');
-    return `${base}${url.startsWith('/') ? '' : '/'}${url}`;
+    return `${base}${trimmed.startsWith('/') ? '' : '/'}${trimmed}`;
   },
 
   async uploadAvatar(file) {
