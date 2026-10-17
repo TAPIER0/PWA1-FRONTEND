@@ -310,6 +310,34 @@
     .note-date .day{ font-size:18px; }
   }
 
+  /* ---------- Contraseña del estudiante ---------- */
+  .security-card{ max-width:560px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px 26px; }
+  .security-form{ display:flex; flex-direction:column; gap:18px; margin-top:8px; }
+  .security-form .field{ display:flex; flex-direction:column; gap:6px; }
+  .security-form label{ font-size:14.5px; font-weight:700; color:var(--text); }
+  .pw-input-row{ position:relative; display:flex; align-items:center; }
+  .pw-input-row input{
+    font-family:inherit; font-size:16px; width:100%; padding:12px 90px 12px 14px;
+    border:1.5px solid var(--border); border-radius:10px; background:var(--bg); color:var(--text);
+  }
+  .pw-input-row input:focus{ outline:3px solid var(--focus); outline-offset:1px; border-color:var(--focus); background:var(--surface); }
+  .pw-toggle-btn{
+    position:absolute; right:8px; top:50%; transform:translateY(-50%);
+    background:var(--surface); border:1px solid var(--border); font-family:inherit;
+    font-size:13px; font-weight:700; color:var(--primary); padding:6px 10px; cursor:pointer; border-radius:6px;
+  }
+  .pw-toggle-btn:hover{ background:var(--bg); }
+  .pw-toggle-btn:focus-visible{ outline:3px solid var(--focus); outline-offset:1px; }
+  .pw-reqs-list{ list-style:none; margin:4px 0 0 0; padding:0; font-size:13.5px; color:var(--text-muted); display:flex; flex-direction:column; gap:3px; }
+  .pw-reqs-list li::before{ content:"○ "; }
+  .pw-reqs-list li.met{ color:var(--ok-text); font-weight:700; }
+  .pw-reqs-list li.met::before{ content:"✓ "; }
+  .security-alert{ font-size:14.5px; border-radius:10px; padding:12px 14px; border:1px solid var(--border); margin-top:4px; }
+  .security-alert[hidden]{ display:none; }
+  .security-alert.ok{ background:var(--ok-bg); color:var(--ok-text); border-color:#88BFA9; }
+  .security-alert.error{ background:var(--warn-bg); color:var(--warn-text); border-color:var(--warn-border); }
+  .security-alert ul{ margin:6px 0 0 0; padding-left:18px; }
+
   .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 
   /* ---------- Responsivo ---------- */
@@ -346,6 +374,7 @@
       <button type="button" class="nav-item active" data-view="preferencias" aria-current="page"><span class="dot"></span> Preferencias sensoriales</button>
       <button type="button" class="nav-item" data-view="progreso"><span class="dot"></span> Progreso</button>
       <button type="button" class="nav-item" data-view="notas"><span class="dot"></span> Notas del docente</button>
+      <button type="button" class="nav-item" data-view="seguridad"><span class="dot"></span> Contraseña del estudiante</button>
     </nav>
  
     <div class="sidebar-footer">
@@ -675,6 +704,62 @@
 
     <div id="notes-timeline"></div>
    </div>
+
+   <!-- ================= Vista: Contraseña del estudiante ================= -->
+   <div class="view" id="view-seguridad" hidden>
+    <div class="page-header">
+      <div>
+        <h1>Contraseña del estudiante</h1>
+        <p class="subtitle">Los estudiantes no reciben correos de recuperación. Desde aquí puedes asignarle una nueva contraseña a tu estudiante vinculado.</p>
+      </div>
+    </div>
+
+    <div class="student-bar">
+      <div class="field">
+        <label for="security-student">Estudiante</label>
+        <select id="security-student"></select>
+      </div>
+    </div>
+
+    <section class="student-hero" aria-labelledby="security-student-name">
+      <div class="student-avatar" id="security-student-initials" aria-hidden="true">—</div>
+      <div>
+        <p class="student-hero-label">Restablecer acceso de</p>
+        <h2 class="student-hero-name" id="security-student-name">—</h2>
+        <p class="student-hero-code" id="security-student-code" hidden></p>
+      </div>
+    </section>
+
+    <div class="security-card">
+      <form id="security-form" class="security-form" novalidate>
+        <div class="field">
+          <label for="sec-new-pw">Nueva contraseña del estudiante</label>
+          <div class="pw-input-row">
+            <input type="password" id="sec-new-pw" autocomplete="new-password" aria-describedby="sec-pw-reqs" placeholder="Mínimo 6 caracteres y 1 número">
+            <button type="button" class="pw-toggle-btn" id="sec-toggle-pw1" aria-pressed="false">Mostrar</button>
+          </div>
+          <ul class="pw-reqs-list" id="sec-pw-reqs">
+            <li id="sec-req-len">Al menos 6 caracteres</li>
+            <li id="sec-req-num">Al menos 1 número (0–9)</li>
+          </ul>
+        </div>
+
+        <div class="field">
+          <label for="sec-confirm-pw">Confirmar nueva contraseña</label>
+          <div class="pw-input-row">
+            <input type="password" id="sec-confirm-pw" autocomplete="new-password" placeholder="Repite la nueva contraseña">
+            <button type="button" class="pw-toggle-btn" id="sec-toggle-pw2" aria-pressed="false">Mostrar</button>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; align-items:center;">
+          <button type="submit" class="btn btn-primary" id="sec-submit-btn">Guardar nueva contraseña</button>
+        </div>
+
+        <div class="security-alert" id="sec-feedback" role="status" aria-live="polite" hidden></div>
+      </form>
+    </div>
+   </div>
   </main>
 </div>
  
@@ -762,7 +847,7 @@
   const studentSelect = document.getElementById('student-select');
 
   function populateAllStudentSelects() {
-    const selIds = ['student-select', 'progress-student', 'notes-student'];
+    const selIds = ['student-select', 'progress-student', 'notes-student', 'security-student'];
     selIds.forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
@@ -1077,6 +1162,10 @@
     if(name === 'notas'){
       notesStudent.value = studentSelect.value;
       loadNotes();
+    }
+    if(name === 'seguridad'){
+      securityStudent.value = studentSelect.value;
+      loadSecurityStudent();
     }
   }
   navItems.forEach(item => item.addEventListener('click', () => showView(item.dataset.view)));
@@ -1924,6 +2013,123 @@
     ];
   }
 
+  /* =====================================================================
+   * SEGURIDAD — Restablecimiento de contraseña del estudiante por acudiente
+   * CONEXIÓN BACKEND: POST /api/guardian/students/{studentId}/reset-password
+   * ===================================================================== */
+  const securityStudent = document.getElementById('security-student');
+  const securityForm = document.getElementById('security-form');
+  const secNewPw = document.getElementById('sec-new-pw');
+  const secConfirmPw = document.getElementById('sec-confirm-pw');
+  const secReqLen = document.getElementById('sec-req-len');
+  const secReqNum = document.getElementById('sec-req-num');
+  const secSubmitBtn = document.getElementById('sec-submit-btn');
+  const secFeedback = document.getElementById('sec-feedback');
+
+  function showSecurityFeedback(message, type) {
+    if (!secFeedback) return;
+    if (!message) {
+      secFeedback.hidden = true;
+      secFeedback.textContent = '';
+      secFeedback.className = 'security-alert';
+      return;
+    }
+    secFeedback.textContent = message;
+    secFeedback.className = 'security-alert ' + (type === 'ok' ? 'ok' : 'error');
+    secFeedback.hidden = false;
+  }
+
+  function updateSecurityPwChecklist() {
+    const val = secNewPw ? secNewPw.value : '';
+    if (secReqLen) secReqLen.classList.toggle('valid', val.length >= 6);
+    if (secReqNum) secReqNum.classList.toggle('valid', /\d/.test(val));
+  }
+
+  function loadSecurityStudent() {
+    if (!securityStudent) return;
+    const studentId = securityStudent.value;
+    const info = studentInfo(studentId);
+    document.getElementById('security-student-name').textContent = info.name;
+    document.getElementById('security-student-initials').textContent = info.initials;
+    const code = document.getElementById('security-student-code');
+    code.textContent = info.code ? `Código: ${info.code}` : '';
+    code.hidden = !info.code;
+    if (secNewPw) secNewPw.value = '';
+    if (secConfirmPw) secConfirmPw.value = '';
+    updateSecurityPwChecklist();
+    showSecurityFeedback('', '');
+  }
+
+  if (securityStudent) {
+    securityStudent.addEventListener('change', () => {
+      studentSelect.value = securityStudent.value;
+      loadSecurityStudent();
+    });
+  }
+
+  if (secNewPw) {
+    secNewPw.addEventListener('input', updateSecurityPwChecklist);
+  }
+
+  function bindSecurityPwToggle(btnId, inputEl) {
+    const btn = document.getElementById(btnId);
+    if (!btn || !inputEl) return;
+    btn.addEventListener('click', () => {
+      const showing = inputEl.type === 'text';
+      inputEl.type = showing ? 'password' : 'text';
+      btn.setAttribute('aria-pressed', String(!showing));
+      btn.textContent = showing ? 'Mostrar' : 'Ocultar';
+    });
+  }
+
+  bindSecurityPwToggle('sec-toggle-pw1', secNewPw);
+  bindSecurityPwToggle('sec-toggle-pw2', secConfirmPw);
+
+  if (securityForm) {
+    securityForm.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      showSecurityFeedback('', '');
+
+      const studentId = securityStudent ? securityStudent.value : '';
+      const newPw = secNewPw ? secNewPw.value : '';
+      const confirmPw = secConfirmPw ? secConfirmPw.value : '';
+
+      if (!studentId) {
+        showSecurityFeedback('Selecciona un estudiante válido.', 'error');
+        return;
+      }
+      if (newPw.length < 6 || !/\d/.test(newPw)) {
+        showSecurityFeedback('La nueva contraseña debe tener al menos 6 caracteres e incluir al menos un número.', 'error');
+        if (secNewPw) secNewPw.focus();
+        return;
+      }
+      if (newPw !== confirmPw) {
+        showSecurityFeedback('Las contraseñas no coinciden. Verifica que ambas sean iguales.', 'error');
+        if (secConfirmPw) secConfirmPw.focus();
+        return;
+      }
+
+      const originalLabel = secSubmitBtn.textContent;
+      secSubmitBtn.disabled = true;
+      secSubmitBtn.textContent = 'Guardando…';
+
+      try {
+        await ApiClient.resetStudentPassword(studentId, newPw, confirmPw);
+        const info = studentInfo(studentId);
+        if (secNewPw) secNewPw.value = '';
+        if (secConfirmPw) secConfirmPw.value = '';
+        updateSecurityPwChecklist();
+        showSecurityFeedback(`La contraseña de ${info.name} fue actualizada correctamente.`, 'ok');
+      } catch (err) {
+        const msg = (err && err.message) ? err.message : 'No se pudo actualizar la contraseña del estudiante. Verifica tu conexión con el servidor.';
+        showSecurityFeedback(msg, 'error');
+      } finally {
+        secSubmitBtn.disabled = false;
+        secSubmitBtn.textContent = originalLabel;
+      }
+    });
+  }
+
   // ---------- Inicializar ----------
   async function initStudents() {
     try {
@@ -1947,6 +2153,7 @@
       studentSelect.value = students[0].id;
       if (progressStudent) progressStudent.value = students[0].id;
       if (notesStudent) notesStudent.value = students[0].id;
+      if (securityStudent) securityStudent.value = students[0].id;
       await loadStudent(students[0].id);
     }
   }

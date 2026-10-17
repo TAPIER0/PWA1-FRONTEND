@@ -229,6 +229,14 @@
     padding: 14px 16px; cursor: pointer; margin-top: 4px;
   }
   .primary-btn:hover{ background: var(--primary-hover); }
+  .forgot-row{ display:flex; justify-content:flex-end; margin-top:-8px; }
+  .link-btn{
+    font-family: inherit; font-size: calc(14px * var(--font-scale)); font-weight: 700;
+    color: var(--primary); text-decoration: underline; text-underline-offset: 3px;
+    padding: 6px 4px; border-radius: 6px;
+  }
+  .link-btn:hover{ background: var(--bg); }
+  .link-btn:focus{ outline: 3px solid var(--focus); outline-offset: 2px; }
   .primary-btn:focus{ outline: 3px solid var(--focus); outline-offset: 2px; }
   .status-region{ margin-top: 18px; font-size: calc(13.5px * var(--font-scale)); color: var(--text-muted); text-align:center; }
   @media (max-width: 560px){ .card{ padding: 30px 24px 26px; } }
@@ -302,6 +310,10 @@
           <button type="button" class="toggle-visibility" id="toggle-pw" aria-pressed="false">Mostrar</button>
         </div>
         <div class="error-msg" id="password-error" role="alert"></div>
+      </div>
+
+      <div class="forgot-row">
+        <a class="link-btn" href="forgot-password.html">¿Olvidaste tu contraseña?</a>
       </div>
 
       <button type="submit" class="primary-btn">Iniciar sesión</button>

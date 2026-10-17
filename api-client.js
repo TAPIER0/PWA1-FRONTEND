@@ -520,5 +520,12 @@ const ApiClient = {
   async getStudents() {
     const res = await this.request('/students');
     return res.data;
+  },
+
+  async resetStudentPassword(studentId, newPassword, confirmPassword) {
+    return await this.request(`/guardian/students/${encodeURIComponent(studentId)}/reset-password`, {
+      method: 'POST',
+      body: { newPassword, confirmPassword }
+    });
   }
 };

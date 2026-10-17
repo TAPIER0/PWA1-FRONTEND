@@ -80,6 +80,7 @@ El proyecto ha completado exitosamente las metas de los **Sprints 1, 2, 3 y 4** 
 | **Hardening Admin** | — | **Seguridad & Gestión de Usuarios** | Fortalecimiento del panel administrativo en [`Interfaz_Admin.html`](Interfaz_Admin.html): edición habilitada de correo electrónico, actualización de estado activo/inactivo (`PUT /api/users/{id}`) y vinculación relacional persistente de estudiantes a acudientes mediante `PUT /api/users/{id}/students`. |
 | **RFC 7807 ProblemDetails** | — | **Manejo Estandarizado de Errores** | Soporte e integración en [`api-client.js`](api-client.js) y las vistas para procesar respuestas de error en el estándar **RFC 7807 (`application/problem+json`)**, extrayendo de forma segura campos como `title`, `detail`, `status` y diccionarios de `errors` de validación. |
 | **Optimización SQL** | — | **Índices Compuestos de Base de Datos** | Creación y soporte para índices de alto rendimiento en Microsoft SQL Server sobre `BitacoraNotas` (`(StudentProfileId, Fecha DESC, CreatedAt DESC) INCLUDE (VisibleAcudiente)`), `Assignments` y `ExecutionAttempts` para acelerar las consultas analíticas de docentes y acudientes. |
+| **Recuperación de Contraseña** | — | **Restablecimiento por Correo + Acudiente** | Flujo dual de recuperación: (1) por correo electrónico (`POST /api/auth/forgot-password` y `/api/auth/reset-password`) mediante [`forgot-password.html`](forgot-password.html) y [`reset-password.html`](reset-password.html) para `Administrador`, `Docente` y `Acudiente` (leyendo el token desde el fragmento `#` de la URL y limpiando el historial); (2) desde la plataforma (`POST /api/guardian/students/{studentId}/reset-password`) en la vista **"Contraseña del estudiante"** de [`Interfaz_Acudiente.html`](Interfaz_Acudiente.html), exclusivo para el acudiente titular del estudiante. |
 
 ---
 
@@ -118,9 +119,10 @@ El proyecto ha completado exitosamente las metas de los **Sprints 1, 2, 3 y 4** 
 - **Diseño**: Inspirado en interfaces modernas de alto rendimiento tecnológico (estilo NVIDIA/Apple), carrusel interactivo por categorías temáticas, tipografía optimizada (16px a 18px), arte vectorial original y acceso rápido al inicio de sesión.
 - **Ruta por defecto**: Servida como raíz `/` en `server.js`.
 
-### 2. `login.html` — Inicio de Sesión Adaptativo
-- **Propósito**: Acceso centralizado con validación en tiempo real y pre-ajustes sensoriales (contraste y escala tipográfica utilizables antes de ingresar credenciales).
+### 2. `login.html`, `forgot-password.html` y `reset-password.html` — Inicio de Sesión y Recuperación Adaptativa
+- **Propósito**: Acceso centralizado con validación en tiempo real y pre-ajustes sensoriales (contraste y escala tipográfica utilizables antes de ingresar credenciales, compartidos mediante `recovery.css` y `recovery.js`).
 - **Seguridad**: Autenticación JWT (`POST /api/auth/login`), conmutador de visibilidad de contraseña, protección de historial (BFCache / popstate) y redirección automática según el rol asignado.
+- **Recuperación de contraseña**: Enlace `¿Olvidaste tu contraseña?` hacia `forgot-password.html` (para `Administrador`, `Docente` y `Acudiente`, con aviso informativo para estudiantes) y confirmación en `reset-password.html` leyendo `#email=...&token=...` desde `window.location.hash` y limpiando inmediatamente la URL con `history.replaceState`.
 
 ### 3. `Interfaz_Estudiante.html` — Portal del Estudiante ("Mi rutina de hoy" & "Mis logros")
 - **Sección Rutina Diaria (HU-002, HU-006)**: Secuencia visual estructurada, barra de progreso interactiva, renderizado del ejercicio basado en `ConfigJson` (secuencia lógica o emparejamiento visual), aviso sonoro/visual de transición y telemetría de ejecución (`/start` y `/submit`).
@@ -135,6 +137,7 @@ El proyecto ha completado exitosamente las metas de los **Sprints 1, 2, 3 y 4** 
 - **Vista Preferencias Sensoriales (HU-003)**: Calibración en tiempo real de paletas cromáticas, tipografía, volumen, TTS, reducción de movimiento y temporizadores con vista previa interactiva sincronizada con el backend.
 - **Vista Progreso (HU-009)**: Indicadores de cumplimiento global, tiempo total invertido, evolución semanal, historial cronológico de actividades con resultados claros ("Lo logró", "Necesitó varios intentos", "Sin terminar") y consejos prácticos para el hogar.
 - **Vista Notas del Docente (HU-010, HU-012)**: Consulta paginada y filtrada cronológicamente de las observaciones docentes y recomendaciones pedagógicas compartidas para cada estudiante a cargo (`/guardian/students/{id}/observations`).
+- **Vista Contraseña del Estudiante**: Permite al acudiente titular restablecer directamente la contraseña de su estudiante vinculado (`POST /api/guardian/students/{studentId}/reset-password`) con validación de política de contraseña en vivo (mín. 6 caracteres y 1 número).
 
 ### 6. `Interfaz_Admin.html` — Panel de Administración Global
 - **Usuarios & Hardening (HU-001, Sprint 4)**: Creación y edición de cuentas (nombres, apellidos, correo editable, estado activo/inactivo), asignación de roles y vinculación persistente de estudiantes a cargo para el rol Acudiente (`PUT /api/users/{id}/students`).
@@ -155,6 +158,8 @@ Backend Base URL: http://localhost:5264/api
 | :--- | :---: | :--- | :---: | :--- |
 | **Auth** | `POST` | `/auth/login` | HU-001 | Autenticación y expedición de tokens JWT |
 | **Auth** | `POST` | `/auth/register` | HU-001 | Registro de nuevos usuarios desde administración |
+| **Auth** | `POST` | `/auth/forgot-password` | Sprint 4 | Solicitud de correo de restablecimiento (`Administrador`, `Docente`, `Acudiente`) |
+| **Auth** | `POST` | `/auth/reset-password` | Sprint 4 | Confirmación de cambio de contraseña con token Base64Url |
 | **Usuarios** | `GET` | `/users` | HU-001 | Obtención de usuarios y roles registrados |
 | **Usuarios** | `PUT` | `/users/{id}` | Sprint 4 | Actualización completa de datos y estado de usuario |
 | **Usuarios** | `PUT` | `/users/{id}/roles` | HU-001 | Modificación de roles asignados a un usuario |
@@ -173,6 +178,7 @@ Backend Base URL: http://localhost:5264/api
 | **Progreso Acudiente** | `GET` | `/guardian/students/{id}/progress` | HU-009 | Resumen de avance para el acudiente |
 | **Historial Acudiente** | `GET` | `/guardian/students/{id}/activity-history` | HU-009 | Historial detallado y paginado de actividades |
 | **Observaciones Acudiente** | `GET` | `/guardian/students/{id}/observations` | HU-012 | Consulta paginada y filtrada de observaciones para familias |
+| **Seguridad Acudiente** | `POST` | `/guardian/students/{id}/reset-password` | Sprint 4 | Restablecimiento de contraseña de estudiante por su acudiente titular |
 | **Bitácora** | `GET, POST` | `/students/{id}/pedagogical-notes` | HU-010 | Consulta y registro de observaciones pedagógicas |
 | **Bitácora Edición** | `PUT, DELETE`| `/log-entries/{id}` | HU-010 | Edición y eliminación de notas del docente |
 | **Calificaciones** | `GET` | `/students/{id}/grades` | HU-010 | Listado de actividades y notas asignadas |
@@ -224,14 +230,18 @@ PWA1-FRONTEND/
 ├── .gitignore                  # Exclusiones de control de versiones Git
 ├── README.md                   # Documentación técnica completa (Sprints 1, 2, 3 y 4)
 ├── api-client.js               # Cliente HTTP centralizado, RBAC, JWT, BFCache, ProblemDetails RFC 7807
+├── recovery.css                # Hoja de estilos compartida para flujo de recuperación de contraseña (WCAG AA/AAA)
+├── recovery.js                 # Utilidades de preferencias pre-login, toggles y validación para recuperación
 ├── server.js                   # Servidor HTTP en Node.js (puerto 5500) con fallback a error.html y no-cache
 ├── error.html                  # Pantalla accesible de gestión de errores (404, 403, 401, 500, offline)
 ├── 404.html                    # Redirección espejo a error.html para hosts estáticos
 ├── Interfaz_General.html       # Landing page institucional "Sendero" optimizada (ruta '/')
 ├── login.html                  # Login adaptativo con pre-ajustes sensoriales y protección bfcache
+├── forgot-password.html        # Solicitud de enlace de restablecimiento de contraseña por correo
+├── reset-password.html         # Confirmación de nueva contraseña desde enlace de correo (#email&token)
 ├── Interfaz_Estudiante.html    # Portal del Estudiante: Rutina (HU-002, 006) y Logros éticos (HU-011)
 ├── Interfaz_Docente.html       # Portal Docente: Actividades (HU-004, 005), Desempeño (HU-008), Bitácora (HU-010)
-├── Interfaz_Acudiente.html     # Portal Acudiente: Sensorial (HU-003), Progreso (HU-009), Observaciones (HU-012)
+├── Interfaz_Acudiente.html     # Portal Acudiente: Sensorial (HU-003), Progreso (HU-009), Observaciones (HU-012) y Contraseña del estudiante
 └── Interfaz_Admin.html         # Portal Administrador: Usuarios, Módulos/Categorías y Hardening (HU-001, 007)
 ```
 
