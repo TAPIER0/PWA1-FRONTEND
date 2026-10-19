@@ -3,8 +3,8 @@
 // Configuración Dual: Desarrollo Local (localhost / 127.0.0.1) y Producción (Azure App Service)
 // ============================================================================
 
-// URL de producción en Azure App Service (actualiza el subdominio si cambia en el portal de Azure):
-const PRODUCTION_API_URL = 'https://tealearning-api.azurewebsites.net/api';
+// URL de producción en Azure App Service (Brazil South):
+const PRODUCTION_API_URL = 'https://tealearning-api-fya0gqf4b9axe5ge.brazilsouth-01.azurewebsites.net/api';
 const LOCAL_API_URL = 'http://localhost:5264/api';
 
 const IS_LOCAL_ENV = typeof window !== 'undefined' && (

@@ -63,7 +63,12 @@ const Recovery = {
 
   /** POST JSON tolerante a respuestas sin cuerpo (por ejemplo el 429 del limitador de solicitudes). */
   async postJson(path, body) {
-    const response = await fetch(`${ApiClient.baseUrl}${path}`, {
+    const baseUrl = (typeof ApiClient !== 'undefined' && ApiClient.baseUrl)
+      ? ApiClient.baseUrl
+      : ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+          ? 'http://localhost:5264/api'
+          : 'https://tealearning-api-fya0gqf4b9axe5ge.brazilsouth-01.azurewebsites.net/api');
+    const response = await fetch(`${baseUrl}${path}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
