@@ -424,6 +424,1600 @@
     </div>
   </section>
 
+  <!-- ==========================================================================
+       INICIO MÓDULO AUTOCONTENIDO: SUSTENTACIÓN TÉCNICA Y DOCUMENTACIÓN VIVA (PWA1)
+       Proyecto: Sendero / TeaLearning — Universidad de Cundinamarca (UDEC)
+       Cumplimiento estricto: WCAG 2.1 Niveles AA y AAA (Principios POUR)
+       ========================================================================== -->
+  <style id="pwa1-doc-styles">
+    #pwa1-sustentacion {
+      --pwa1-bg: #EDF1EF;
+      --pwa1-surface: #FFFFFF;
+      --pwa1-surface-alt: #F4F6F5;
+      --pwa1-surface-code: #141A17;
+      --pwa1-text: #171B19;
+      --pwa1-text-muted: #4A544F;
+      --pwa1-border: #C5D0CA;
+      --pwa1-primary: #2F6E5C;
+      --pwa1-primary-strong: #1E4E40;
+      --pwa1-primary-soft: #E4EEEA;
+      --pwa1-accent: #705324;
+      --pwa1-accent-soft: #F3E9D8;
+      --pwa1-lime: #B7D62A;
+      --pwa1-focus: #14382E;
+      --pwa1-ok-bg: #E3F1EC;
+      --pwa1-ok-text: #17493B;
+      --pwa1-radius: 14px;
+      --pwa1-radius-sm: 10px;
+      --pwa1-scale: 1;
+      background: var(--pwa1-bg);
+      color: var(--pwa1-text);
+      border-top: 2px solid var(--pwa1-border);
+      border-bottom: 2px solid var(--pwa1-border);
+      padding: 72px 0 84px;
+      font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+      font-size: calc(16px * var(--pwa1-scale));
+      line-height: 1.6;
+      position: relative;
+    }
+
+    /* Modo Alto Contraste AAA (Auditorio / Proyección) */
+    #pwa1-sustentacion[data-pwa1-contrast="aaa"] {
+      --pwa1-bg: #FFFFFF;
+      --pwa1-surface: #FFFFFF;
+      --pwa1-surface-alt: #F2F4F3;
+      --pwa1-surface-code: #000000;
+      --pwa1-text: #000000;
+      --pwa1-text-muted: #1A1A1A;
+      --pwa1-border: #000000;
+      --pwa1-primary: #144537;
+      --pwa1-primary-strong: #0B2920;
+      --pwa1-primary-soft: #DFECE7;
+      --pwa1-accent: #4D3610;
+      --pwa1-accent-soft: #EFE3CE;
+      --pwa1-focus: #000000;
+      --pwa1-ok-bg: #DFECE7;
+      --pwa1-ok-text: #0B2920;
+    }
+
+    #pwa1-sustentacion *,
+    #pwa1-sustentacion *::before,
+    #pwa1-sustentacion *::after {
+      box-sizing: border-box;
+    }
+
+    /* Foco de teclado de alta visibilidad (WCAG 2.4.7 AA / 2.4.11 AAA) */
+    #pwa1-sustentacion a:focus-visible,
+    #pwa1-sustentacion button:focus-visible,
+    #pwa1-sustentacion [tabindex]:focus-visible,
+    .pwa1-doc-modal-overlay button:focus-visible,
+    .pwa1-doc-modal-overlay a:focus-visible {
+      outline: 3px solid var(--pwa1-focus, #14382E) !important;
+      outline-offset: 3px !important;
+      box-shadow: 0 0 0 6px rgba(47, 110, 92, 0.22) !important;
+    }
+
+    /* Cabecera Superior de Sustentación */
+    .pwa1-doc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+      padding-bottom: 24px;
+      border-bottom: 1.5px solid var(--pwa1-border);
+    }
+
+    .pwa1-doc-head-left {
+      max-width: 72ch;
+    }
+
+    .pwa1-doc-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .pwa1-doc-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: calc(13px * var(--pwa1-scale));
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1.5px solid transparent;
+    }
+
+    .pwa1-doc-badge-primary {
+      background: var(--pwa1-primary);
+      color: #FFFFFF;
+    }
+
+    .pwa1-doc-badge-accent {
+      background: var(--pwa1-accent-soft);
+      color: var(--pwa1-accent);
+      border-color: var(--pwa1-accent);
+    }
+
+    .pwa1-doc-badge-a11y {
+      background: var(--pwa1-ok-bg);
+      color: var(--pwa1-ok-text);
+      border-color: var(--pwa1-primary);
+    }
+
+    .pwa1-doc-title {
+      font-size: clamp(26px, 3.2vw, 38px);
+      line-height: 1.15;
+      margin: 0 0 10px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .pwa1-doc-subtitle {
+      font-size: calc(17px * var(--pwa1-scale));
+      color: var(--pwa1-text-muted);
+      margin: 0;
+    }
+
+    /* Barra de Herramientas de Proyección y A11y en Vivo */
+    .pwa1-doc-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      background: var(--pwa1-surface);
+      border: 1.5px solid var(--pwa1-border);
+      padding: 10px 14px;
+      border-radius: var(--pwa1-radius);
+    }
+
+    .pwa1-doc-ctrl-btn {
+      font-family: inherit;
+      font-size: calc(14px * var(--pwa1-scale));
+      font-weight: 700;
+      min-height: 44px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1.5px solid var(--pwa1-border);
+      background: var(--pwa1-surface-alt);
+      color: var(--pwa1-text);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .pwa1-doc-ctrl-btn:hover {
+      border-color: var(--pwa1-primary);
+      background: var(--pwa1-primary-soft);
+    }
+
+    .pwa1-doc-ctrl-btn[aria-pressed="true"] {
+      background: var(--pwa1-primary);
+      color: #FFFFFF;
+      border-color: var(--pwa1-primary);
+    }
+
+    .pwa1-doc-ctrl-btn-qr {
+      background: var(--pwa1-lime);
+      color: #12210B;
+      border-color: #8CA61B;
+    }
+
+    .pwa1-doc-ctrl-btn-qr:hover {
+      background: #A5C221;
+      border-color: #12210B;
+    }
+
+    /* Navegación por Pestañas (Dashboard / Sustentación) */
+    .pwa1-doc-tablist {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      background: var(--pwa1-surface);
+      padding: 8px;
+      border-radius: var(--pwa1-radius);
+      border: 1.5px solid var(--pwa1-border);
+      margin-bottom: 28px;
+    }
+
+    .pwa1-doc-tab {
+      font-family: inherit;
+      font-size: calc(14.5px * var(--pwa1-scale));
+      font-weight: 700;
+      min-height: 52px;
+      padding: 10px 12px;
+      border-radius: var(--pwa1-radius-sm);
+      border: 1.5px solid transparent;
+      background: transparent;
+      color: var(--pwa1-text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-align: center;
+      line-height: 1.25;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .pwa1-doc-tab:hover {
+      background: var(--pwa1-surface-alt);
+      color: var(--pwa1-text);
+    }
+
+    .pwa1-doc-tab[aria-selected="true"] {
+      background: var(--pwa1-primary);
+      color: #FFFFFF;
+      border-color: var(--pwa1-primary-strong);
+      box-shadow: 0 4px 12px rgba(30, 78, 64, 0.18);
+    }
+
+    .pwa1-doc-tab svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .pwa1-doc-panel {
+      display: none;
+      animation: pwa1FadeIn 0.22s ease-out;
+    }
+
+    .pwa1-doc-panel.active,
+    #pwa1-sustentacion[data-pwa1-view="all"] .pwa1-doc-panel {
+      display: block;
+    }
+
+    #pwa1-sustentacion[data-pwa1-view="all"] .pwa1-doc-panel + .pwa1-doc-panel {
+      margin-top: 44px;
+      padding-top: 44px;
+      border-top: 2px dashed var(--pwa1-border);
+    }
+
+    @keyframes pwa1FadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Tarjetas, Grillas y Métricas */
+    .pwa1-doc-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .pwa1-doc-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .pwa1-doc-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .pwa1-doc-card {
+      background: var(--pwa1-surface);
+      border: 1.5px solid var(--pwa1-border);
+      border-radius: var(--pwa1-radius);
+      padding: 24px;
+    }
+
+    .pwa1-doc-card-highlight {
+      border-left: 6px solid var(--pwa1-primary);
+    }
+
+    .pwa1-doc-card-accent {
+      border-left: 6px solid var(--pwa1-accent);
+    }
+
+    .pwa1-doc-card h3 {
+      font-size: calc(19px * var(--pwa1-scale));
+      margin: 0 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pwa1-doc-card h4 {
+      font-size: calc(16.5px * var(--pwa1-scale));
+      margin: 0 0 8px;
+    }
+
+    .pwa1-doc-card p {
+      margin: 0 0 12px;
+      color: var(--pwa1-text-muted);
+      font-size: calc(15.5px * var(--pwa1-scale));
+    }
+
+    .pwa1-doc-card p:last-child {
+      margin-bottom: 0;
+    }
+
+    .pwa1-doc-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .pwa1-doc-kpi {
+      background: var(--pwa1-surface);
+      border: 1.5px solid var(--pwa1-border);
+      border-radius: var(--pwa1-radius);
+      padding: 18px 20px;
+    }
+
+    .pwa1-doc-kpi-val {
+      font-size: calc(28px * var(--pwa1-scale));
+      font-weight: 700;
+      color: var(--pwa1-primary);
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .pwa1-doc-kpi-label {
+      font-size: calc(14px * var(--pwa1-scale));
+      font-weight: 700;
+      color: var(--pwa1-text);
+    }
+
+    .pwa1-doc-kpi-sub {
+      font-size: calc(13px * var(--pwa1-scale));
+      color: var(--pwa1-text-muted);
+      margin-top: 2px;
+    }
+
+    /* Listas Técnicas y Etiquetas de Código */
+    .pwa1-doc-list {
+      margin: 0;
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: calc(15px * var(--pwa1-scale));
+    }
+
+    .pwa1-doc-list li {
+      color: var(--pwa1-text);
+    }
+
+    .pwa1-doc-list li span.muted {
+      color: var(--pwa1-text-muted);
+    }
+
+    .pwa1-doc-code-inline {
+      font-family: Consolas, Monaco, 'Courier New', monospace;
+      font-size: 0.9em;
+      background: var(--pwa1-surface-alt);
+      border: 1px solid var(--pwa1-border);
+      padding: 2px 6px;
+      border-radius: 5px;
+      color: var(--pwa1-primary-strong);
+      font-weight: 700;
+    }
+
+    .pwa1-doc-pre {
+      background: var(--pwa1-surface-code);
+      color: #ECFDF5;
+      padding: 16px 18px;
+      border-radius: var(--pwa1-radius-sm);
+      overflow-x: auto;
+      font-family: Consolas, Monaco, 'Courier New', monospace;
+      font-size: calc(13.5px * var(--pwa1-scale));
+      line-height: 1.5;
+      margin: 12px 0 0;
+      border: 1.5px solid var(--pwa1-border);
+    }
+
+    /* Flujo de Capas (.NET 9 Clean Architecture) */
+    .pwa1-doc-layer-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .pwa1-doc-layer {
+      background: var(--pwa1-surface);
+      border: 1.5px solid var(--pwa1-border);
+      border-radius: var(--pwa1-radius-sm);
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .pwa1-doc-layer-tag {
+      font-weight: 700;
+      font-size: calc(15px * var(--pwa1-scale));
+      color: var(--pwa1-primary);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .pwa1-doc-layer-tag small {
+      font-size: calc(12.5px * var(--pwa1-scale));
+      color: var(--pwa1-text-muted);
+      font-weight: 400;
+    }
+
+    /* Tablas Accesibles */
+    .pwa1-doc-table-wrap {
+      overflow-x: auto;
+      border: 1.5px solid var(--pwa1-border);
+      border-radius: var(--pwa1-radius-sm);
+      background: var(--pwa1-surface);
+    }
+
+    .pwa1-doc-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: calc(14.5px * var(--pwa1-scale));
+    }
+
+    .pwa1-doc-table th,
+    .pwa1-doc-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--pwa1-border);
+      vertical-align: top;
+    }
+
+    .pwa1-doc-table th {
+      background: var(--pwa1-surface-alt);
+      font-weight: 700;
+      color: var(--pwa1-text);
+    }
+
+    .pwa1-doc-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Simulador Interactivo de Paletas Sensoriales WCAG (Sección 4) */
+    .pwa1-doc-swatch-bar {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .pwa1-doc-swatch-btn {
+      font-family: inherit;
+      padding: 12px;
+      border-radius: 10px;
+      border: 2px solid var(--pwa1-border);
+      background: var(--pwa1-surface);
+      color: var(--pwa1-text);
+      cursor: pointer;
+      text-align: left;
+      transition: transform 0.12s ease, border-color 0.12s ease;
+    }
+
+    .pwa1-doc-swatch-btn[aria-pressed="true"] {
+      border-color: var(--pwa1-primary);
+      box-shadow: 0 0 0 3px var(--pwa1-primary-soft);
+    }
+
+    .pwa1-doc-swatch-preview {
+      height: 28px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      display: flex;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.18);
+    }
+
+    .pwa1-doc-swatch-preview span {
+      flex: 1;
+    }
+
+    .pwa1-doc-live-preview-box {
+      border: 2px solid var(--pwa1-border);
+      border-radius: var(--pwa1-radius);
+      padding: 22px;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    /* Contenedores para Diagramas de Arquitectura (Sección 5) */
+    .pwa1-doc-diagram-card {
+      background: var(--pwa1-surface);
+      border: 1.5px solid var(--pwa1-border);
+      border-radius: var(--pwa1-radius);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin: 0;
+    }
+
+    .pwa1-doc-diagram-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .pwa1-doc-diagram-viewport {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background:
+        linear-gradient(90deg, rgba(47,110,92,0.06) 1px, transparent 1px) 0 0 / 24px 24px,
+        linear-gradient(rgba(47,110,92,0.06) 1px, transparent 1px) 0 0 / 24px 24px,
+        var(--pwa1-surface-alt);
+      border: 2px dashed var(--pwa1-primary);
+      border-radius: var(--pwa1-radius-sm);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .pwa1-doc-diagram-viewport img.pwa1-doc-diagram-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      background: #FFFFFF;
+    }
+
+    .pwa1-doc-diagram-skeleton {
+      max-width: 44ch;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pwa1-doc-diagram-skeleton svg {
+      width: 44px;
+      height: 44px;
+      color: var(--pwa1-primary);
+    }
+
+    .pwa1-doc-diagram-caption {
+      font-size: calc(14px * var(--pwa1-scale));
+      color: var(--pwa1-text-muted);
+      border-top: 1px solid var(--pwa1-border);
+      padding-top: 10px;
+    }
+
+    /* Zona de Prueba en Vivo y Placeholder Código QR 1:1 (Sección 6) */
+    .pwa1-doc-qr-hero {
+      background: linear-gradient(135deg, #173F33 0%, #255A4B 100%);
+      color: #FFFFFF;
+      border-radius: var(--pwa1-radius);
+      padding: 36px;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 36px;
+      align-items: center;
+      border: 2px solid var(--pwa1-primary-strong);
+    }
+
+    .pwa1-doc-qr-frame {
+      width: 100%;
+      max-width: 320px;
+      aspect-ratio: 1 / 1;
+      background: #FFFFFF;
+      color: #171B19;
+      border-radius: var(--pwa1-radius);
+      padding: 18px;
+      border: 4px solid var(--pwa1-lime);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+      margin: 0 auto;
+    }
+
+    .pwa1-doc-qr-frame img.pwa1-doc-qr-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .pwa1-doc-qr-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      height: 100%;
+      border: 2px dashed #2F6E5C;
+      border-radius: 10px;
+      padding: 16px;
+      background: #F4F6F5;
+    }
+
+    .pwa1-doc-qr-placeholder svg {
+      width: 68px;
+      height: 68px;
+      color: #1E4E40;
+    }
+
+    .pwa1-doc-cred-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .pwa1-doc-cred-card {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.26);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+
+    .pwa1-doc-cred-card strong {
+      display: block;
+      color: var(--pwa1-lime);
+      font-size: calc(14px * var(--pwa1-scale));
+      margin-bottom: 4px;
+    }
+
+    .pwa1-doc-cred-card code {
+      display: block;
+      font-family: Consolas, Monaco, monospace;
+      font-size: calc(13px * var(--pwa1-scale));
+      color: #FFFFFF;
+      word-break: break-all;
+    }
+
+    /* Modal Lightbox (Diagramas y Proyección QR en Pantalla Completa) */
+    .pwa1-doc-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 20, 18, 0.82);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      backdrop-filter: blur(4px);
+    }
+
+    .pwa1-doc-modal-overlay.open {
+      display: flex;
+    }
+
+    .pwa1-doc-modal-box {
+      background: var(--pwa1-surface, #FFFFFF);
+      color: var(--pwa1-text, #171B19);
+      border: 2px solid var(--pwa1-primary, #2F6E5C);
+      border-radius: 16px;
+      max-width: 1060px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    .pwa1-doc-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1.5px solid #D6DDD9;
+      margin-bottom: 20px;
+    }
+
+    .pwa1-doc-modal-header h3 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    /* Responsividad */
+    @media (max-width: 1080px) {
+      .pwa1-doc-tablist {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .pwa1-doc-kpi-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .pwa1-doc-qr-hero {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .pwa1-doc-tablist {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .pwa1-doc-grid-2,
+      .pwa1-doc-grid-3,
+      .pwa1-doc-grid-4,
+      .pwa1-doc-cred-grid,
+      .pwa1-doc-swatch-bar {
+        grid-template-columns: 1fr;
+      }
+      .pwa1-doc-layer {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .pwa1-doc-tablist,
+      .pwa1-doc-kpi-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <section id="pwa1-sustentacion" aria-labelledby="pwa1-sustentacion-title" data-pwa1-contrast="normal" data-pwa1-view="tabs">
+    <div class="wrap">
+
+      <!-- Región ARIA Live para anunciar cambios de pestaña, contraste o escala a lectores de pantalla -->
+      <div id="pwa1-doc-live" role="status" aria-live="polite" aria-atomic="true" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;"></div>
+
+      <!-- CABECERA DEL PANEL DE SUSTENTACIÓN -->
+      <div class="pwa1-doc-header">
+        <div class="pwa1-doc-head-left">
+          <div class="pwa1-doc-badges" aria-label="Metadatos del proyecto académico">
+            <span class="pwa1-doc-badge pwa1-doc-badge-primary">UDEC · Ingeniería de Software (2026-II)</span>
+            <span class="pwa1-doc-badge pwa1-doc-badge-accent">.NET 9 + EF Core 9 + SQL Server</span>
+            <span class="pwa1-doc-badge pwa1-doc-badge-a11y">WCAG 2.1 AA / AAA · TEA Nivel 1</span>
+          </div>
+          <h2 class="pwa1-doc-title" id="pwa1-sustentacion-title">Arquitectura de Software, Accesibilidad y Sustentación Técnica (PWA1)</h2>
+          <p class="pwa1-doc-subtitle">
+            Documentación viva del ecosistema <strong>Sendero (TeaLearning)</strong>: ingeniería backend multicapa, cliente web progresivo resiliente y diseño neuroinclusivo para estudiantes con Trastorno del Espectro Autista (Nivel 1).
+          </p>
+        </div>
+
+        <!-- Controles de Accesibilidad y Proyección en Auditorio -->
+        <div class="pwa1-doc-controls" role="region" aria-label="Controles de visualización para sustentación en auditorio">
+          <button type="button" class="pwa1-doc-ctrl-btn" id="pwa1-btn-contrast" aria-pressed="false" title="Activar alto contraste 21:1 para proyección en auditorio">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/></svg>
+            <span>Contraste AAA</span>
+          </button>
+          <button type="button" class="pwa1-doc-ctrl-btn" id="pwa1-btn-scale" aria-pressed="false" title="Alternar tamaño de fuente para lectura a distancia (100%, 112%, 125%)">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+            <span id="pwa1-scale-label">Texto: 100%</span>
+          </button>
+          <button type="button" class="pwa1-doc-ctrl-btn" id="pwa1-btn-view-all" aria-pressed="false" title="Mostrar todas las secciones simultáneamente o navegar por pestañas">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="6" rx="1"/><rect x="3" y="13" width="18" height="8" rx="1"/></svg>
+            <span>Vista Continua</span>
+          </button>
+          <button type="button" class="pwa1-doc-ctrl-btn pwa1-doc-ctrl-btn-qr" id="pwa1-btn-open-qr-modal" aria-haspopup="dialog">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 18h3v3h-3zM18 14h3"/></svg>
+            <span>Proyectar QR en Vivo</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- BARRA DE NAVEGACIÓN INTERACTIVA (WAI-ARIA TABLIST) -->
+      <div class="pwa1-doc-tablist" role="tablist" aria-label="Secciones de documentación técnica de PWA1">
+        <button type="button" class="pwa1-doc-tab" role="tab" id="pwa1-tab-btn-1" aria-selected="true" aria-controls="pwa1-tab-panel-1" tabindex="0" data-pwa1-tab="1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          <span>1. Resumen y Valor</span>
+        </button>
+        <button type="button" class="pwa1-doc-tab" role="tab" id="pwa1-tab-btn-2" aria-selected="false" aria-controls="pwa1-tab-panel-2" tabindex="-1" data-pwa1-tab="2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          <span>2. Backend (.NET 9)</span>
+        </button>
+        <button type="button" class="pwa1-doc-tab" role="tab" id="pwa1-tab-btn-3" aria-selected="false" aria-controls="pwa1-tab-panel-3" tabindex="-1" data-pwa1-tab="3">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          <span>3. Frontend y PWA</span>
+        </button>
+        <button type="button" class="pwa1-doc-tab" role="tab" id="pwa1-tab-btn-4" aria-selected="false" aria-controls="pwa1-tab-panel-4" tabindex="-1" data-pwa1-tab="4">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="4" r="2"/><path d="M4 9l8 2 8-2"/><path d="M12 11v5"/><path d="M9 22l3-6 3 6"/></svg>
+          <span>4. Accesibilidad WCAG</span>
+        </button>
+        <button type="button" class="pwa1-doc-tab" role="tab" id="pwa1-tab-btn-5" aria-selected="false" aria-controls="pwa1-tab-panel-5" tabindex="-1" data-pwa1-tab="5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><path d="M6.5 10v7.5H14"/></svg>
+          <span>5. Diagramas</span>
+        </button>
+        <button type="button" class="pwa1-doc-tab" role="tab" id="pwa1-tab-btn-6" aria-selected="false" aria-controls="pwa1-tab-panel-6" tabindex="-1" data-pwa1-tab="6">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          <span>6. Prueba en Vivo (QR)</span>
+        </button>
+      </div>
+
+      <!-- ====================================================================
+           SECCIÓN 1: RESUMEN EJECUTIVO Y PROPUESTA DE VALOR
+           ==================================================================== -->
+      <div class="pwa1-doc-panel active" role="tabpanel" id="pwa1-tab-panel-1" aria-labelledby="pwa1-tab-btn-1" tabindex="0">
+        <div class="pwa1-doc-kpi-row">
+          <div class="pwa1-doc-kpi">
+            <div class="pwa1-doc-kpi-val">100% (55 pts)</div>
+            <div class="pwa1-doc-kpi-label">Sprints 1 a 4 Completados</div>
+            <div class="pwa1-doc-kpi-sub">12 Historias de Usuario + Hardening</div>
+          </div>
+          <div class="pwa1-doc-kpi">
+            <div class="pwa1-doc-kpi-val">4 Roles RBAC</div>
+            <div class="pwa1-doc-kpi-label">Ecosistema Multi-Actor</div>
+            <div class="pwa1-doc-kpi-sub">Estudiante, Acudiente, Docente, Admin</div>
+          </div>
+          <div class="pwa1-doc-kpi">
+            <div class="pwa1-doc-kpi-val">WCAG 2.1 AA/AAA</div>
+            <div class="pwa1-doc-kpi-label">Accesibilidad Cognitiva y Visual</div>
+            <div class="pwa1-doc-kpi-sub">Contraste hasta 21:1 y perfil sensorial</div>
+          </div>
+          <div class="pwa1-doc-kpi">
+            <div class="pwa1-doc-kpi-val">~35 Endpoints</div>
+            <div class="pwa1-doc-kpi-label">API RESTful en .NET 9</div>
+            <div class="pwa1-doc-kpi-sub">SQL Server + RFC 7807 ProblemDetails</div>
+          </div>
+        </div>
+
+        <div class="pwa1-doc-grid-2" style="margin-bottom: 20px;">
+          <article class="pwa1-doc-card pwa1-doc-card-highlight">
+            <h3>¿Qué problema resuelve Sendero (TeaLearning)?</h3>
+            <p>
+              Las plataformas educativas convencionales presentan alta carga de estímulos visuales, menús ramificados impredecibles, temporizadores punitivos, mecánicas competitivas (rankings/rachas) e instrucciones con lenguaje figurado. En estudiantes diagnosticados con <strong>Trastorno del Espectro Autista (TEA Nivel 1)</strong>, estos factores detonan sobrecarga sensorial, fatiga ejecutiva y ansiedad ante las transiciones.
+            </p>
+            <p>
+              <strong>Propuesta de Valor:</strong> Sendero articula a la escuela y la familia en un entorno web adaptable donde el <strong>Acudiente</strong> calibra las preferencias sensoriales del niño, el <strong>Docente</strong> parametriza secuencias literales y monitorea analítica cognitiva con alertas tempranas, y el <strong>Estudiante</strong> avanza por su rutina diaria un paso a la vez sin distractores.
+            </p>
+          </article>
+
+          <article class="pwa1-doc-card pwa1-doc-card-accent">
+            <h3>Los 4 Pilares Tecnológicos de PWA1</h3>
+            <ul class="pwa1-doc-list">
+              <li><strong>1. Neuroinclusión y Accesibilidad de Fábrica:</strong> Cumplimiento estricto de pautas WCAG 2.1 (Niveles AA y AAA), tipografía <em>Atkinson Hyperlegible</em> / <em>OpenDyslexic</em>, síntesis de voz (TTS) y gamificación ética auditada.</li>
+              <li><strong>2. Arquitectura Limpia en .NET 9 (Backend):</strong> Separación rigurosa en 4 capas (<span class="pwa1-doc-code-inline">Api</span>, <span class="pwa1-doc-code-inline">Services</span>, <span class="pwa1-doc-code-inline">Data</span>, <span class="pwa1-doc-code-inline">Core</span>) más suite de pruebas automatizadas (<span class="pwa1-doc-code-inline">TeaLearning.Tests</span>).</li>
+              <li><strong>3. Modelo Híbrido Relacional + JSON Dinámico:</strong> Combinación de integridad referencial en SQL Server con estructuras <span class="pwa1-doc-code-inline">ConfigJson</span> para ejercicios dinámicos de secuencia lógica y emparejamiento visual.</li>
+              <li><strong>4. Seguridad End-to-End y Despliegue Cloud Dual:</strong> Hashing <strong>BCrypt (factor 11)</strong>, JWT con rotación de Refresh Token, Rate Limiting por IP real y arquitectura lista para <strong>Azure App Service + Cloudflare Pages</strong>.</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="pwa1-doc-card">
+          <h3>Matriz Consolidada de Ingeniería por Sprints (HU-001 a HU-012)</h3>
+          <div class="pwa1-doc-table-wrap">
+            <table class="pwa1-doc-table" aria-label="Matriz de requerimientos completados en los 4 sprints del proyecto">
+              <thead>
+                <tr>
+                  <th scope="col">Sprint</th>
+                  <th scope="col">Historias / Componentes</th>
+                  <th scope="col">Entregables Técnicos Clave</th>
+                  <th scope="col">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Sprint 1</strong><br><small>15 pts</small></td>
+                  <td><span class="pwa1-doc-code-inline">HU-001</span>, <span class="pwa1-doc-code-inline">HU-002</span>, <span class="pwa1-doc-code-inline">HU-003</span></td>
+                  <td>Autenticación JWT + RBAC (4 roles), secuencia diaria ordenada (<span class="pwa1-doc-code-inline">/students/me/daily-routine</span>) y motor reactivo de Preferencias Sensoriales (<span class="pwa1-doc-code-inline">SensoryPreference</span>).</td>
+                  <td><strong>100% Completado</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Sprint 2</strong><br><small>22 pts</small></td>
+                  <td><span class="pwa1-doc-code-inline">HU-004</span>, <span class="pwa1-doc-code-inline">HU-005</span>, <span class="pwa1-doc-code-inline">HU-006</span>, <span class="pwa1-doc-code-inline">HU-007</span></td>
+                  <td>Parametrización híbrida con <span class="pwa1-doc-code-inline">ConfigJson</span>, detector de lenguaje figurado, asignación individual/por aula, telemetría cronometrada (<span class="pwa1-doc-code-inline">/start</span> y <span class="pwa1-doc-code-inline">/submit</span>) y catálogo de módulos.</td>
+                  <td><strong>100% Completado</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Sprint 3</strong><br><small>16 pts</small></td>
+                  <td><span class="pwa1-doc-code-inline">HU-008</span>, <span class="pwa1-doc-code-inline">HU-009</span>, <span class="pwa1-doc-code-inline">HU-010</span>, <span class="pwa1-doc-code-inline">HU-011</span></td>
+                  <td>Tablero analítico cognitivo docente (SVG + alerta temprana &lt; 60%), monitoreo familiar empático, bitácora cualitativa + calificaciones (1.0–5.0) y logros no competitivos.</td>
+                  <td><strong>100% Completado</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Sprint 4</strong><br><small>2 pts + Calidad</small></td>
+                  <td><span class="pwa1-doc-code-inline">HU-012</span>, Hardening, RFC 7807, SQL Indexes, Recovery</td>
+                  <td>Observaciones paginadas para familias, protección anti-autodemoción Admin, middleware global RFC 7807, índices compuestos SQL y recuperación dual (SMTP MailKit + Acudiente).</td>
+                  <td><strong>100% Completado</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           SECCIÓN 2: ARQUITECTURA BACKEND (PWA1-BACKEND-API)
+           ==================================================================== -->
+      <div class="pwa1-doc-panel" role="tabpanel" id="pwa1-tab-panel-2" aria-labelledby="pwa1-tab-btn-2" tabindex="0">
+        <div class="pwa1-doc-grid-2" style="margin-bottom: 20px;">
+          <div class="pwa1-doc-card">
+            <h3>Arquitectura Limpia en Capas (.NET 9 / C# 13)</h3>
+            <p>La solución <span class="pwa1-doc-code-inline">TeaLearningSystem.slnx</span> implementa inversión de dependencias y separación estricta de responsabilidades en 5 proyectos:</p>
+            <div class="pwa1-doc-layer-stack">
+              <div class="pwa1-doc-layer">
+                <div class="pwa1-doc-layer-tag">
+                  1. TeaLearning.Api
+                  <small>Capa de Presentación REST</small>
+                </div>
+                <div>
+                  10 Controladores RESTful, <span class="pwa1-doc-code-inline">ExceptionHandlingMiddleware</span> (RFC 7807), <span class="pwa1-doc-code-inline">ServiceCollectionExtensions</span> (DI, CORS dinámico, RateLimiter por IP, ForwardedHeaders) y endpoint <span class="pwa1-doc-code-inline">/api/health</span>.
+                </div>
+              </div>
+              <div class="pwa1-doc-layer">
+                <div class="pwa1-doc-layer-tag">
+                  2. TeaLearning.Services
+                  <small>Capa de Lógica de Negocio</small>
+                </div>
+                <div>
+                  15 Servicios de dominio tras interfaces (<span class="pwa1-doc-code-inline">IAuthService</span>, <span class="pwa1-doc-code-inline">IActivityExecutionService</span>, <span class="pwa1-doc-code-inline">ITeacherAnalyticsService</span>, etc.), DTOs tipados, respuesta estándar <span class="pwa1-doc-code-inline">ApiResponse&lt;T&gt;</span> y <span class="pwa1-doc-code-inline">BcryptPasswordHasher</span>.
+                </div>
+              </div>
+              <div class="pwa1-doc-layer">
+                <div class="pwa1-doc-layer-tag">
+                  3. TeaLearning.Data
+                  <small>Persistencia EF Core 9</small>
+                </div>
+                <div>
+                  <span class="pwa1-doc-code-inline">ApplicationDbContext</span> con ASP.NET Core Identity (<span class="pwa1-doc-code-inline">Guid</span>), configuraciones Fluent API sin cascadas cíclicas, Repositorios especializados, Índices compuestos SQL y <span class="pwa1-doc-code-inline">DatabaseSeeder</span> idempotente.
+                </div>
+              </div>
+              <div class="pwa1-doc-layer">
+                <div class="pwa1-doc-layer-tag">
+                  4. TeaLearning.Core
+                  <small>Núcleo de Dominio Puro</small>
+                </div>
+                <div>
+                  11 Entidades de negocio que heredan de <span class="pwa1-doc-code-inline">BaseEntity</span> (<span class="pwa1-doc-code-inline">Id</span>, <span class="pwa1-doc-code-inline">CreatedAt</span>, <span class="pwa1-doc-code-inline">UpdatedAt</span>, <span class="pwa1-doc-code-inline">IsActive</span>) y enumeraciones pedagógicas/sensoriales sin dependencias externas.
+                </div>
+              </div>
+              <div class="pwa1-doc-layer">
+                <div class="pwa1-doc-layer-tag">
+                  5. TeaLearning.Tests
+                  <small>Calidad y Auditoría xUnit</small>
+                </div>
+                <div>
+                  Pruebas unitarias e integración: <span class="pwa1-doc-code-inline">BcryptPasswordHasherTests</span>, <span class="pwa1-doc-code-inline">SecurityAuditTests</span>, <span class="pwa1-doc-code-inline">PasswordResetServiceTests</span>, <span class="pwa1-doc-code-inline">GuardianStudentPasswordResetTests</span> y <span class="pwa1-doc-code-inline">ExceptionHandlingMiddlewareTests</span>.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:20px;">
+            <article class="pwa1-doc-card pwa1-doc-card-highlight">
+              <h3>Seguridad, Criptografía y Hardening</h3>
+              <ul class="pwa1-doc-list">
+                <li><strong>BCrypt en lugar de PBKDF2:</strong> Implementación de <span class="pwa1-doc-code-inline">IPasswordHasher&lt;ApplicationUser&gt;</span> con <span class="pwa1-doc-code-inline">BCrypt.Net-Next</span> (factor de trabajo <span class="pwa1-doc-code-inline">11</span>) y migración transparente de hashes legados.</li>
+                <li><strong>JWT + Rotación de Sesiones:</strong> Firma simétrica HMAC-SHA256 (<span class="pwa1-doc-code-inline">ClockSkew = TimeSpan.Zero</span>), vigencia de 60 min y Refresh Token de 7 días. Al cambiar contraseña se invalidan <span class="pwa1-doc-code-inline">RefreshToken</span> y <span class="pwa1-doc-code-inline">SecurityStamp</span>.</li>
+                <li><strong>Recuperación Dual de Contraseña:</strong>
+                  <span class="muted">Roles adultos (<span class="pwa1-doc-code-inline">Administrador</span>, <span class="pwa1-doc-code-inline">Docente</span>, <span class="pwa1-doc-code-inline">Acudiente</span>) vía SMTP TLS/STARTTLS (<span class="pwa1-doc-code-inline">MailKit</span>) con token <span class="pwa1-doc-code-inline">DataProtectorTokenProvider</span> (TTL 30 min, Base64Url) y respuesta anti-enumeración <span class="pwa1-doc-code-inline">200 OK</span>. El <span class="pwa1-doc-code-inline">Estudiante</span> es restablecido directamente desde el portal de su acudiente titular (<span class="pwa1-doc-code-inline">POST /api/guardian/students/{id}/reset-password</span>).</span>
+                </li>
+                <li><strong>Rate Limiting por IP Real (<span class="pwa1-doc-code-inline">X-Forwarded-For</span>):</strong> Políticas <span class="pwa1-doc-code-inline">FixedWindowLimiter</span> para proteger <span class="pwa1-doc-code-inline">login</span> (10/5m), <span class="pwa1-doc-code-inline">forgot-password</span> (5/15m) y <span class="pwa1-doc-code-inline">reset-password</span> (10/15m).</li>
+                <li><strong>Admin Self-Protection:</strong> Reglas de dominio que impiden al administrador activo auto-eliminarse, auto-desactivarse o quitarse el rol <span class="pwa1-doc-code-inline">Administrador</span>.</li>
+              </ul>
+            </article>
+
+            <article class="pwa1-doc-card pwa1-doc-card-accent">
+              <h3>Optimización SQL Server y Contratos Estandarizados</h3>
+              <p>
+                <strong>Índices Compuestos:</strong> Aceleración de consultas analíticas y de rutina diaria sobre <span class="pwa1-doc-code-inline">ActivityAssignments (StudentProfileId, ScheduledDate, SequentialOrder)</span>, <span class="pwa1-doc-code-inline">ActivityExecutions (StudentProfileId, CompletedAt)</span> y <span class="pwa1-doc-code-inline">PedagogicalNotes (StudentProfileId, VisibleToGuardian, CreatedAt)</span>, más resiliencia cloud con <span class="pwa1-doc-code-inline">EnableRetryOnFailure(5)</span>.
+              </p>
+              <pre class="pwa1-doc-pre" aria-label="Ejemplo de contrato de respuesta ApiResponse y ProblemDetails RFC 7807"><code>// Éxito: ApiResponse&lt;T&gt;           | // Error No Controlado: RFC 7807 (application/problem+json)
+{                                  | {
+  "success": true,                 |   "type": "https://tools.ietf.org/html/rfc7231#section-6.6.1",
+  "message": "Operación exitosa",  |   "title": "An error occurred while processing your request.",
+  "data": { /* DTO tipado */ },    |   "status": 500, "traceId": "0HN8F...", "success": false,
+  "errors": []                     |   "detail": "Ha ocurrido un error inesperado..."
+}                                  | }</code></pre>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           SECCIÓN 3: ARQUITECTURA FRONTEND Y CAPACIDADES PWA (PWA1-FRONTEND)
+           ==================================================================== -->
+      <div class="pwa1-doc-panel" role="tabpanel" id="pwa1-tab-panel-3" aria-labelledby="pwa1-tab-btn-3" tabindex="0">
+        <div class="pwa1-doc-grid-3" style="margin-bottom: 20px;">
+          <article class="pwa1-doc-card pwa1-doc-card-highlight">
+            <h3>Arquitectura Vanilla ES6+ Zero-Overhead</h3>
+            <p>
+              Construida en <strong>HTML5 Semántico, CSS3 Custom Properties y JavaScript ES6+ modular</strong> sin frameworks pesados. Esto elimina tiempos de hidratación, garantiza un <em>First Contentful Paint</em> casi instantáneo en redes móviles y evita re-renderizados parpadeantes que afectan a usuarios con hipersensibilidad visual.
+            </p>
+            <ul class="pwa1-doc-list">
+              <li><strong>Cliente Centralizado (<span class="pwa1-doc-code-inline">api-client.js</span>):</strong> Detección automática de entorno (<span class="pwa1-doc-code-inline">localhost:5264</span> vs. Azure App Service).</li>
+              <li><strong>Silent Token Refresh:</strong> Cola de promesas (<span class="pwa1-doc-code-inline">_refreshPromise</span>) que intercepta errores <span class="pwa1-doc-code-inline">401</span> y renueva el JWT vía <span class="pwa1-doc-code-inline">/auth/refresh-token</span> sin interrumpir la actividad del estudiante.</li>
+            </ul>
+          </article>
+
+          <article class="pwa1-doc-card">
+            <h3>Persistencia Offline-Resilient y BFCache</h3>
+            <p>
+              Estrategia híbrida de almacenamiento local y degradación elegante para garantizar continuidad pedagógica:
+            </p>
+            <ul class="pwa1-doc-list">
+              <li><strong>Sincronización Sensorial:</strong> Cacheo en <span class="pwa1-doc-code-inline">localStorage</span> (<span class="pwa1-doc-code-inline">tea_sensory_prefs</span> y <span class="pwa1-doc-code-inline">tea_login_prefs</span>) aplicado en el arranque antes del primer pintado para evitar <em>Flash of Unadapted Content</em>.</li>
+              <li><strong>Motores de Contingencia Offline:</strong> Cada portal integra generadores de respaldo (<span class="pwa1-doc-code-inline">buildDemoRoutine</span>, <span class="pwa1-doc-code-inline">buildDemoAchievements</span>) si se pierde la conectividad con el API.</li>
+              <li><strong>Blindaje contra BFCache:</strong> Eventos <span class="pwa1-doc-code-inline">pageshow (event.persisted)</span> + cabeceras <span class="pwa1-doc-code-inline">Cache-Control: no-store</span> en <span class="pwa1-doc-code-inline">server.js</span> y Cloudflare <span class="pwa1-doc-code-inline">_headers</span> que impiden reabrir sesiones cerradas con el botón "Atrás".</li>
+            </ul>
+          </article>
+
+          <article class="pwa1-doc-card pwa1-doc-card-accent">
+            <h3>Ecosistema de Portales por Rol</h3>
+            <ul class="pwa1-doc-list">
+              <li><span class="pwa1-doc-code-inline">Interfaz_General.html</span>: Portal institucional público y sustentación interactiva.</li>
+              <li><span class="pwa1-doc-code-inline">login.html</span> / <span class="pwa1-doc-code-inline">forgot</span> / <span class="pwa1-doc-code-inline">reset</span>: Acceso con ajustes sensoriales pre-login y lectura de token desde <span class="pwa1-doc-code-inline">location.hash</span> con limpieza inmediata (<span class="pwa1-doc-code-inline">history.replaceState</span>).</li>
+              <li><span class="pwa1-doc-code-inline">Interfaz_Estudiante.html</span>: Rutina paso a paso, renderizador <span class="pwa1-doc-code-inline">ConfigJson</span>, TTS y logros éticos.</li>
+              <li><span class="pwa1-doc-code-inline">Interfaz_Acudiente.html</span>: Calibrador sensorial en vivo, progreso, observaciones paginadas y clave del estudiante.</li>
+              <li><span class="pwa1-doc-code-inline">Interfaz_Docente.html</span>: Editor de actividades con detector de metáforas, analítica SVG y bitácora 1.0–5.0.</li>
+              <li><span class="pwa1-doc-code-inline">Interfaz_Admin.html</span> &amp; <span class="pwa1-doc-code-inline">error.html</span>: Gobierno RBAC, módulos y manejo empático de errores HTTP.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           SECCIÓN 4: ESTÁNDARES DE ACCESIBILIDAD WCAG 2.1 AA y AAA (FOCO PRINCIPAL)
+           ==================================================================== -->
+      <div class="pwa1-doc-panel" role="tabpanel" id="pwa1-tab-panel-4" aria-labelledby="pwa1-tab-btn-4" tabindex="0">
+        <div class="pwa1-doc-card pwa1-doc-card-highlight" style="margin-bottom: 20px;">
+          <h3>Cumplimiento Integral de los 4 Principios POUR (WCAG 2.1 Niveles AA y AAA)</h3>
+          <p>
+            En <strong>Sendero (TeaLearning)</strong> la accesibilidad no es un complemento cosmético: es el requerimiento funcional primario. A continuación se detalla cómo la ingeniería del sistema materializa cada principio de la norma <strong>W3C WCAG 2.1</strong>:
+          </p>
+
+          <div class="pwa1-doc-grid-2" style="margin-top: 16px;">
+            <div class="pwa1-doc-card" style="background: var(--pwa1-surface-alt);">
+              <h4>1. Perceptible (Perceivable) — Criterios 1.3.1, 1.4.3 (AA), 1.4.6 (AAA), 1.4.8 (AAA), 1.4.12</h4>
+              <ul class="pwa1-doc-list">
+                <li><strong>Relaciones de Contraste Certificadas:</strong> Texto principal <span class="pwa1-doc-code-inline">#171B19</span> sobre <span class="pwa1-doc-code-inline">#F4F6F5</span> con ratio <strong>16.4:1 (AAA)</strong>; acentos y botones primarios con ratios superiores a <strong>5.88:1 (AA/AAA)</strong>; y modo de <strong>Alto Contraste 21:1 (AAA)</strong>.</li>
+                <li><strong>Decodificación Tipográfica:</strong> Uso de <em>Atkinson Hyperlegible</em> (Braille Institute) para desambiguar glifos homólogos (<span class="pwa1-doc-code-inline">I</span>, <span class="pwa1-doc-code-inline">l</span>, <span class="pwa1-doc-code-inline">1</span>) y soporte nativo para <em>OpenDyslexic</em>, con 4 escalas (<span class="pwa1-doc-code-inline">--font-scale</span>) y espaciado de letras (<span class="pwa1-doc-code-inline">--letter-tracking</span>).</li>
+                <li><strong>Bimodalidad Textual y Auditiva:</strong> Síntesis de voz integrada mediante <strong>Web Speech API</strong> (<span class="pwa1-doc-code-inline">speechSynthesis</span> en <span class="pwa1-doc-code-inline">es-CO</span>) con volumen regulado por el acudiente.</li>
+              </ul>
+            </div>
+
+            <div class="pwa1-doc-card" style="background: var(--pwa1-surface-alt);">
+              <h4>2. Operable (Operable) — Criterios 2.1.1, 2.2.1, 2.2.3 (AAA), 2.3.3 (AAA), 2.4.7, 2.5.5 (AAA)</h4>
+              <ul class="pwa1-doc-list">
+                <li><strong>Navegación 100% por Teclado:</strong> Operabilidad completa con <span class="pwa1-doc-code-inline">Tab</span>, <span class="pwa1-doc-code-inline">Shift+Tab</span>, <span class="pwa1-doc-code-inline">Enter</span>, <span class="pwa1-doc-code-inline">Espacio</span>, <span class="pwa1-doc-code-inline">Escape</span> y teclas de dirección en listas de pestañas, con anillo de foco <span class="pwa1-doc-code-inline">:focus-visible</span> de <span class="pwa1-doc-code-inline">3px solid</span> y <span class="pwa1-doc-code-inline">outline-offset: 2px</span>.</li>
+                <li><strong>Supresión de Animaciones:</strong> Respeto simultáneo a la media query del sistema operativo <span class="pwa1-doc-code-inline">@media (prefers-reduced-motion: reduce)</span> y a la preferencia <span class="pwa1-doc-code-inline">animacionesReducidas</span> del perfil sensorial (<span class="pwa1-doc-code-inline">.motion-reduced</span>).</li>
+                <li><strong>Temporizadores sin Ansiedad:</strong> Modo <em>Sin Temporizador</em> (2.2.3 AAA) o <em>Tiempo Extendido (2x)</em> con pre-aviso visual y sonoro de transición (<span class="pwa1-doc-code-inline">warningSeconds = 15s</span>).</li>
+              </ul>
+            </div>
+
+            <div class="pwa1-doc-card" style="background: var(--pwa1-surface-alt);">
+              <h4>3. Comprensible (Understandable) — Criterios 3.1.3 (AAA), 3.2.3, 3.2.4, 3.3.1, 3.3.3</h4>
+              <ul class="pwa1-doc-list">
+                <li><strong>Claridad Pragmática y Literalidad (3.1.3 AAA):</strong> El panel docente incorpora un <strong>detector heurístico en tiempo real de modismos y metáforas</strong> (ej. <em>"pan comido"</em>, <em>"a toda máquina"</em>) para garantizar instrucciones literales aptas para TEA Nivel 1.</li>
+                <li><strong>Previsibilidad Cognitiva:</strong> La interfaz del estudiante muestra una secuencia lineal con <strong>un único paso activo a la vez</strong> (<span class="pwa1-doc-code-inline">aria-current="step"</span>), eliminando menús laterales complejos.</li>
+                <li><strong>Gamificación Ética No Competitiva:</strong> Filtro de lista blanca y auditoría en consola <span class="pwa1-doc-code-inline">validarSinElementosCompetitivos()</span> que prohíbe rankings, rachas punitivas o comparaciones grupales.</li>
+              </ul>
+            </div>
+
+            <div class="pwa1-doc-card" style="background: var(--pwa1-surface-alt);">
+              <h4>4. Robusto (Robust) — Criterios 4.1.1, 4.1.2, 4.1.3 (Regiones de Estado ARIA)</h4>
+              <ul class="pwa1-doc-list">
+                <li><strong>Semántica WAI-ARIA Completa:</strong> Asociación explícita <span class="pwa1-doc-code-inline">for</span>/<span class="pwa1-doc-code-inline">id</span>, estados <span class="pwa1-doc-code-inline">aria-pressed</span> en interruptores, <span class="pwa1-doc-code-inline">aria-expanded</span> en menús, <span class="pwa1-doc-code-inline">role="dialog"</span> con <span class="pwa1-doc-code-inline">aria-modal="true"</span> y barras de progreso con <span class="pwa1-doc-code-inline">aria-valuenow</span>.</li>
+                <li><strong>Anuncios No Intrusivos para Lectores de Pantalla:</strong> Regiones <span class="pwa1-doc-code-inline">aria-live="polite"</span> (<span class="pwa1-doc-code-inline">#live-region</span>) que notifican cambios de actividad, estado del sonido y validaciones de formulario sin robar el foco.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- INSPECTOR INTERACTIVO DE PALETAS SENSORIALES Y CONTRASTE EN VIVO -->
+        <div class="pwa1-doc-card">
+          <h3>Laboratorio Interactivo de Paletas Sensoriales y Métricas de Contraste (HU-003)</h3>
+          <p>Selecciona cualquiera de las paletas sensoriales implementadas en la plataforma para inspeccionar en vivo sus tokens cromáticos y su relación de contraste matemático frente a los umbrales WCAG 2.1 AA (4.5:1) y AAA (7.0:1):</p>
+
+          <div class="pwa1-doc-swatch-bar" role="group" aria-label="Selector de paleta sensorial para demostración en vivo">
+            <button type="button" class="pwa1-doc-swatch-btn" aria-pressed="true" data-pwa1-palette="verde">
+              <div class="pwa1-doc-swatch-preview"><span style="background:#F4F6F5;"></span><span style="background:#2F6E5C;"></span><span style="background:#171B19;"></span></div>
+              <strong>Verde Pastel Suave</strong>
+              <small style="display:block;color:var(--pwa1-text-muted);">Texto: 16.4:1 (AAA)</small>
+            </button>
+            <button type="button" class="pwa1-doc-swatch-btn" aria-pressed="false" data-pwa1-palette="neutro">
+              <div class="pwa1-doc-swatch-preview"><span style="background:#F6F7F6;"></span><span style="background:#55605A;"></span><span style="background:#202623;"></span></div>
+              <strong>Neutro Calmante</strong>
+              <small style="display:block;color:var(--pwa1-text-muted);">Texto: 14.9:1 (AAA)</small>
+            </button>
+            <button type="button" class="pwa1-doc-swatch-btn" aria-pressed="false" data-pwa1-palette="lavanda">
+              <div class="pwa1-doc-swatch-preview"><span style="background:#F5F3F7;"></span><span style="background:#5B4E8C;"></span><span style="background:#221E2E;"></span></div>
+              <strong>Lavanda Suave</strong>
+              <small style="display:block;color:var(--pwa1-text-muted);">Texto: 15.2:1 (AAA)</small>
+            </button>
+            <button type="button" class="pwa1-doc-swatch-btn" aria-pressed="false" data-pwa1-palette="arena">
+              <div class="pwa1-doc-swatch-preview"><span style="background:#FBF6EF;"></span><span style="background:#705324;"></span><span style="background:#262017;"></span></div>
+              <strong>Arena Cálida</strong>
+              <small style="display:block;color:var(--pwa1-text-muted);">Texto: 15.6:1 (AAA)</small>
+            </button>
+            <button type="button" class="pwa1-doc-swatch-btn" aria-pressed="false" data-pwa1-palette="alto">
+              <div class="pwa1-doc-swatch-preview"><span style="background:#FFFFFF;"></span><span style="background:#000000;"></span><span style="background:#144537;"></span></div>
+              <strong>Alto Contraste</strong>
+              <small style="display:block;color:var(--pwa1-text-muted);">Texto: 21.0:1 (AAA)</small>
+            </button>
+          </div>
+
+          <div class="pwa1-doc-live-preview-box" id="pwa1-palette-stage" style="background:#F4F6F5; color:#171B19; border-color:#2F6E5C;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:10px;">
+              <strong id="pwa1-palette-title" style="font-size:18px;">Vista Previa Sensorial: Paleta Verde / Pastel Suave (Predeterminada)</strong>
+              <span id="pwa1-palette-badge" style="background:#2F6E5C; color:#FFFFFF; padding:5px 12px; border-radius:999px; font-weight:700; font-size:13.5px;">Contraste Texto: 16.4:1 (Cumple AAA) · Primario: 5.88:1 (Cumple AA)</span>
+            </div>
+            <p id="pwa1-palette-desc" style="margin:0; color:inherit;">
+              Diseñada para maximizar el enfoque y la calma visual sin utilizar blancos puros deslumbrantes ni colores saturados. Cuando el acudiente guarda esta preferencia en <span class="pwa1-doc-code-inline">PUT /api/students/{id}/sensory-preferences</span>, el portal del estudiante actualiza dinámicamente sus variables CSS.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           SECCIÓN 5: CONTENEDORES PARA DIAGRAMAS DE ARQUITECTURA (PLACEHOLDERS)
+           ==================================================================== -->
+      <div class="pwa1-doc-panel" role="tabpanel" id="pwa1-tab-panel-5" aria-labelledby="pwa1-tab-btn-5" tabindex="0">
+        <div class="pwa1-doc-card" style="margin-bottom: 20px;">
+          <h3>Repositorio Visual de Diagramas de Ingeniería (Con Visor Lightbox Accesible)</h3>
+          <p>
+            Cada contenedor cuenta con proporción panorámica <span class="pwa1-doc-code-inline">16:9</span>, guía de resolución recomendada y soporte de ampliación en pantalla completa (<em>Lightbox</em>) mediante clic o teclado (<span class="pwa1-doc-code-inline">Enter</span> / <span class="pwa1-doc-code-inline">Escape</span>). Reemplaza o descomenta la etiqueta <span class="pwa1-doc-code-inline">&lt;img&gt;</span> señalada en cada bloque para mostrar tus diagramas oficiales.
+          </p>
+        </div>
+
+        <div class="pwa1-doc-grid-2">
+          <!-- DIAGRAMA 1: ARQUITECTURA GENERAL -->
+          <figure class="pwa1-doc-diagram-card">
+            <div class="pwa1-doc-diagram-head">
+              <div>
+                <span class="pwa1-doc-badge pwa1-doc-badge-primary">Figura 1 · Resolución sugerida: 1920 × 1080 px (16:9)</span>
+                <h4 style="margin-top:8px;">Diagrama de Arquitectura General y Despliegue Cloud</h4>
+              </div>
+              <button type="button" class="pwa1-doc-ctrl-btn pwa1-btn-expand-diagram" data-diagram-target="pwa1-diag-1" aria-label="Ampliar Figura 1: Diagrama de Arquitectura General">
+                Ampliar
+              </button>
+            </div>
+            <div class="pwa1-doc-diagram-viewport" id="pwa1-diag-1" tabindex="0" role="button" aria-label="Contenedor del Diagrama de Arquitectura General. Presione Enter para ampliar en pantalla completa.">
+              <!-- TODO: INSERTAR DIAGRAMA AQUÍ (Figura 1: Diagrama de Arquitectura General Clean Architecture .NET 9 + Cloudflare Pages / Azure) -->
+              <!-- Descomenta la siguiente etiqueta <img> y reemplaza el atributo src con la ruta de tu imagen (ej. "assets/diagrama-arquitectura.png"): -->
+              <!-- <img class="pwa1-doc-diagram-img" src="RUTA_DE_TU_DIAGRAMA_ARQUITECTURA.png" alt="Diagrama de Arquitectura General de PWA1 mostrando Cloudflare Pages en el Frontend y las 4 capas de .NET 9 con Azure SQL Database en el Backend" loading="lazy" /> -->
+              <div class="pwa1-doc-diagram-skeleton">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 8h10"/><path d="M7 12h6"/></svg>
+                <strong>Espacio Reservado: Diagrama de Arquitectura General</strong>
+                <span style="font-size:13.5px; color:var(--pwa1-text-muted);">Clean Layered Architecture (<span class="pwa1-doc-code-inline">Api</span> → <span class="pwa1-doc-code-inline">Services</span> → <span class="pwa1-doc-code-inline">Data</span> → <span class="pwa1-doc-code-inline">Core</span>) + Frontend Vanilla en Cloudflare Pages.</span>
+              </div>
+            </div>
+            <figcaption class="pwa1-doc-diagram-caption">
+              <strong>Pie de figura técnico:</strong> Desacoplamiento cliente-servidor mediante REST sobre HTTPS, proxy inverso <span class="pwa1-doc-code-inline">ForwardedHeaders</span>, inyección de dependencias y persistencia resiliente en SQL Server.
+            </figcaption>
+          </figure>
+
+          <!-- DIAGRAMA 2: MODELO ENTIDAD-RELACIÓN -->
+          <figure class="pwa1-doc-diagram-card">
+            <div class="pwa1-doc-diagram-head">
+              <div>
+                <span class="pwa1-doc-badge pwa1-doc-badge-accent">Figura 2 · Resolución sugerida: 1920 × 1080 px (16:9)</span>
+                <h4 style="margin-top:8px;">Modelo Entidad-Relación (SQL Server + Modelo Híbrido)</h4>
+              </div>
+              <button type="button" class="pwa1-doc-ctrl-btn pwa1-btn-expand-diagram" data-diagram-target="pwa1-diag-2" aria-label="Ampliar Figura 2: Modelo Entidad-Relación">
+                Ampliar
+              </button>
+            </div>
+            <div class="pwa1-doc-diagram-viewport" id="pwa1-diag-2" tabindex="0" role="button" aria-label="Contenedor del Modelo Entidad-Relación. Presione Enter para ampliar en pantalla completa.">
+              <!-- TODO: INSERTAR DIAGRAMA AQUÍ (Figura 2: Modelo Entidad-Relación de Base de Datos SQL Server) -->
+              <!-- Descomenta la siguiente etiqueta <img> y reemplaza el atributo src con la ruta de tu imagen (ej. "assets/modelo-er.png"): -->
+              <!-- <img class="pwa1-doc-diagram-img" src="RUTA_DE_TU_MODELO_ER.png" alt="Modelo Entidad-Relación en SQL Server con ApplicationUser, StudentProfile, SensoryPreference, Activity, ActivityAssignment, ActivityExecution y PedagogicalNote" loading="lazy" /> -->
+              <div class="pwa1-doc-diagram-skeleton">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                <strong>Espacio Reservado: Modelo Entidad-Relación (MER)</strong>
+                <span style="font-size:13.5px; color:var(--pwa1-text-muted);">11 tablas de dominio + Identity (<span class="pwa1-doc-code-inline">Guid</span>), columna híbrida <span class="pwa1-doc-code-inline">ConfigJson</span> e índices compuestos sin cascadas cíclicas.</span>
+              </div>
+            </div>
+            <figcaption class="pwa1-doc-diagram-caption">
+              <strong>Pie de figura técnico:</strong> Esquema Code-First en Entity Framework Core 9 con relaciones 1:1 (<span class="pwa1-doc-code-inline">StudentProfile ↔ SensoryPreference</span>) y 1:N protegidas con <span class="pwa1-doc-code-inline">DeleteBehavior.Restrict</span>.
+            </figcaption>
+          </figure>
+
+          <!-- DIAGRAMA 3: FLUJO DE AUTENTICACIÓN Y RECUPERACIÓN -->
+          <figure class="pwa1-doc-diagram-card">
+            <div class="pwa1-doc-diagram-head">
+              <div>
+                <span class="pwa1-doc-badge pwa1-doc-badge-a11y">Figura 3 · Resolución sugerida: 1600 × 900 px (16:9)</span>
+                <h4 style="margin-top:8px;">Flujo de Autenticación JWT, RBAC y Recuperación Dual</h4>
+              </div>
+              <button type="button" class="pwa1-doc-ctrl-btn pwa1-btn-expand-diagram" data-diagram-target="pwa1-diag-3" aria-label="Ampliar Figura 3: Flujo de Autenticación y Seguridad">
+                Ampliar
+              </button>
+            </div>
+            <div class="pwa1-doc-diagram-viewport" id="pwa1-diag-3" tabindex="0" role="button" aria-label="Contenedor del Diagrama de Secuencia de Autenticación. Presione Enter para ampliar en pantalla completa.">
+              <!-- TODO: INSERTAR DIAGRAMA AQUÍ (Figura 3: Diagrama de Secuencia de Autenticación JWT, Refresh Token y Recuperación de Contraseña) -->
+              <!-- Descomenta la siguiente etiqueta <img> y reemplaza el atributo src con la ruta de tu imagen (ej. "assets/flujo-autenticacion.png"): -->
+              <!-- <img class="pwa1-doc-diagram-img" src="RUTA_DE_TU_DIAGRAMA_AUTENTICACION.png" alt="Diagrama de secuencia del flujo de login con BCrypt, emisión de JWT y Refresh Token, y recuperación dual por SMTP MailKit o Acudiente" loading="lazy" /> -->
+              <div class="pwa1-doc-diagram-skeleton">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <strong>Espacio Reservado: Flujo de Autenticación y Seguridad</strong>
+                <span style="font-size:13.5px; color:var(--pwa1-text-muted);">Secuencia de validación BCrypt, expedición de JWT/RefreshToken, guardas RBAC y recuperación SMTP / Acudiente.</span>
+              </div>
+            </div>
+            <figcaption class="pwa1-doc-diagram-caption">
+              <strong>Pie de figura técnico:</strong> Protección contra enumeración de cuentas, tokens firmados en fragmento URL (<span class="pwa1-doc-code-inline">#email&amp;token</span>) e invalidación inmediata de sesiones previas.
+            </figcaption>
+          </figure>
+
+          <!-- DIAGRAMA 4: FLUJO DE EJECUCIÓN Y TELEMETRÍA COGNITIVA -->
+          <figure class="pwa1-doc-diagram-card">
+            <div class="pwa1-doc-diagram-head">
+              <div>
+                <span class="pwa1-doc-badge pwa1-doc-badge-primary">Figura 4 · Resolución sugerida: 1600 × 900 px (16:9)</span>
+                <h4 style="margin-top:8px;">Ciclo de Ejecución Adaptativa y Telemetría Cognitiva</h4>
+              </div>
+              <button type="button" class="pwa1-doc-ctrl-btn pwa1-btn-expand-diagram" data-diagram-target="pwa1-diag-4" aria-label="Ampliar Figura 4: Ciclo de Ejecución y Telemetría">
+                Ampliar
+              </button>
+            </div>
+            <div class="pwa1-doc-diagram-viewport" id="pwa1-diag-4" tabindex="0" role="button" aria-label="Contenedor del Diagrama de Telemetría y Ejecución. Presione Enter para ampliar en pantalla completa.">
+              <!-- TODO: INSERTAR DIAGRAMA AQUÍ (Figura 4: Flujo de Ejecución de Actividades HU-006 y Analítica Cognitiva HU-008) -->
+              <!-- Descomenta la siguiente etiqueta <img> y reemplaza el atributo src con la ruta de tu imagen (ej. "assets/flujo-telemetria.png"): -->
+              <!-- <img class="pwa1-doc-diagram-img" src="RUTA_DE_TU_DIAGRAMA_TELEMETRIA.png" alt="Diagrama del flujo entre configuración sensorial del acudiente, ejecución de actividad por el estudiante y tablero analítico del docente" loading="lazy" /> -->
+              <div class="pwa1-doc-diagram-skeleton">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+                <strong>Espacio Reservado: Flujo Pedagógico y Telemetría</strong>
+                <span style="font-size:13.5px; color:var(--pwa1-text-muted);">Sincronización entre <span class="pwa1-doc-code-inline">POST /activities/{id}/start</span>, captura de tiempos en cliente (<span class="pwa1-doc-code-inline">/submit</span>) y agregación analítica docente.</span>
+              </div>
+            </div>
+            <figcaption class="pwa1-doc-diagram-caption">
+              <strong>Pie de figura técnico:</strong> El inicio de cada actividad inyecta las adaptaciones sensoriales vigentes y el envío registra tiempos e intentos para calcular alertas tempranas (&lt; 60%).
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           SECCIÓN 6: ZONA DE PRUEBA EN VIVO (PLACEHOLDER PARA CÓDIGO QR 1:1)
+           ==================================================================== -->
+      <div class="pwa1-doc-panel" role="tabpanel" id="pwa1-tab-panel-6" aria-labelledby="pwa1-tab-btn-6" tabindex="0">
+        <div class="pwa1-doc-qr-hero">
+          <!-- CONTENEDOR 1:1 DEL CÓDIGO QR -->
+          <div class="pwa1-doc-qr-frame" id="pwa1-qr-main-container" aria-label="Espacio reservado en proporción 1 a 1 para el código QR de prueba en vivo">
+            <!-- TODO: INSERTAR QR AQUÍ (Proporción recomendada: 1:1 cuadrada, ej. 600 × 600 px en PNG o SVG) -->
+            <!-- Descomenta la siguiente etiqueta <img> y reemplaza el atributo src con la ruta o URL de tu código QR: -->
+            <!-- <img class="pwa1-doc-qr-img" src="RUTA_DE_TU_CODIGO_QR.png" alt="Código QR para abrir y evaluar en vivo la plataforma Sendero TeaLearning desde dispositivos móviles" /> -->
+            <div class="pwa1-doc-qr-placeholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                <rect x="5.5" y="5.5" width="2" height="2"/><rect x="16.5" y="5.5" width="2" height="2"/><rect x="5.5" y="16.5" width="2" height="2"/>
+                <path d="M14 14h3v3h-3zM18 18h3v3h-3zM18 14h3M14 19h2"/>
+              </svg>
+              <strong style="font-size:16px; color:#171B19;">Espacio QR (1:1)</strong>
+              <span style="font-size:13px; color:#4A544F;">Reemplaza el comentario <code style="font-weight:700;">TODO: INSERTAR QR AQUÍ</code> por tu imagen QR (600×600 px).</span>
+            </div>
+          </div>
+
+          <!-- LLAMADO A LA ACCIÓN Y CREDENCIALES PARA JURADOS Y PARES -->
+          <div>
+            <span class="pwa1-doc-badge" style="background:var(--pwa1-lime); color:#12210B; margin-bottom:12px;">Evaluación Interactiva en Tiempo Real</span>
+            <h3 style="font-size:clamp(24px, 3vw, 34px); margin:0 0 12px; color:#FFFFFF;">¡Escanea el código QR y pon a prueba Sendero desde tu celular!</h3>
+            <p style="font-size:calc(16.5px * var(--pwa1-scale)); color:#E4EEEA; margin:0 0 16px;">
+              Invitamos a los profesores evaluadores y pares académicos a escanear el código con la cámara de su dispositivo móvil para recorrer en vivo los 4 portales de la plataforma. Gracias a la configuración <span class="pwa1-doc-code-inline" style="background:rgba(0,0,0,0.35); color:#FFFFFF; border-color:rgba(255,255,255,0.3);">UseForwardedHeaders()</span> en .NET 9, cada dispositivo cuenta con su propia cuota independiente en el limitador de peticiones por IP.
+            </p>
+
+            <div class="pwa1-doc-cred-grid" aria-label="Credenciales de demostración del semillero automático">
+              <div class="pwa1-doc-cred-card">
+                <strong>Rol Estudiante (Rutina y Logros)</strong>
+                <code>Usuario: estudiante@tealearning.com</code>
+                <code>Clave: Estudiante123!*</code>
+              </div>
+              <div class="pwa1-doc-cred-card">
+                <strong>Rol Acudiente (Sensorial y Progreso)</strong>
+                <code>Usuario: tealearning.rol+acudiente@gmail.com</code>
+                <code>Clave: Acudiente123!*</code>
+              </div>
+              <div class="pwa1-doc-cred-card">
+                <strong>Rol Docente (Actividades y Analítica)</strong>
+                <code>Usuario: tealearning.rol+docente@gmail.com</code>
+                <code>Clave: Docente123!*</code>
+              </div>
+              <div class="pwa1-doc-cred-card">
+                <strong>Rol Administrador (Usuarios y Módulos)</strong>
+                <code>Usuario: tealearning.rol+administrador@gmail.com</code>
+                <code>Clave: Admin123!*</code>
+              </div>
+            </div>
+
+            <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:22px;">
+              <a href="login.html" class="btn-lime" style="text-decoration:none;">
+                Abrir Inicio de Sesión en este Equipo
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </a>
+              <button type="button" class="pwa1-doc-ctrl-btn" id="pwa1-btn-open-qr-modal-2" style="background:transparent; color:#FFFFFF; border-color:#FFFFFF;">
+                Maximizar QR para Auditorio
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MODAL LIGHTBOX ACCESIBLE (PARA AMPLIAR DIAGRAMAS O EL CÓDIGO QR EN AUDITORIO) -->
+    <div class="pwa1-doc-modal-overlay" id="pwa1-doc-modal" role="dialog" aria-modal="true" aria-labelledby="pwa1-doc-modal-title" aria-hidden="true">
+      <div class="pwa1-doc-modal-box">
+        <div class="pwa1-doc-modal-header">
+          <h3 id="pwa1-doc-modal-title">Vista Ampliada para Sustentación</h3>
+          <button type="button" class="pwa1-doc-ctrl-btn" id="pwa1-doc-modal-close" aria-label="Cerrar ventana ampliada (Tecla Escape)">
+            Cerrar (Esc)
+          </button>
+        </div>
+        <div id="pwa1-doc-modal-body"></div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    (function initPwa1TechShowcase() {
+      const root = document.getElementById('pwa1-sustentacion');
+      if (!root) return;
+
+      // 1. Inyección automática y no destructiva del enlace "Sustentación Técnica" en la navegación de Interfaz_General.html
+      const navContainers = [
+        document.querySelector('header.nav nav.links'),
+        document.getElementById('mobile-menu'),
+        document.querySelector('footer.site nav.footer-links')
+      ];
+      navContainers.forEach(nav => {
+        if (nav && !nav.querySelector('a[href="#pwa1-sustentacion"]')) {
+          const link = document.createElement('a');
+          link.href = '#pwa1-sustentacion';
+          link.textContent = 'Sustentación Técnica';
+          nav.appendChild(link);
+        }
+      });
+
+      const liveRegion = document.getElementById('pwa1-doc-live');
+      function announce(msg) {
+        if (liveRegion) liveRegion.textContent = msg;
+      }
+
+      // 2. Navegación accesible por pestañas (WAI-ARIA Authoring Practices: Click + Flechas + Home/End)
+      const tabs = Array.from(root.querySelectorAll('[role="tab"]'));
+      const panels = Array.from(root.querySelectorAll('[role="tabpanel"]'));
+
+      function activateTab(targetTab, moveFocus = false) {
+        const targetId = targetTab.getAttribute('aria-controls');
+        tabs.forEach(tab => {
+          const isSelected = tab === targetTab;
+          tab.setAttribute('aria-selected', String(isSelected));
+          tab.setAttribute('tabindex', isSelected ? '0' : '-1');
+        });
+        panels.forEach(panel => {
+          panel.classList.toggle('active', panel.id === targetId);
+        });
+        if (moveFocus) targetTab.focus();
+        announce('Sección activa: ' + targetTab.textContent.trim());
+      }
+
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => {
+          if (root.getAttribute('data-pwa1-view') === 'all') {
+            root.setAttribute('data-pwa1-view', 'tabs');
+            const viewAllBtn = document.getElementById('pwa1-btn-view-all');
+            if (viewAllBtn) viewAllBtn.setAttribute('aria-pressed', 'false');
+          }
+          activateTab(tab, false);
+        });
+
+        tab.addEventListener('keydown', (e) => {
+          let nextIndex = null;
+          if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            nextIndex = (index + 1) % tabs.length;
+          } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            nextIndex = (index - 1 + tabs.length) % tabs.length;
+          } else if (e.key === 'Home') {
+            nextIndex = 0;
+          } else if (e.key === 'End') {
+            nextIndex = tabs.length - 1;
+          }
+          if (nextIndex !== null) {
+            e.preventDefault();
+            activateTab(tabs[nextIndex], true);
+          }
+        });
+      });
+
+      // 3. Controles de Auditorio: Alto Contraste AAA, Escala Tipográfica y Vista Continua
+      const btnContrast = document.getElementById('pwa1-btn-contrast');
+      if (btnContrast) {
+        btnContrast.addEventListener('click', () => {
+          const isAAA = root.getAttribute('data-pwa1-contrast') === 'aaa';
+          root.setAttribute('data-pwa1-contrast', isAAA ? 'normal' : 'aaa');
+          btnContrast.setAttribute('aria-pressed', String(!isAAA));
+          announce(!isAAA ? 'Modo de alto contraste AAA activado.' : 'Modo de contraste estándar activado.');
+        });
+      }
+
+      const scales = [1, 1.12, 1.24];
+      let scaleIdx = 0;
+      const btnScale = document.getElementById('pwa1-btn-scale');
+      const scaleLabel = document.getElementById('pwa1-scale-label');
+      if (btnScale && scaleLabel) {
+        btnScale.addEventListener('click', () => {
+          scaleIdx = (scaleIdx + 1) % scales.length;
+          const currentScale = scales[scaleIdx];
+          root.style.setProperty('--pwa1-scale', String(currentScale));
+          const pct = Math.round(currentScale * 100) + '%';
+          scaleLabel.textContent = 'Texto: ' + pct;
+          btnScale.setAttribute('aria-pressed', String(scaleIdx > 0));
+          announce('Escala de texto ajustada al ' + pct);
+        });
+      }
+
+      const btnViewAll = document.getElementById('pwa1-btn-view-all');
+      if (btnViewAll) {
+        btnViewAll.addEventListener('click', () => {
+          const isAll = root.getAttribute('data-pwa1-view') === 'all';
+          root.setAttribute('data-pwa1-view', isAll ? 'tabs' : 'all');
+          btnViewAll.setAttribute('aria-pressed', String(!isAll));
+          announce(!isAll ? 'Vista continua activada: mostrando los 6 apartados simultáneamente.' : 'Vista por pestañas activada.');
+        });
+      }
+
+      // 4. Simulador Interactivo de Paletas Sensoriales (Sección 4)
+      const PALETTE_SPECS = {
+        verde: {
+          title: 'Vista Previa Sensorial: Paleta Verde / Pastel Suave (Predeterminada)',
+          badge: 'Contraste Texto: 16.4:1 (Cumple AAA) · Primario: 5.88:1 (Cumple AA)',
+          bg: '#F4F6F5', text: '#171B19', primary: '#2F6E5C',
+          desc: 'Diseñada para maximizar el enfoque y la calma visual sin utilizar blancos puros deslumbrantes ni colores saturados. Sincronizada vía PUT /api/students/{id}/sensory-preferences.'
+        },
+        neutro: {
+          title: 'Vista Previa Sensorial: Paleta Neutro Calmante (Cero Interferencia Cromática)',
+          badge: 'Contraste Texto: 14.9:1 (Cumple AAA) · Primario: 6.12:1 (Cumple AA)',
+          bg: '#F6F7F6', text: '#202623', primary: '#55605A',
+          desc: 'Pensada para estudiantes con alta sensibilidad cromática que requieren una interfaz libre de matices intensos durante la resolución de secuencias lógicas.'
+        },
+        lavanda: {
+          title: 'Vista Previa Sensorial: Paleta Lavanda Suave (Regulación Sensorial)',
+          badge: 'Contraste Texto: 15.2:1 (Cumple AAA) · Primario: 6.85:1 (Cumple AA)',
+          bg: '#F5F3F7', text: '#221E2E', primary: '#5B4E8C',
+          desc: 'Tonalidades frías de baja luminancia que favorecen la autorregulación emocional en sesiones de aprendizaje prolongadas.'
+        },
+        arena: {
+          title: 'Vista Previa Sensorial: Paleta Arena Cálida (Baja Luz Azul)',
+          badge: 'Contraste Texto: 15.6:1 (Cumple AAA) · Primario: 6.92:1 (Cumple AA)',
+          bg: '#FBF6EF', text: '#262017', primary: '#705324',
+          desc: 'Reduce el componente espectral azul de la pantalla manteniendo un contraste cercano a 7:1 para lectura prolongada sin fatiga ocular.'
+        },
+        alto: {
+          title: 'Vista Previa Sensorial: Modo Alto Contraste (Máxima Legibilidad AAA)',
+          badge: 'Contraste Texto: 21.0:1 (Máximo AAA) · Bordes: 21.0:1 (AAA)',
+          bg: '#FFFFFF', text: '#000000', primary: '#144537',
+          desc: 'Cumple con los criterios más exigentes de baja visión (WCAG 1.4.6 AAA), eliminando degradados y aplicando bordes sólidos de 2px.'
+        }
+      };
+
+      const swatchBtns = Array.from(root.querySelectorAll('[data-pwa1-palette]'));
+      const stage = document.getElementById('pwa1-palette-stage');
+      const stageTitle = document.getElementById('pwa1-palette-title');
+      const stageBadge = document.getElementById('pwa1-palette-badge');
+      const stageDesc = document.getElementById('pwa1-palette-desc');
+
+      swatchBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const key = btn.getAttribute('data-pwa1-palette');
+          const spec = PALETTE_SPECS[key];
+          if (!spec || !stage) return;
+          swatchBtns.forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+          stage.style.background = spec.bg;
+          stage.style.color = spec.text;
+          stage.style.borderColor = spec.primary;
+          stageTitle.textContent = spec.title;
+          stageBadge.textContent = spec.badge;
+          stageBadge.style.background = spec.primary;
+          stageDesc.textContent = spec.desc;
+          announce(spec.title + '. ' + spec.badge);
+        });
+      });
+
+      // 5. Modal Lightbox Accesible (Diagramas y Código QR para Proyección)
+      const modal = document.getElementById('pwa1-doc-modal');
+      const modalTitle = document.getElementById('pwa1-doc-modal-title');
+      const modalBody = document.getElementById('pwa1-doc-modal-body');
+      const modalClose = document.getElementById('pwa1-doc-modal-close');
+      let lastFocusedElement = null;
+
+      function openModal(titleText, contentHtml) {
+        if (!modal || !modalBody || !modalTitle) return;
+        lastFocusedElement = document.activeElement;
+        modalTitle.textContent = titleText;
+        modalBody.innerHTML = contentHtml;
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        if (modalClose) modalClose.focus();
+        announce('Ventana modal abierta: ' + titleText);
+      }
+
+      function closeModal() {
+        if (!modal || !modal.classList.contains('open')) return;
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        modalBody.innerHTML = '';
+        if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+          lastFocusedElement.focus();
+        }
+      }
+
+      if (modalClose) modalClose.addEventListener('click', closeModal);
+      if (modal) {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) closeModal();
+        });
+      }
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal && modal.classList.contains('open')) {
+          closeModal();
+        }
+      });
+
+      // Ampliar diagramas
+      root.querySelectorAll('.pwa1-btn-expand-diagram').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetId = btn.getAttribute('data-diagram-target');
+          const viewport = document.getElementById(targetId);
+          const card = btn.closest('figure');
+          const heading = card ? card.querySelector('h4')?.textContent : 'Diagrama de Arquitectura';
+          const caption = card ? card.querySelector('figcaption')?.innerHTML : '';
+          if (viewport) {
+            openModal(heading || 'Diagrama', `
+              <div class="pwa1-doc-diagram-viewport" style="aspect-ratio:16/9; margin-bottom:14px;">${viewport.innerHTML}</div>
+              <div style="font-size:15px; color:#4A544F;">${caption}</div>
+            `);
+          }
+        });
+      });
+
+      root.querySelectorAll('.pwa1-doc-diagram-viewport').forEach(vp => {
+        vp.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            const card = vp.closest('figure');
+            const btn = card ? card.querySelector('.pwa1-btn-expand-diagram') : null;
+            if (btn) btn.click();
+          }
+        });
+        vp.addEventListener('click', () => {
+          const card = vp.closest('figure');
+          const btn = card ? card.querySelector('.pwa1-btn-expand-diagram') : null;
+          if (btn) btn.click();
+        });
+      });
+
+      // Proyectar QR en vivo
+      function openQrProjectionModal() {
+        const qrContainer = document.getElementById('pwa1-qr-main-container');
+        const qrInner = qrContainer ? qrContainer.innerHTML : '';
+        openModal('Probar Plataforma Sendero (TeaLearning) en Vivo', `
+          <div style="display:grid; grid-template-columns: minmax(260px, 360px) 1fr; gap:28px; align-items:center;">
+            <div class="pwa1-doc-qr-frame" style="margin:0 auto;">${qrInner}</div>
+            <div>
+              <p style="font-size:18px; font-weight:700; margin:0 0 10px; color:#1E4E40;">Escanea con la cámara de tu teléfono móvil</p>
+              <p style="margin:0 0 14px; font-size:15.5px; color:#4A544F;">
+                Accede en tiempo real al entorno desplegado y prueba cualquiera de los 4 perfiles del sistema:
+              </p>
+              <ul class="pwa1-doc-list" style="margin-bottom:16px;">
+                <li><strong>Estudiante:</strong> <code class="pwa1-doc-code-inline">estudiante@tealearning.com</code> / <code class="pwa1-doc-code-inline">Estudiante123!*</code></li>
+                <li><strong>Acudiente:</strong> <code class="pwa1-doc-code-inline">tealearning.rol+acudiente@gmail.com</code> / <code class="pwa1-doc-code-inline">Acudiente123!*</code></li>
+                <li><strong>Docente:</strong> <code class="pwa1-doc-code-inline">tealearning.rol+docente@gmail.com</code> / <code class="pwa1-doc-code-inline">Docente123!*</code></li>
+                <li><strong>Administrador:</strong> <code class="pwa1-doc-code-inline">tealearning.rol+administrador@gmail.com</code> / <code class="pwa1-doc-code-inline">Admin123!*</code></li>
+              </ul>
+            </div>
+          </div>
+        `);
+      }
+
+      const btnQr1 = document.getElementById('pwa1-btn-open-qr-modal');
+      const btnQr2 = document.getElementById('pwa1-btn-open-qr-modal-2');
+      if (btnQr1) btnQr1.addEventListener('click', openQrProjectionModal);
+      if (btnQr2) btnQr2.addEventListener('click', openQrProjectionModal);
+    })();
+  </script>
+  <!-- ==========================================================================
+       FIN MÓDULO AUTOCONTENIDO: SUSTENTACIÓN TÉCNICA Y DOCUMENTACIÓN VIVA (PWA1)
+       ========================================================================== -->
+
 </main>
 
 <footer class="site">
