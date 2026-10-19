@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Panel Administrativo</title>
+<meta name="theme-color" content="#2F6E5C">
+<meta name="description" content="Sendero - Panel de Administración Global">
+<title>Panel Administrativo — Sendero</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <script src="api-client.js"></script>
@@ -125,8 +127,31 @@
   .result-count{ font-size:13px; color:var(--text-muted); align-self:center; }
 
   /* ---------- Tabla ---------- */
-  .table-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
-  table{ width:100%; border-collapse:collapse; }
+  .table-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    position:relative;
+  }
+  .table-swipe-hint{
+    display:none;
+    font-size:12px;
+    font-weight:700;
+    color:var(--text-muted);
+    background:var(--primary-soft);
+    padding:6px 12px;
+    border-bottom:1px solid var(--border);
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    text-align:center;
+  }
+  @media (max-width: 768px){
+    .table-swipe-hint{ display:flex; }
+  }
+  table{ width:100%; min-width:620px; border-collapse:collapse; }
   thead th{
     text-align:left; font-size:12.5px; text-transform:uppercase; letter-spacing:.02em;
     color: var(--text-muted); background: var(--bg); padding: 13px 18px; border-bottom:1px solid var(--border);
@@ -149,10 +174,11 @@
   .cat-cell{ display:flex; align-items:center; gap:8px; }
   .color-dot{ width:12px; height:12px; border-radius:50%; flex-shrink:0; border:1px solid rgba(0,0,0,.12); }
 
-  .row-actions{ display:flex; gap:8px; }
+  .row-actions{ display:flex; gap:6px; flex-wrap:nowrap; }
   .icon-btn{
     font-family:inherit; font-size:13px; font-weight:700; cursor:pointer;
     background:transparent; border:1.5px solid var(--border); border-radius:8px; padding:7px 11px; color:var(--text);
+    min-height:38px; min-width:38px; display:inline-flex; align-items:center; justify-content:center;
   }
   .icon-btn:hover{ background:var(--bg); }
   .icon-btn.danger{ color:var(--danger); border-color:var(--danger-soft); }
@@ -219,12 +245,12 @@
     padding:6px 10px; background:var(--surface);
   }
   .student-picker .student-option{
-    display:flex; align-items:center; gap:9px; padding:8px 4px; font-size:14.5px;
-    border-bottom:1px solid var(--bg); cursor:pointer;
+    display:flex; align-items:center; gap:9px; padding:10px 6px; font-size:14.5px;
+    border-bottom:1px solid var(--bg); cursor:pointer; min-height:42px;
   }
   .student-picker .student-option:last-child{ border-bottom:none; }
   .student-picker .student-option:hover{ background:var(--bg); border-radius:6px; }
-  .student-picker input[type="checkbox"]{ width:16px; height:16px; accent-color:var(--primary); cursor:pointer; flex-shrink:0; }
+  .student-picker input[type="checkbox"]{ width:18px; height:18px; accent-color:var(--primary); cursor:pointer; flex-shrink:0; }
   .student-picker .student-option-meta{ color:var(--text-muted); font-size:12.5px; }
   .student-picker .empty-note{ font-size:13.5px; color:var(--text-muted); padding:8px 4px; }
 
@@ -244,10 +270,75 @@
 
   @media (max-width: 860px){
     .app{ flex-direction:column; }
-    .sidebar{ width:100%; flex-direction:row; align-items:center; overflow-x:auto; }
-    .sidebar-footer{ margin-top:0; border-top:none; }
-    .main{ padding: 20px; }
+    .sidebar{
+      width:100%;
+      flex-direction:row;
+      align-items:center;
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
+      padding:10px 14px;
+      gap:12px;
+      border-right:none;
+      border-bottom:1px solid var(--border);
+      position:sticky;
+      top:0;
+      z-index:40;
+      background:var(--surface);
+    }
+    .sidebar::-webkit-scrollbar{ display:none; }
+    .brand{ padding:0; flex-shrink:0; }
+    .brand-tag{ display:none; }
+    nav.nav-list{ flex-direction:row; gap:6px; flex-shrink:0; }
+    .nav-item{ white-space:nowrap; padding:9px 12px; min-height:44px; }
+    .sidebar-footer{
+      margin-top:0;
+      padding:0;
+      border-top:none;
+      margin-left:auto;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-shrink:0;
+    }
+    .admin-chip .admin-info{ display:none; }
+    #btn-logout{
+      margin-top:0 !important;
+      width:auto !important;
+      padding:6px 12px !important;
+      font-size:12.5px !important;
+      white-space:nowrap;
+      min-height:36px;
+    }
+    .main{ padding: 20px 16px; min-width: 0; }
     .modal .field-row{ flex-direction:column; }
+  }
+
+  @media (max-width: 640px){
+    .brand-name{ display:none; }
+    .main{ padding: 16px 12px; }
+    .page-header{ gap: 12px; margin-bottom: 16px; flex-direction: column; align-items: stretch; }
+    .page-header h1{ font-size: clamp(20px, 5.5vw, 23px); }
+    .page-header .btn{ width: 100%; justify-content: center; }
+    .toolbar{ padding: 12px 14px; gap: 10px; }
+    .field{ width: 100%; min-width: 0; }
+    .field input, .field select, .field textarea{ width: 100%; min-width: 0; }
+    .search-field{ width: 100%; min-width: 0; flex: none; }
+    .toolbar .spacer{ display: none; }
+    .result-count{ width: 100%; text-align: right; }
+    .modal{ padding: 22px 18px; max-height: 92vh; }
+    .modal-actions{ gap: 8px; }
+  }
+
+  @media (max-width: 480px){
+    .main{ padding: 12px 8px; }
+    .btn{ padding: 10px 14px; font-size: 14px; }
+    .table-card thead th{ padding: 10px 12px; font-size: 11.5px; }
+    .table-card tbody td{ padding: 12px 10px; font-size: 13.5px; }
+    .modal{ padding: 18px 14px; border-radius: 10px; }
+    .modal-actions{ flex-direction: column-reverse; }
+    .modal-actions .btn{ width: 100%; justify-content: center; }
+    .order-presets{ flex-direction: column; }
   }
 </style>
 </head>
@@ -320,6 +411,7 @@
       </div>
 
       <div class="table-card">
+        <div class="table-swipe-hint" aria-hidden="true"><span>⟵ Desliza horizontalmente para ver todas las columnas y acciones ⟶</span></div>
         <table>
           <thead>
             <tr>
@@ -367,6 +459,7 @@
       </div>
 
       <div class="table-card">
+        <div class="table-swipe-hint" aria-hidden="true"><span>⟵ Desliza horizontalmente para ver todas las columnas y acciones ⟶</span></div>
         <table>
           <thead>
             <tr>
@@ -420,6 +513,7 @@
       </div>
 
       <div class="table-card">
+        <div class="table-swipe-hint" aria-hidden="true"><span>⟵ Desliza horizontalmente para ver todas las columnas y acciones ⟶</span></div>
         <table>
           <thead>
             <tr>

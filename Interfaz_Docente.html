@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Docente — Actividades interactivas</title>
+<meta name="theme-color" content="#2F6E5C">
+<meta name="description" content="Sendero - Centro de Gestión y Analítica Pedagógica para Docentes">
+<title>Docente — Centro de Gestión y Analítica Pedagógica</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <script src="api-client.js"></script>
@@ -81,8 +83,31 @@
   .result-count{ font-size:13px; color:var(--text-muted); align-self:center; }
  
   /* ---------- Tabla ---------- */
-  .table-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
-  table{ width:100%; border-collapse:collapse; }
+  .table-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    position:relative;
+  }
+  .table-swipe-hint{
+    display:none;
+    font-size:12px;
+    font-weight:700;
+    color:var(--text-muted);
+    background:var(--primary-soft);
+    padding:6px 12px;
+    border-bottom:1px solid var(--border);
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    text-align:center;
+  }
+  @media (max-width: 768px){
+    .table-swipe-hint{ display:flex; }
+  }
+  table{ width:100%; min-width:640px; border-collapse:collapse; }
   thead th{ text-align:left; font-size:12.5px; text-transform:uppercase; letter-spacing:.02em; color: var(--text-muted); background: var(--bg); padding: 13px 18px; border-bottom:1px solid var(--border); }
   tbody td{ padding: 14px 18px; border-bottom:1px solid var(--border); font-size:14.5px; vertical-align:middle; }
   tbody tr:last-child td{ border-bottom:none; }
@@ -96,8 +121,12 @@
   .badge-activa{ background:var(--ok-bg); color:var(--ok-text); }
   .badge-inactiva{ background:var(--warn-bg); color:var(--warn-text); border:1px solid var(--warn-border); }
  
-  .row-actions{ display:flex; gap:8px; }
-  .icon-btn{ font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; background:transparent; border:1.5px solid var(--border); border-radius:8px; padding:7px 11px; color:var(--text); }
+  .row-actions{ display:flex; gap:6px; flex-wrap:nowrap; }
+  .icon-btn{
+    font-family:inherit; font-size:13px; font-weight:700; cursor:pointer;
+    background:transparent; border:1.5px solid var(--border); border-radius:8px; padding:7px 11px; color:var(--text);
+    min-height:38px; min-width:38px; display:inline-flex; align-items:center; justify-content:center;
+  }
   .icon-btn:hover{ background:var(--bg); }
   .icon-btn.danger{ color:var(--danger); border-color:var(--danger-soft); }
   .icon-btn.danger:hover{ background:var(--danger-soft); }
@@ -257,18 +286,52 @@
   .main{ min-width:0; }   /* permite que las tablas anchas se desplacen dentro de su tarjeta */
   @media (max-width: 860px){
     .app{ flex-direction:column; }
-    .sidebar{ width:100%; flex-direction:row; align-items:center; overflow-x:auto; border-right:none; border-bottom:1px solid var(--border); }
-    nav.nav-list{ flex-direction:row; }
-    .sidebar-footer{ margin-top:0; margin-left:auto; border-top:none; }
+    .sidebar{
+      width:100%;
+      flex-direction:row;
+      align-items:center;
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
+      padding:10px 14px;
+      gap:12px;
+      border-right:none;
+      border-bottom:1px solid var(--border);
+      position:sticky;
+      top:0;
+      z-index:40;
+      background:var(--surface);
+    }
+    .sidebar::-webkit-scrollbar{ display:none; }
+    .brand{ padding:0; flex-shrink:0; }
+    .brand-tag{ display:none; }
+    nav.nav-list{ flex-direction:row; gap:6px; flex-shrink:0; }
+    .nav-item{ white-space:nowrap; padding:9px 12px; min-height:44px; }
+    .sidebar-footer{
+      margin-top:0;
+      padding:0;
+      border-top:none;
+      margin-left:auto;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-shrink:0;
+    }
+    .admin-chip .admin-info{ display:none; }
+    #btn-logout{
+      margin-top:0 !important;
+      width:auto !important;
+      padding:6px 12px !important;
+      font-size:12.5px !important;
+      white-space:nowrap;
+      min-height:36px;
+    }
   }
   @media (max-width: 760px){
     .kpi-grid{ grid-template-columns:1fr 1fr; }
     .chart-grid{ grid-template-columns:1fr; }
-    .main{ padding:20px 16px; }
-    .table-card{ overflow-x:auto; }
-  }
-  @media (max-width: 480px){
-    .kpi-grid{ grid-template-columns:1fr; }
+    .main{ padding:18px 14px; }
+    .preview-card{ position:static; }
   }
 
   /* ---------- Bitácora pedagógica ---------- */
@@ -352,6 +415,18 @@
   .chip-group .chip-btn svg{ width:15px; height:15px; vertical-align:-2px; margin-right:4px; }
 
   @media (max-width: 640px){
+    .brand-name{ display:none; }
+    .page-header{ gap:12px; margin-bottom:16px; flex-direction:column; align-items:stretch; }
+    .page-header h1{ font-size:clamp(20px, 5.5vw, 23px); }
+    .page-header .btn{ width:100%; justify-content:center; }
+    .toolbar{ padding:12px 14px; gap:10px; }
+    .field{ width:100%; min-width:0; }
+    .field input, .field select{ width:100%; min-width:0; }
+    .search-field{ width:100%; min-width:0; flex:none; }
+    .toolbar .spacer{ display:none; }
+    .result-count{ width:100%; text-align:right; }
+    .modal{ padding:20px 16px; margin:10px 0 30px; max-height:92vh; }
+    .modal-actions{ gap:8px; }
     .grade-summary{ grid-template-columns:1fr; }
     .note-grid{ grid-template-columns:1fr; }
     .log-entry{ grid-template-columns:1fr; }
@@ -359,6 +434,45 @@
     .log-date .day{ font-size:18px; }
     .log-student{ flex-wrap:wrap; }
     .log-student .who-count{ margin-left:0; text-align:left; }
+    #btn-save-note{ width:100%; justify-content:center; }
+  }
+
+  @media (max-width: 540px){
+    .pair-row{
+      flex-direction:column;
+      align-items:stretch;
+      gap:8px;
+      padding:12px 10px;
+    }
+    .pair-side{ width:100%; }
+    .pair-link{ text-align:center; font-size:16px; font-weight:bold; color:var(--primary); margin:-2px 0; }
+    .pair-row .mini-btn.danger{ align-self:flex-end; }
+  }
+
+  @media (max-width: 520px){
+    .editor-item{
+      flex-wrap:wrap;
+      gap:8px;
+      padding:10px 12px;
+    }
+    .editor-item .order-num{ order:1; }
+    .editor-item select{ order:2; flex:1; min-width:80px; }
+    .editor-item .icon-preview{ order:3; }
+    .editor-item .item-actions{ order:4; margin-left:auto; }
+    .editor-item input[type="text"]{ order:5; width:100%; flex:none; }
+    .mini-btn{ padding:6px 9px; min-height:36px; min-width:36px; display:inline-flex; align-items:center; justify-content:center; }
+  }
+
+  @media (max-width: 480px){
+    .main{ padding:12px 8px; }
+    .btn{ padding:10px 14px; font-size:14px; }
+    .kpi-grid{ grid-template-columns:1fr; }
+    .kpi .kpi-value{ font-size:clamp(22px, 5.5vw, 28px); }
+    .modal{ padding:18px 14px; }
+    .modal-actions{ flex-direction:column-reverse; }
+    .modal-actions .btn{ width:100%; justify-content:center; }
+    .table-card thead th{ padding:10px 12px; font-size:11.5px; }
+    .table-card tbody td{ padding:12px 10px; font-size:13.5px; }
   }
 </style>
 </head>
@@ -425,6 +539,7 @@
     </div>
  
     <div class="table-card">
+      <div class="table-swipe-hint" aria-hidden="true"><span>⟵ Desliza horizontalmente para ver todas las columnas y acciones ⟶</span></div>
       <table>
         <thead>
           <tr>
@@ -505,6 +620,7 @@
         <p id="perf-table-help">Se marca "Necesita apoyo" cuando la tasa de aciertos es menor al 60 %.</p>
       </div>
       <div class="table-scroll">
+        <div class="table-swipe-hint" aria-hidden="true"><span>⟵ Desliza horizontalmente para ver todas las métricas de los estudiantes ⟶</span></div>
         <table aria-labelledby="perf-table-title">
           <thead id="perf-table-head"></thead>
           <tbody id="perf-table-body"></tbody>
@@ -592,6 +708,7 @@
           <p>Escala de 1.0 a 5.0. Nota mínima aprobatoria: 3.0.</p>
         </div>
         <div class="table-scroll">
+          <div class="table-swipe-hint" aria-hidden="true"><span>⟵ Desliza horizontalmente para ver todas las columnas y calificaciones ⟶</span></div>
           <table aria-labelledby="grades-title">
             <thead>
               <tr>
