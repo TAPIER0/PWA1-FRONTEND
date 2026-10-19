@@ -1,11 +1,23 @@
 // ============================================================================
 // TeaLearning - Cliente de Conexión a la API (.NET 9)
+// Configuración Dual: Desarrollo Local (localhost / 127.0.0.1) y Producción (Azure App Service)
 // ============================================================================
 
-const API_BASE_URL = 'http://localhost:5264/api';
+// URL de producción en Azure App Service (actualiza el subdominio si cambia en el portal de Azure):
+const PRODUCTION_API_URL = 'https://tealearning-api.azurewebsites.net/api';
+const LOCAL_API_URL = 'http://localhost:5264/api';
+
+const IS_LOCAL_ENV = typeof window !== 'undefined' && (
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1' ||
+  window.location.protocol === 'file:'
+);
+
+const API_BASE_URL = IS_LOCAL_ENV ? LOCAL_API_URL : PRODUCTION_API_URL;
 
 const ApiClient = {
   baseUrl: API_BASE_URL,
+  isLocal: IS_LOCAL_ENV,
 
   getToken() {
     return localStorage.getItem('tea_token');

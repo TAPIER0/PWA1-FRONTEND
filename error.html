@@ -296,7 +296,7 @@
       '500': {
         badge: 'Error 500 — Servicio no disponible',
         title: 'El servidor no está respondiendo',
-        desc: 'No pudimos comunicarnos con la base de datos o el backend de TeaLearning (http://localhost:5264). Verifica que la API esté encendida e inténtalo de nuevo.',
+        desc: `No pudimos comunicarnos con la base de datos o el backend de TeaLearning (${(typeof ApiClient !== 'undefined' && ApiClient.baseUrl) ? ApiClient.baseUrl.replace(/\/api\/?$/, '') : 'API'}). Verifica que el servicio esté disponible e inténtalo de nuevo.`,
         icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>'
       },
       'offline': {

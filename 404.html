@@ -1,4 +1,19 @@
-<!-- Mirror de error.html para servidores estáticos -->
-<script>
-  window.location.replace('error.html' + window.location.search);
-</script>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirigiendo — TeaLearning</title>
+  <!-- Mirror de error.html para servidores estáticos (Cloudflare Pages) -->
+  <script>
+    (function () {
+      var search = window.location.search;
+      if (!search || search === '?') {
+        var missingPath = window.location.pathname || '/';
+        search = '?code=404&resource=' + encodeURIComponent(missingPath);
+      }
+      window.location.replace('/error.html' + search);
+    })();
+  </script>
+</head>
+<body></body>
+</html>

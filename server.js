@@ -32,7 +32,7 @@ function getSecurityHeaders(contentType, isNoStore = false) {
     'X-Frame-Options': 'DENY',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net data:; img-src 'self' data: blob: http://localhost:5264 http://localhost:5066 https://localhost:7287; connect-src 'self' http://localhost:5264 http://localhost:5066 https://localhost:7287;"
+    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net data:; img-src 'self' data: blob: http://localhost:5264 http://localhost:5066 https://localhost:7287 https://*.azurewebsites.net; connect-src 'self' http://localhost:5264 http://localhost:5066 https://localhost:7287 https://*.azurewebsites.net;"
   };
   if (isNoStore) {
     headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
