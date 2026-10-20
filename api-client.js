@@ -48,7 +48,19 @@ const ApiClient = {
 
   logout() {
     this.clearSession();
-    window.location.replace('login.html');
+    window.location.replace('/login.html');
+  },
+
+  redirectToError(code, extraParams = {}) {
+    const params = new URLSearchParams({ code: String(code) });
+    const currentResource = extraParams.resource || (window.location.pathname + window.location.search);
+    if (currentResource && !/^\/?(error|404)(\.html)?/i.test(currentResource)) {
+      params.set('resource', currentResource);
+    }
+    if (extraParams.roles) {
+      params.set('roles', extraParams.roles);
+    }
+    window.location.replace('/error.html?' + params.toString());
   },
 
   requireAuth(allowedRoles = []) {
@@ -58,7 +70,7 @@ const ApiClient = {
       window.addEventListener('pageshow', (event) => {
         if (event.persisted || !this.getToken() || !this.getUser()) {
           if (!this.getToken() || !this.getUser()) {
-            window.location.replace('login.html');
+            this.redirectToError('401');
           }
         }
       });
@@ -68,7 +80,7 @@ const ApiClient = {
     const user = this.getUser();
 
     if (!token || !user) {
-      window.location.replace('login.html');
+      this.redirectToError('401');
       return false;
     }
 
@@ -76,7 +88,7 @@ const ApiClient = {
       const roles = user.roles || [];
       const hasRole = roles.some(r => allowedRoles.includes(r));
       if (!hasRole) {
-        window.location.replace('error.html?code=403&roles=' + encodeURIComponent(roles.join(',')));
+        this.redirectToError('403', { roles: roles.join(',') });
         return false;
       }
     }
@@ -87,15 +99,15 @@ const ApiClient = {
   redirectToRoleHome(user) {
     const roles = (user && user.roles) ? user.roles : [];
     if (roles.includes('Estudiante')) {
-      window.location.replace('Interfaz_Estudiante.html');
+      window.location.replace('/Interfaz_Estudiante.html');
     } else if (roles.includes('Acudiente')) {
-      window.location.replace('Interfaz_Acudiente.html');
+      window.location.replace('/Interfaz_Acudiente.html');
     } else if (roles.includes('Docente') || roles.includes('Profesor')) {
-      window.location.replace('Interfaz_Docente.html');
+      window.location.replace('/Interfaz_Docente.html');
     } else if (roles.includes('Administrador')) {
-      window.location.replace('Interfaz_Admin.html');
+      window.location.replace('/Interfaz_Admin.html');
     } else {
-      window.location.replace('login.html');
+      window.location.replace('/login.html');
     }
   },
 
@@ -174,8 +186,12 @@ const ApiClient = {
           return this.request(endpoint, options, true);
         }
         this.clearSession();
-        window.location.replace('login.html');
+        this.redirectToError('401');
         throw new Error('Sesión expirada o no autorizada.');
+      }
+
+      if (response.status >= 500 && !options.suppressErrorRedirect) {
+        this.redirectToError('500', { resource: endpoint });
       }
 
       if (response.status === 204) {
@@ -197,6 +213,9 @@ const ApiClient = {
       return { ok: response.ok, status: response.status, data: json };
     } catch (err) {
       console.error(`[API Error] Error en llamada a ${url}:`, err);
+      if (typeof navigator !== 'undefined' && navigator.onLine === false && !options.suppressErrorRedirect) {
+        this.redirectToError('offline');
+      }
       throw err;
     }
   },
@@ -279,7 +298,7 @@ const ApiClient = {
   initAvatarFeature(options = {}) {
     const triggerSelector = options.triggerSelector || '.brand-mark, .avatar';
     const shape = options.shape || 'rounded'; // 'circle' | 'rounded'
-    const extraSelectors = options.extraSelectors || ['.admin-avatar'];
+    const extraSelectors = options.extraSelectors || [];
 
     // Inyectar estilos necesarios una sola vez
     if (!document.getElementById('tea-avatar-styles')) {
@@ -601,3 +620,14 @@ const ApiClient = {
     });
   }
 };
+
+// Detección global de pérdida de conexión (offline) para activar error.html?code=offline igual que 403
+if (typeof window !== 'undefined' && !window._teaOfflineListenerAttached) {
+  window._teaOfflineListenerAttached = true;
+  window.addEventListener('offline', () => {
+    const path = window.location.pathname || '';
+    if (!/^\/?(error|404)(\.html)?$/i.test(path)) {
+      ApiClient.redirectToError('offline');
+    }
+  });
+}

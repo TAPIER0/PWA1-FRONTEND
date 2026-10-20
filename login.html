@@ -464,9 +464,11 @@
     } catch (err) {
       submitBtn.disabled = false;
       console.error('Error al conectar:', err);
-      status.textContent = 'No se pudo conectar con el servidor (http://localhost:5264). Asegúrate de que el backend esté ejecutándose.';
+      const hostDisplay = (typeof ApiClient !== 'undefined' && ApiClient.baseUrl) ? ApiClient.baseUrl : 'el servidor';
+      status.textContent = `No se pudo conectar con ${hostDisplay}. Asegúrate de contar con conexión a internet y que el servicio esté disponible.`;
     }
   });
 </script>
 </body>
 </html>
+

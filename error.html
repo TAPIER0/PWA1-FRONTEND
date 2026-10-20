@@ -197,7 +197,7 @@
     text-align: center;
   }
 </style>
-<script src="api-client.js"></script>
+<script src="/api-client.js"></script>
 </head>
 <body>
 
@@ -230,7 +230,7 @@
     </div>
 
     <div class="actions">
-      <a href="login.html" class="btn btn-primary" id="btn-login">
+      <a href="/login.html" class="btn btn-primary" id="btn-login">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
           <polyline points="10 17 15 12 10 7"></polyline>
@@ -268,9 +268,15 @@
     if (currentPath === '{{RESOURCE_PATH}}' || !currentPath) {
       currentPath = params.get('resource') || window.location.pathname;
     }
-    if (currentPath && currentPath !== '/' && !currentPath.includes('error.html') && !currentPath.includes('404.html')) {
+    const isErrorSelf = /^\/?(error|404)(\.html)?$/i.test(currentPath);
+    if (currentPath && currentPath !== '/' && !isErrorSelf) {
       resourcePath.textContent = currentPath;
       resourceBox.classList.add('visible');
+      if (!window.location.search.includes('code=')) {
+        try {
+          window.history.replaceState(null, '', '/error.html?code=' + encodeURIComponent(code) + '&resource=' + encodeURIComponent(currentPath));
+        } catch (e) {}
+      }
     }
 
     // Configurar contenidos amigables según el código de error
@@ -316,10 +322,13 @@
 
     // Acción del botón volver
     btnBack.addEventListener('click', () => {
-      if (window.history.length > 1) {
+      const targetResource = params.get('resource');
+      if ((code === 'offline' || code === '500') && targetResource && targetResource.startsWith('/')) {
+        window.location.replace(targetResource);
+      } else if (window.history.length > 1) {
         window.history.back();
       } else {
-        window.location.replace('login.html');
+        window.location.replace('/login.html');
       }
     });
 
@@ -327,7 +336,7 @@
     try {
       const user = ApiClient.getUser();
       const token = ApiClient.getToken();
-      if (token && user) {
+      if (token && user && code !== '401') {
         const btnLogin = document.getElementById('btn-login');
         btnLogin.textContent = 'Ir a mi interfaz (' + ((user.roles && user.roles[0]) || 'Inicio') + ')';
         btnLogin.addEventListener('click', (e) => {
