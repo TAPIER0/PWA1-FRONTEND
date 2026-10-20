@@ -280,19 +280,72 @@ const ApiClient = {
     }
   },
 
+  getUserDisplayName(user) {
+    const u = user || this.getUser() || {};
+    const full = u.nombreCompleto || u.fullName || u.name ||
+      [u.nombres, u.apellidos].filter(Boolean).join(' ') ||
+      [u.firstName, u.lastName].filter(Boolean).join(' ');
+    return typeof full === 'string' ? full.trim() : '';
+  },
+
+  // Iniciales (máx. 2) a partir del nombre: "Laura Gómez" -> "LG"
+  getUserInitials(user) {
+    const name = this.getUserDisplayName(user);
+    const words = (name.match(/[\p{L}\p{N}]+/gu) || []);
+    if (!words.length) return '';
+    const first = Array.from(words[0])[0];
+    const last = words.length > 1 ? Array.from(words[words.length - 1])[0] : '';
+    return (first + last).toLocaleUpperCase('es');
+  },
+
+  // Fallback visual: iniciales sobre verde institucional (#2F6E5C) o silueta SVG si no hay nombre.
+  buildAvatarFallback(user) {
+    const initials = this.getUserInitials(user);
+    const el = document.createElement('span');
+    el.className = 'tea-avatar-fallback';
+    el.setAttribute('aria-hidden', 'true');
+    if (initials) {
+      el.textContent = initials;
+    } else {
+      el.innerHTML =
+        '<svg viewBox="0 0 24 24" width="60%" height="60%" focusable="false" aria-hidden="true">' +
+        '<circle cx="12" cy="8.5" r="4" fill="currentColor"/>' +
+        '<path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z" fill="currentColor"/></svg>';
+    }
+    return el;
+  },
+
   renderAvatar(container, avatarUrl) {
     if (!container) return;
+    const user = this.getUser();
+    const name = this.getUserDisplayName(user);
+    const token = (container._teaAvatarToken || 0) + 1;
+    container._teaAvatarToken = token;
+
     container.innerHTML = '';
-    if (avatarUrl) {
-      container.style.overflow = 'hidden';
-      const img = document.createElement('img');
-      img.src = this.resolveAvatarUrl(avatarUrl);
-      img.alt = 'Foto de perfil';
-      img.className = 'tea-avatar-img';
+    container.style.overflow = 'hidden';
+    container.style.containerType = 'inline-size';
+    container.appendChild(this.buildAvatarFallback(user));
+
+    const src = avatarUrl ? this.resolveAvatarUrl(avatarUrl) : '';
+    if (!src) return;
+
+    // La imagen se carga fuera del DOM: solo reemplaza al fallback si carga bien,
+    // de modo que nunca se vea el ícono de imagen rota ni el texto alt.
+    const img = new Image();
+    img.className = 'tea-avatar-img';
+    img.alt = name ? `Foto de perfil de ${name}` : 'Foto de perfil';
+    img.decoding = 'async';
+    img.onload = () => {
+      if (container._teaAvatarToken !== token) return;
+      container.innerHTML = '';
       container.appendChild(img);
-    } else {
-      container.style.overflow = '';
-    }
+    };
+    img.onerror = () => {
+      if (container._teaAvatarToken !== token) return;
+      console.warn('[Avatar] No se pudo cargar la foto de perfil; se usa el avatar de iniciales.');
+    };
+    img.src = src;
   },
 
   initAvatarFeature(options = {}) {
@@ -311,6 +364,26 @@ const ApiClient = {
           object-fit: cover;
           display: block;
           border-radius: inherit;
+        }
+        .tea-avatar-fallback {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #2F6E5C;
+          color: #FFFFFF; /* contraste 5.99:1 (AA); texto >= 18.66px en negrita cumple AAA para texto grande */
+          font-family: inherit;
+          font-size: 19px;
+          font-size: 40cqw;
+          font-weight: 700;
+          line-height: 1;
+          letter-spacing: 0.02em;
+          border-radius: inherit;
+          user-select: none;
+        }
+        @media (forced-colors: active) {
+          .tea-avatar-fallback { background: Canvas; color: CanvasText; border: 2px solid CanvasText; box-sizing: border-box; }
         }
         .tea-avatar-clickable {
           cursor: pointer !important;
@@ -596,9 +669,7 @@ const ApiClient = {
 
     // Renderizar avatar inicial si existe en sesión
     const initialUser = ApiClient.getUser();
-    if (initialUser && initialUser.avatarUrl) {
-      updateAllAvatars(initialUser.avatarUrl);
-    }
+    updateAllAvatars(initialUser ? initialUser.avatarUrl : null);
 
     // Sincronizar en segundo plano con el servidor
     ApiClient.getMe().then(res => {
