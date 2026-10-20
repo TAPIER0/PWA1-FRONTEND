@@ -1044,27 +1044,50 @@
     .pwa1-doc-diagram-viewport {
       position: relative;
       width: 100%;
-      aspect-ratio: 16 / 9;
-      background:
-        linear-gradient(90deg, rgba(47,110,92,0.06) 1px, transparent 1px) 0 0 / 24px 24px,
-        linear-gradient(rgba(47,110,92,0.06) 1px, transparent 1px) 0 0 / 24px 24px,
-        var(--pwa1-surface-alt);
-      border: 2px dashed var(--pwa1-primary);
+      background: #FFFFFF;
+      border: none;
       border-radius: var(--pwa1-radius-sm);
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 0;
       text-align: center;
+      cursor: zoom-in;
     }
 
     .pwa1-doc-diagram-viewport img.pwa1-doc-diagram-img {
       width: 100%;
-      height: 100%;
+      height: auto;
+      max-height: 850px;
       object-fit: contain;
       display: block;
       background: #FFFFFF;
+      border-radius: var(--pwa1-radius-sm);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      transition: transform 0.15s ease;
+    }
+
+    .pwa1-doc-diagram-viewport:hover img.pwa1-doc-diagram-img {
+      transform: scale(1.008);
+    }
+
+    /* Grilla de Diagramas: 1 columna por defecto para aprovechar el 100% del espacio */
+    .pwa1-doc-diagrams-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    .pwa1-doc-diagrams-grid[data-cols="2"] {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .pwa1-doc-diagrams-grid[data-cols="2"] {
+        grid-template-columns: 1fr;
+      }
     }
 
     .pwa1-doc-diagram-skeleton {
@@ -1198,11 +1221,11 @@
       color: var(--pwa1-text, #171B19);
       border: 2px solid var(--pwa1-primary, #2F6E5C);
       border-radius: 16px;
-      max-width: 1060px;
-      width: 100%;
-      max-height: 90vh;
+      max-width: 1320px;
+      width: 96vw;
+      max-height: 94vh;
       overflow-y: auto;
-      padding: 28px;
+      padding: 24px;
       box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
     }
 
@@ -1691,18 +1714,32 @@
            ==================================================================== -->
       <div class="pwa1-doc-panel" role="tabpanel" id="pwa1-tab-panel-5" aria-labelledby="pwa1-tab-btn-5" tabindex="0">
         <div class="pwa1-doc-card" style="margin-bottom: 20px;">
-          <h3>Repositorio Visual de Diagramas de Ingeniería (Con Visor Lightbox Accesible)</h3>
-          <p>
-            Cada contenedor cuenta con proporción panorámica <span class="pwa1-doc-code-inline">16:9</span>, guía de resolución recomendada y soporte de ampliación en pantalla completa (<em>Lightbox</em>) mediante clic o teclado (<span class="pwa1-doc-code-inline">Enter</span> / <span class="pwa1-doc-code-inline">Escape</span>). Reemplaza o descomenta la etiqueta <span class="pwa1-doc-code-inline">&lt;img&gt;</span> señalada en cada bloque para mostrar tus diagramas oficiales.
-          </p>
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+            <div style="max-width:76ch;">
+              <h3 style="margin:0 0 6px;">Repositorio Visual de Diagramas de Ingeniería</h3>
+              <p style="margin:0;">
+                Visualización ampliada al 100% del espacio disponible, adaptable a cualquier proporción gráfica y optimizada para proyección técnica en auditorio. Haz clic en cualquier diagrama o presiona <span class="pwa1-doc-code-inline">Enter</span> para abrir el visor Lightbox en pantalla completa.
+              </p>
+            </div>
+            <div class="pwa1-doc-controls" style="padding:6px 10px; margin:0;" role="group" aria-label="Distribución de columnas para diagramas">
+              <button type="button" class="pwa1-doc-ctrl-btn" id="pwa1-btn-diag-cols-1" aria-pressed="true" title="Mostrar diagramas en 1 columna (ancho completo)">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                <span>1 Columna (100% Ancho)</span>
+              </button>
+              <button type="button" class="pwa1-doc-ctrl-btn" id="pwa1-btn-diag-cols-2" aria-pressed="false" title="Mostrar diagramas en 2 columnas">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="8" height="18" rx="1"/><rect x="13" y="3" width="8" height="18" rx="1"/></svg>
+                <span>2 Columnas</span>
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div class="pwa1-doc-grid-2">
+        <div class="pwa1-doc-diagrams-grid" id="pwa1-diagrams-grid" data-cols="1">
           <!-- DIAGRAMA 1: ARQUITECTURA GENERAL -->
           <figure class="pwa1-doc-diagram-card">
             <div class="pwa1-doc-diagram-head">
               <div>
-                <span class="pwa1-doc-badge pwa1-doc-badge-primary">Figura 1 · Resolución sugerida: 1920 × 1080 px (16:9)</span>
+                <span class="pwa1-doc-badge pwa1-doc-badge-primary">Figura 1</span>
                 <h4 style="margin-top:8px;">Diagrama de Arquitectura General y Despliegue Cloud</h4>
               </div>
               <button type="button" class="pwa1-doc-ctrl-btn pwa1-btn-expand-diagram" data-diagram-target="pwa1-diag-1" aria-label="Ampliar Figura 1: Diagrama de Arquitectura General">
@@ -1712,12 +1749,7 @@
             <div class="pwa1-doc-diagram-viewport" id="pwa1-diag-1" tabindex="0" role="button" aria-label="Contenedor del Diagrama de Arquitectura General. Presione Enter para ampliar en pantalla completa.">
               <!-- TODO: INSERTAR DIAGRAMA AQUÍ (Figura 1: Diagrama de Arquitectura General Clean Architecture .NET 9 + Cloudflare Pages / Azure) -->
               <!-- Descomenta la siguiente etiqueta <img> y reemplaza el atributo src con la ruta de tu imagen (ej. "assets/diagrama-arquitectura.png"): -->
-              <!-- <img class="pwa1-doc-diagram-img" src="RUTA_DE_TU_DIAGRAMA_ARQUITECTURA.png" alt="Diagrama de Arquitectura General de PWA1 mostrando Cloudflare Pages en el Frontend y las 4 capas de .NET 9 con Azure SQL Database en el Backend" loading="lazy" /> -->
-              <div class="pwa1-doc-diagram-skeleton">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 8h10"/><path d="M7 12h6"/></svg>
-                <strong>Espacio Reservado: Diagrama de Arquitectura General</strong>
-                <span style="font-size:13.5px; color:var(--pwa1-text-muted);">Clean Layered Architecture (<span class="pwa1-doc-code-inline">Api</span> → <span class="pwa1-doc-code-inline">Services</span> → <span class="pwa1-doc-code-inline">Data</span> → <span class="pwa1-doc-code-inline">Core</span>) + Frontend Vanilla en Cloudflare Pages.</span>
-              </div>
+              <img class="pwa1-doc-diagram-img" src="arquitectura-tealearning-diagrama.png" alt="Diagrama de Arquitectura General de PWA1 mostrando Cloudflare Pages en el Frontend y las 4 capas de .NET 9 con Azure SQL Database en el Backend" loading="lazy" /> 
             </div>
             <figcaption class="pwa1-doc-diagram-caption">
               <strong>Pie de figura técnico:</strong> Desacoplamiento cliente-servidor mediante REST sobre HTTPS, proxy inverso <span class="pwa1-doc-code-inline">ForwardedHeaders</span>, inyección de dependencias y persistencia resiliente en SQL Server.
@@ -1728,7 +1760,7 @@
           <figure class="pwa1-doc-diagram-card">
             <div class="pwa1-doc-diagram-head">
               <div>
-                <span class="pwa1-doc-badge pwa1-doc-badge-accent">Figura 2 · Resolución sugerida: 1920 × 1080 px (16:9)</span>
+                <span class="pwa1-doc-badge pwa1-doc-badge-accent">Figura 2</span>
                 <h4 style="margin-top:8px;">Modelo Entidad-Relación (SQL Server + Modelo Híbrido)</h4>
               </div>
               <button type="button" class="pwa1-doc-ctrl-btn pwa1-btn-expand-diagram" data-diagram-target="pwa1-diag-2" aria-label="Ampliar Figura 2: Modelo Entidad-Relación">
@@ -1738,12 +1770,7 @@
             <div class="pwa1-doc-diagram-viewport" id="pwa1-diag-2" tabindex="0" role="button" aria-label="Contenedor del Modelo Entidad-Relación. Presione Enter para ampliar en pantalla completa.">
               <!-- TODO: INSERTAR DIAGRAMA AQUÍ (Figura 2: Modelo Entidad-Relación de Base de Datos SQL Server) -->
               <!-- Descomenta la siguiente etiqueta <img> y reemplaza el atributo src con la ruta de tu imagen (ej. "assets/modelo-er.png"): -->
-              <!-- <img class="pwa1-doc-diagram-img" src="RUTA_DE_TU_MODELO_ER.png" alt="Modelo Entidad-Relación en SQL Server con ApplicationUser, StudentProfile, SensoryPreference, Activity, ActivityAssignment, ActivityExecution y PedagogicalNote" loading="lazy" /> -->
-              <div class="pwa1-doc-diagram-skeleton">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-                <strong>Espacio Reservado: Modelo Entidad-Relación (MER)</strong>
-                <span style="font-size:13.5px; color:var(--pwa1-text-muted);">11 tablas de dominio + Identity (<span class="pwa1-doc-code-inline">Guid</span>), columna híbrida <span class="pwa1-doc-code-inline">ConfigJson</span> e índices compuestos sin cascadas cíclicas.</span>
-              </div>
+              <img class="pwa1-doc-diagram-img" src="modelo-de-datos-tealearning-diagrama.png" alt="Modelo Entidad-Relación en SQL Server con ApplicationUser, StudentProfile, SensoryPreference, Activity, ActivityAssignment, ActivityExecution y PedagogicalNote" loading="lazy" /> 
             </div>
             <figcaption class="pwa1-doc-diagram-caption">
               <strong>Pie de figura técnico:</strong> Esquema Code-First en Entity Framework Core 9 con relaciones 1:1 (<span class="pwa1-doc-code-inline">StudentProfile ↔ SensoryPreference</span>) y 1:N protegidas con <span class="pwa1-doc-code-inline">DeleteBehavior.Restrict</span>.
@@ -1754,8 +1781,8 @@
           <figure class="pwa1-doc-diagram-card">
             <div class="pwa1-doc-diagram-head">
               <div>
-                <span class="pwa1-doc-badge pwa1-doc-badge-a11y">Figura 3 · Resolución sugerida: 1600 × 900 px (16:9)</span>
-                <h4 style="margin-top:8px;">Flujo de Autenticación JWT, RBAC y Recuperación Dual</h4>
+                <span class="pwa1-doc-badge pwa1-doc-badge-a11y">Figura 3</span>
+                <h4 style="margin-top:8px;">Ciclo de Vida de la Actividad</h4>
               </div>
               <button type="button" class="pwa1-doc-ctrl-btn pwa1-btn-expand-diagram" data-diagram-target="pwa1-diag-3" aria-label="Ampliar Figura 3: Flujo de Autenticación y Seguridad">
                 Ampliar
@@ -1764,12 +1791,7 @@
             <div class="pwa1-doc-diagram-viewport" id="pwa1-diag-3" tabindex="0" role="button" aria-label="Contenedor del Diagrama de Secuencia de Autenticación. Presione Enter para ampliar en pantalla completa.">
               <!-- TODO: INSERTAR DIAGRAMA AQUÍ (Figura 3: Diagrama de Secuencia de Autenticación JWT, Refresh Token y Recuperación de Contraseña) -->
               <!-- Descomenta la siguiente etiqueta <img> y reemplaza el atributo src con la ruta de tu imagen (ej. "assets/flujo-autenticacion.png"): -->
-              <!-- <img class="pwa1-doc-diagram-img" src="RUTA_DE_TU_DIAGRAMA_AUTENTICACION.png" alt="Diagrama de secuencia del flujo de login con BCrypt, emisión de JWT y Refresh Token, y recuperación dual por SMTP MailKit o Acudiente" loading="lazy" /> -->
-              <div class="pwa1-doc-diagram-skeleton">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                <strong>Espacio Reservado: Flujo de Autenticación y Seguridad</strong>
-                <span style="font-size:13.5px; color:var(--pwa1-text-muted);">Secuencia de validación BCrypt, expedición de JWT/RefreshToken, guardas RBAC y recuperación SMTP / Acudiente.</span>
-              </div>
+              <img class="pwa1-doc-diagram-img" src="ciclo-vida-actividad-diagrama.png" alt="Diagrama de secuencia del flujo de login con BCrypt, emisión de JWT y Refresh Token, y recuperación dual por SMTP MailKit o Acudiente" loading="lazy" /> 
             </div>
             <figcaption class="pwa1-doc-diagram-caption">
               <strong>Pie de figura técnico:</strong> Protección contra enumeración de cuentas, tokens firmados en fragmento URL (<span class="pwa1-doc-code-inline">#email&amp;token</span>) e invalidación inmediata de sesiones previas.
@@ -1780,8 +1802,8 @@
           <figure class="pwa1-doc-diagram-card">
             <div class="pwa1-doc-diagram-head">
               <div>
-                <span class="pwa1-doc-badge pwa1-doc-badge-primary">Figura 4 · Resolución sugerida: 1600 × 900 px (16:9)</span>
-                <h4 style="margin-top:8px;">Ciclo de Ejecución Adaptativa y Telemetría Cognitiva</h4>
+                <span class="pwa1-doc-badge pwa1-doc-badge-primary">Figura 4</span>
+                <h4 style="margin-top:8px;">Flujo dual de Contraseñas</h4>
               </div>
               <button type="button" class="pwa1-doc-ctrl-btn pwa1-btn-expand-diagram" data-diagram-target="pwa1-diag-4" aria-label="Ampliar Figura 4: Ciclo de Ejecución y Telemetría">
                 Ampliar
@@ -1790,12 +1812,7 @@
             <div class="pwa1-doc-diagram-viewport" id="pwa1-diag-4" tabindex="0" role="button" aria-label="Contenedor del Diagrama de Telemetría y Ejecución. Presione Enter para ampliar en pantalla completa.">
               <!-- TODO: INSERTAR DIAGRAMA AQUÍ (Figura 4: Flujo de Ejecución de Actividades HU-006 y Analítica Cognitiva HU-008) -->
               <!-- Descomenta la siguiente etiqueta <img> y reemplaza el atributo src con la ruta de tu imagen (ej. "assets/flujo-telemetria.png"): -->
-              <!-- <img class="pwa1-doc-diagram-img" src="RUTA_DE_TU_DIAGRAMA_TELEMETRIA.png" alt="Diagrama del flujo entre configuración sensorial del acudiente, ejecución de actividad por el estudiante y tablero analítico del docente" loading="lazy" /> -->
-              <div class="pwa1-doc-diagram-skeleton">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
-                <strong>Espacio Reservado: Flujo Pedagógico y Telemetría</strong>
-                <span style="font-size:13.5px; color:var(--pwa1-text-muted);">Sincronización entre <span class="pwa1-doc-code-inline">POST /activities/{id}/start</span>, captura de tiempos en cliente (<span class="pwa1-doc-code-inline">/submit</span>) y agregación analítica docente.</span>
-              </div>
+              <img class="pwa1-doc-diagram-img" src="flujo-dual-contraseñas-diagrama.png" alt="Diagrama del flujo entre configuración sensorial del acudiente, ejecución de actividad por el estudiante y tablero analítico del docente" loading="lazy" /> 
             </div>
             <figcaption class="pwa1-doc-diagram-caption">
               <strong>Pie de figura técnico:</strong> El inicio de cada actividad inyecta las adaptaciones sensoriales vigentes y el envío registra tiempos e intentos para calcular alertas tempranas (&lt; 60%).
@@ -1811,18 +1828,7 @@
         <div class="pwa1-doc-qr-hero">
           <!-- CONTENEDOR 1:1 DEL CÓDIGO QR -->
           <div class="pwa1-doc-qr-frame" id="pwa1-qr-main-container" aria-label="Espacio reservado en proporción 1 a 1 para el código QR de prueba en vivo">
-            <!-- TODO: INSERTAR QR AQUÍ (Proporción recomendada: 1:1 cuadrada, ej. 600 × 600 px en PNG o SVG) -->
-            <!-- Descomenta la siguiente etiqueta <img> y reemplaza el atributo src con la ruta o URL de tu código QR: -->
-            <!-- <img class="pwa1-doc-qr-img" src="RUTA_DE_TU_CODIGO_QR.png" alt="Código QR para abrir y evaluar en vivo la plataforma Sendero TeaLearning desde dispositivos móviles" /> -->
-            <div class="pwa1-doc-qr-placeholder">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-                <rect x="5.5" y="5.5" width="2" height="2"/><rect x="16.5" y="5.5" width="2" height="2"/><rect x="5.5" y="16.5" width="2" height="2"/>
-                <path d="M14 14h3v3h-3zM18 18h3v3h-3zM18 14h3M14 19h2"/>
-              </svg>
-              <strong style="font-size:16px; color:#171B19;">Espacio QR (1:1)</strong>
-              <span style="font-size:13px; color:#4A544F;">Reemplaza el comentario <code style="font-weight:700;">TODO: INSERTAR QR AQUÍ</code> por tu imagen QR (600×600 px).</span>
-            </div>
+            <img class="pwa1-doc-qr-img" src="qr-url.png" alt="Código QR para abrir y evaluar en vivo la plataforma Sendero TeaLearning desde dispositivos móviles" /> 
           </div>
 
           <!-- LLAMADO A LA ACCIÓN Y CREDENCIALES PARA JURADOS Y PARES -->
@@ -2100,7 +2106,7 @@
           const caption = card ? card.querySelector('figcaption')?.innerHTML : '';
           if (viewport) {
             openModal(heading || 'Diagrama', `
-              <div class="pwa1-doc-diagram-viewport" style="aspect-ratio:16/9; margin-bottom:14px;">${viewport.innerHTML}</div>
+              <div class="pwa1-doc-diagram-viewport" style="margin-bottom:14px; padding:0; border:none; background:transparent;">${viewport.innerHTML}</div>
               <div style="font-size:15px; color:#4A544F;">${caption}</div>
             `);
           }
@@ -2144,6 +2150,25 @@
             </div>
           </div>
         `);
+      }
+
+      // Selector de columnas de diagramas (1 Columna 100% vs 2 Columnas)
+      const btnDiag1 = document.getElementById('pwa1-btn-diag-cols-1');
+      const btnDiag2 = document.getElementById('pwa1-btn-diag-cols-2');
+      const diagGrid = document.getElementById('pwa1-diagrams-grid');
+      if (btnDiag1 && btnDiag2 && diagGrid) {
+        btnDiag1.addEventListener('click', () => {
+          diagGrid.setAttribute('data-cols', '1');
+          btnDiag1.setAttribute('aria-pressed', 'true');
+          btnDiag2.setAttribute('aria-pressed', 'false');
+          announce('Vista de diagramas en 1 columna de ancho completo.');
+        });
+        btnDiag2.addEventListener('click', () => {
+          diagGrid.setAttribute('data-cols', '2');
+          btnDiag2.setAttribute('aria-pressed', 'true');
+          btnDiag1.setAttribute('aria-pressed', 'false');
+          announce('Vista de diagramas en 2 columnas.');
+        });
       }
 
       const btnQr1 = document.getElementById('pwa1-btn-open-qr-modal');

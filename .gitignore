@@ -35,6 +35,7 @@ lerna-debug.log*
 .env.production.local
 *.env
 !.env.example
+.archify
 
 # --------------------------------------------------------------------
 # 4. Salidas de Compilación y Bundlers (Vite, Webpack, Parcel, etc.)
