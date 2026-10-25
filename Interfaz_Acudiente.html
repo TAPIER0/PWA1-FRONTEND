@@ -826,10 +826,8 @@
   }
 
   const user = ApiClient.getUser();
-  const currentGuardianName = user ? `${user.nombres} ${user.apellidos}`.trim() : 'Carlos Pérez';
-  let students = [
-    { id: 'd8442234-630f-4339-a26f-25a1aecff7db', name: 'Mateo Pérez (EST-TEA-001)' }
-  ];
+  const currentGuardianName = user ? `${user.nombres} ${user.apellidos}`.trim() : 'Acudiente';
+  let students = [];
 
   // "Base de datos" en memoria para respaldo
   const savedPrefsByStudent = {};
@@ -853,6 +851,16 @@
       if (!el) return;
       const prevVal = el.value;
       el.innerHTML = '';
+      if (students.length === 0) {
+        const emptyOpt = document.createElement('option');
+        emptyOpt.value = '';
+        emptyOpt.textContent = 'Sin estudiantes vinculados';
+        el.appendChild(emptyOpt);
+        el.value = '';
+        el.disabled = true;
+        return;
+      }
+      el.disabled = false;
       students.forEach(s => {
         const opt = document.createElement('option');
         opt.value = s.id;
@@ -861,15 +869,19 @@
       });
       if (prevVal && students.some(s => String(s.id) === String(prevVal))) {
         el.value = prevVal;
-      } else if (students.length > 0) {
+      } else {
         el.value = students[0].id;
       }
     });
+    const saveBtn = document.getElementById('btn-save');
+    if (saveBtn) saveBtn.disabled = students.length === 0;
+    const secBtn = document.getElementById('sec-submit-btn');
+    if (secBtn) secBtn.disabled = students.length === 0;
   }
 
   populateAllStudentSelects();
 
-  let currentPrefs = defaultPrefs(students[0].id);
+  let currentPrefs = defaultPrefs('');
  
   // ---------- Construir grid de paletas ----------
   const paletteGrid = document.getElementById('palette-grid');
@@ -966,6 +978,7 @@
     volumeInput.disabled = !currentPrefs.audio.soundsEnabled;
     volumeOutput.textContent = currentPrefs.audio.volume + '%';
     warningSecondsInput.value = currentPrefs.timers.warningSeconds;
+    warningSecondsInput.disabled = currentPrefs.timers.mode === 'sin-temporizador';
     updatePreview();
   }
  
@@ -1002,18 +1015,46 @@
     if(currentPrefs.timers.mode !== 'sin-temporizador'){
       tags.push(`🔔 Aviso ${currentPrefs.timers.warningSeconds}s antes`);
     }
+    if (warningSecondsInput) {
+      warningSecondsInput.disabled = currentPrefs.timers.mode === 'sin-temporizador';
+    }
     previewTags.innerHTML = tags.map(t => `<span class="preview-tag">${t}</span>`).join('');
+  }
+
+  if (pfBtn) {
+    pfBtn.addEventListener('click', () => {
+      const modeDesc = currentPrefs.timers.mode === 'sin-temporizador'
+        ? 'sin límite de tiempo'
+        : currentPrefs.timers.mode === 'tiempo-extendido'
+          ? `con tiempo extendido y aviso previo de ${currentPrefs.timers.warningSeconds} s`
+          : `con tiempo estándar y aviso previo de ${currentPrefs.timers.warningSeconds} s`;
+      setStatus(`Vista previa: el botón «Continuar» avanzaría al siguiente paso ${modeDesc}.`, 'ok');
+    });
   }
 
   // ---------- Selección y Carga de Estudiante ----------
   async function loadStudent(studentId){
+    if (!studentId) {
+      currentPrefs = defaultPrefs('');
+      loadFormFromPrefs();
+      updateSaveMeta();
+      setStatus('Aún no tienes estudiantes vinculados a tu cuenta. Solicita la vinculación al administrador.');
+      return;
+    }
     setStatus('Cargando preferencias sensoriales del estudiante...');
     try {
-      const res = await ApiClient.request(`/students/${studentId}/sensory-preferences`);
-      if (res.ok && res.data.success) {
+      const res = await ApiClient.request(`/students/${encodeURIComponent(studentId)}/sensory-preferences`);
+      if (res.ok && res.data && res.data.success) {
         const sp = res.data.data;
         const paletteBackendToFront = { 'PastelSuave': 'verde', 'NeutroCalmante': 'neutro', 'Lavanda': 'lavanda', 'Arena': 'arena' };
         const fontScaleBackendToFront = { 1: 'pequeno', 2: 'normal', 3: 'grande', 4: 'muy-grande' };
+        const validTimerModes = ['sin-temporizador', 'tiempo-extendido', 'estandar'];
+        const resolvedMode = validTimerModes.includes(sp.modoTemporizador)
+          ? sp.modoTemporizador
+          : (sp.ocultarTemporizadores ? 'sin-temporizador' : 'tiempo-extendido');
+        const resolvedWarn = (sp.segundosAvisoPrevio !== undefined && sp.segundosAvisoPrevio !== null)
+          ? Math.min(60, Math.max(0, Number(sp.segundosAvisoPrevio)))
+          : 15;
 
         currentPrefs = {
           studentId,
@@ -1027,17 +1068,17 @@
             volume: (sp.volumenAudio !== undefined && sp.volumenAudio !== null) ? sp.volumenAudio : 60,
             textToSpeech: Boolean(sp.textoAVoz)
           },
-          reduceMotion: sp.animacionesReducidas,
+          reduceMotion: Boolean(sp.animacionesReducidas),
           timers: {
-            mode: sp.ocultarTemporizadores ? 'sin-temporizador' : 'tiempo-extendido',
-            warningSeconds: 15
+            mode: resolvedMode,
+            warningSeconds: resolvedWarn
           },
           updatedAt: new Date().toISOString()
         };
         setStatus('Preferencias cargadas desde el servidor.', 'ok');
       } else {
         currentPrefs = defaultPrefs(studentId);
-        setStatus('Preferencias por defecto cargadas.');
+        setStatus(ApiClient.extractErrorMessage(res, 'Preferencias por defecto cargadas.'));
       }
     } catch (err) {
       console.warn('Error al cargar preferencias del backend:', err);
@@ -1090,46 +1131,55 @@
 
   // ---------- Guardar en .NET 9 ----------
   document.getElementById('btn-save').addEventListener('click', async () => {
+    if (!currentPrefs.studentId) {
+      setStatus('Selecciona un estudiante vinculado antes de guardar.', 'error');
+      return;
+    }
     const saveBtn = document.getElementById('btn-save');
     saveBtn.disabled = true;
     setStatus('Guardando cambios en el servidor...');
 
     const paletteFrontToBackend = { 'verde': 'PastelSuave', 'neutro': 'NeutroCalmante', 'lavanda': 'Lavanda', 'arena': 'Arena' };
     const fontScaleFrontToBackend = { 'pequeno': 1, 'normal': 2, 'grande': 3, 'muy-grande': 4 };
+    const clampedWarn = Math.min(60, Math.max(0, Math.round(Number(currentPrefs.timers.warningSeconds) || 0)));
+    currentPrefs.timers.warningSeconds = clampedWarn;
+    if (warningSecondsInput) warningSecondsInput.value = clampedWarn;
 
     const payload = {
       paletaColor: paletteFrontToBackend[currentPrefs.palette] || 'PastelSuave',
       tipografia: currentPrefs.tipografia || 'Atkinson Hyperlegible',
       mayorEspacioEntreLetras: Boolean(currentPrefs.letterSpacing),
       audioActivo: Boolean(currentPrefs.audio.soundsEnabled),
-      volumenAudio: Number(currentPrefs.audio.volume),
+      volumenAudio: Math.min(100, Math.max(0, Math.round(Number(currentPrefs.audio.volume) || 0))),
       textoAVoz: Boolean(currentPrefs.audio.textToSpeech),
       animacionesReducidas: Boolean(currentPrefs.reduceMotion),
       nivelEscalaFuente: fontScaleFrontToBackend[currentPrefs.fontSize] || 2,
       modoContraste: 1,
-      ocultarTemporizadores: currentPrefs.timers.mode === 'sin-temporizador'
+      ocultarTemporizadores: currentPrefs.timers.mode === 'sin-temporizador',
+      modoTemporizador: currentPrefs.timers.mode || 'tiempo-extendido',
+      segundosAvisoPrevio: clampedWarn
     };
 
     try {
-      const res = await ApiClient.request(`/students/${currentPrefs.studentId}/sensory-preferences`, {
+      const res = await ApiClient.request(`/students/${encodeURIComponent(currentPrefs.studentId)}/sensory-preferences`, {
         method: 'PUT',
-        body: JSON.stringify(payload)
+        body: payload
       });
 
       saveBtn.disabled = false;
-      if (res.ok && res.data.success) {
+      if (res.ok && res.data && res.data.success) {
         currentPrefs.updatedAt = new Date().toISOString();
         updateSaveMeta();
         const student = students.find(s => s.id === currentPrefs.studentId);
         const sName = student ? student.name : 'el estudiante';
-        setStatus(`¡Preferencias guardadas exitosamente en el backend! Se aplicarán en el panel de ${sName}.`, 'ok');
+        setStatus(`¡Preferencias guardadas exitosamente! Se aplicarán en el panel de ${sName}.`, 'ok');
       } else {
-        setStatus(res.data?.message || 'Error al guardar los datos.', 'error');
+        setStatus(ApiClient.extractErrorMessage(res, 'Error al guardar las preferencias sensoriales.'), 'error');
       }
     } catch (err) {
       saveBtn.disabled = false;
       console.error('Error al guardar en el servidor:', err);
-      setStatus('Error de conexión con el backend (http://localhost:5264).', 'error');
+      setStatus('Error de conexión con el servidor. Verifica tu conexión a internet e inténtalo nuevamente.', 'error');
     }
   });
 
@@ -1373,6 +1423,15 @@
   // ---------- Carga de datos ----------
   async function loadProgress(){
     const studentId = progressStudent.value;
+    if (!studentId) {
+      renderStudentHeader('');
+      progressNotice.hidden = false;
+      progressNotice.textContent = 'Aún no tienes estudiantes vinculados para consultar progreso.';
+      historyGroups.innerHTML = '';
+      historyCount.textContent = '0 registros';
+      historyMore.hidden = true;
+      return;
+    }
     renderStudentHeader(studentId);   // el nombre se ve de inmediato, antes de que lleguen los datos
     const period = progressPeriod(Number(progressRange.value));
     const qs = `?desde=${isoDate(period.desde)}&hasta=${isoDate(period.hasta)}`;
@@ -1880,6 +1939,16 @@
 
   async function loadNotes(){
     const studentId = notesStudent.value;
+    if (!studentId) {
+      document.getElementById('notes-student-name').textContent = 'Sin estudiantes vinculados';
+      document.getElementById('notes-student-initials').textContent = '—';
+      document.getElementById('notes-student-code').hidden = true;
+      notesNotice.hidden = false;
+      notesNotice.textContent = 'Aún no tienes estudiantes vinculados para consultar observaciones.';
+      notesTimeline.innerHTML = '';
+      notesCount.textContent = '0 observaciones';
+      return;
+    }
     const info = studentInfo(studentId);
     const reqId = ++notesRequestId;
 
@@ -2103,6 +2172,11 @@
         if (secNewPw) secNewPw.focus();
         return;
       }
+      if (new TextEncoder().encode(newPw).length > 72) {
+        showSecurityFeedback('La nueva contraseña no puede superar los 72 caracteres.', 'error');
+        if (secNewPw) secNewPw.focus();
+        return;
+      }
       if (newPw !== confirmPw) {
         showSecurityFeedback('Las contraseñas no coinciden. Verifica que ambas sean iguales.', 'error');
         if (secConfirmPw) secConfirmPw.focus();
@@ -2114,7 +2188,15 @@
       secSubmitBtn.textContent = 'Guardando…';
 
       try {
-        await ApiClient.resetStudentPassword(studentId, newPw, confirmPw);
+        const res = await ApiClient.resetStudentPassword(studentId, newPw, confirmPw);
+        if (!res || !res.ok || !res.data || !res.data.success) {
+          const errMsg = ApiClient.extractErrorMessage(
+            res,
+            'No se pudo actualizar la contraseña del estudiante.'
+          );
+          showSecurityFeedback(errMsg, 'error');
+          return;
+        }
         const info = studentInfo(studentId);
         if (secNewPw) secNewPw.value = '';
         if (secConfirmPw) secConfirmPw.value = '';
@@ -2124,7 +2206,7 @@
         const msg = (err && err.message) ? err.message : 'No se pudo actualizar la contraseña del estudiante. Verifica tu conexión con el servidor.';
         showSecurityFeedback(msg, 'error');
       } finally {
-        secSubmitBtn.disabled = false;
+        secSubmitBtn.disabled = students.length === 0;
         secSubmitBtn.textContent = originalLabel;
       }
     });
@@ -2133,10 +2215,9 @@
   // ---------- Inicializar ----------
   async function initStudents() {
     try {
-      const res = await ApiClient.getStudents();
-      const list = (res && Array.isArray(res.data)) ? res.data : (Array.isArray(res) ? res : []);
-      if (list.length > 0) {
-        students = list.map(s => {
+      const res = await ApiClient.request('/students');
+      if (res && res.ok && res.data && res.data.success && Array.isArray(res.data.data)) {
+        students = res.data.data.map(s => {
           const fullName = s.nombre || s.nombreCompleto || `${s.nombres || ''} ${s.apellidos || ''}`.trim() || 'Estudiante';
           const code = s.codigoEstudiante || '';
           return {
@@ -2144,17 +2225,22 @@
             name: code ? `${fullName} (${code})` : fullName
           };
         });
-        populateAllStudentSelects();
+      } else {
+        students = [];
       }
     } catch(err) {
       console.warn('Carga inicial de estudiantes desde backend:', err);
+      students = [];
     }
+    populateAllStudentSelects();
     if (students.length > 0) {
       studentSelect.value = students[0].id;
       if (progressStudent) progressStudent.value = students[0].id;
       if (notesStudent) notesStudent.value = students[0].id;
       if (securityStudent) securityStudent.value = students[0].id;
       await loadStudent(students[0].id);
+    } else {
+      await loadStudent('');
     }
   }
 

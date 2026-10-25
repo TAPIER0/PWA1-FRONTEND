@@ -97,7 +97,7 @@ const ApiClient = {
   },
 
   redirectToRoleHome(user) {
-    const roles = (user && user.roles) ? user.roles : [];
+    const roles = (user && Array.isArray(user.roles)) ? user.roles : [];
     if (roles.includes('Estudiante')) {
       window.location.replace('/Interfaz_Estudiante.html');
     } else if (roles.includes('Acudiente')) {
@@ -107,8 +107,116 @@ const ApiClient = {
     } else if (roles.includes('Administrador')) {
       window.location.replace('/Interfaz_Admin.html');
     } else {
-      window.location.replace('/login.html');
+      this.clearSession();
+      const path = (window.location.pathname || '').toLowerCase();
+      if (!path.endsWith('/login.html') && path !== '/login') {
+        window.location.replace('/login.html');
+      }
     }
+  },
+
+  extractErrorMessage(res, fallback = 'Ocurrió un error al procesar la solicitud.') {
+    if (!res) return fallback;
+    if (res.status === 429) {
+      return (res.data && res.data.message) ||
+        'Demasiadas solicitudes seguidas. Espera un momento e inténtalo nuevamente.';
+    }
+    const data = (res.data !== undefined && res.data !== null) ? res.data : res;
+    if (!data || typeof data !== 'object') {
+      return typeof data === 'string' && data.trim() ? data.trim() : fallback;
+    }
+
+    let errorList = [];
+    if (Array.isArray(data.errors)) {
+      errorList = data.errors.filter(e => typeof e === 'string' && e.trim()).map(e => e.trim());
+    } else if (data.errors && typeof data.errors === 'object') {
+      errorList = Object.values(data.errors)
+        .flat()
+        .filter(e => typeof e === 'string' && e.trim())
+        .map(e => e.trim());
+    }
+
+    const rawMsg = typeof data.message === 'string' ? data.message.trim() : '';
+    const isGenericValidationMsg =
+      rawMsg === 'Datos de entrada inválidos.' ||
+      rawMsg === 'One or more validation errors occurred.';
+
+    if (errorList.length > 0) {
+      const uniqueErrors = Array.from(new Set(errorList));
+      if (!rawMsg || isGenericValidationMsg) {
+        return uniqueErrors.join(' ');
+      }
+      const extra = uniqueErrors.filter(e => e !== rawMsg);
+      return extra.length > 0 ? `${rawMsg} ${extra.join(' ')}` : rawMsg;
+    }
+
+    return rawMsg || data.detail || data.title || fallback;
+  },
+
+  _connectivityTimer: null,
+
+  showConnectivityBanner(isOnline) {
+    if (typeof document === 'undefined' || !document.body) return;
+    let banner = document.getElementById('tea-connectivity-banner');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'tea-connectivity-banner';
+      banner.setAttribute('role', 'status');
+      banner.setAttribute('aria-live', 'polite');
+      banner.style.cssText = [
+        'position:fixed',
+        'bottom:16px',
+        'left:50%',
+        'transform:translateX(-50%)',
+        'z-index:9999',
+        'max-width:min(92vw, 560px)',
+        'padding:12px 16px',
+        'border-radius:12px',
+        'box-shadow:0 6px 20px rgba(0,0,0,0.12)',
+        'font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif',
+        'font-size:0.95rem',
+        'line-height:1.4',
+        'display:flex',
+        'align-items:center',
+        'gap:12px',
+        'border:1px solid transparent'
+      ].join(';');
+      document.body.appendChild(banner);
+    }
+
+    if (this._connectivityTimer) {
+      clearTimeout(this._connectivityTimer);
+      this._connectivityTimer = null;
+    }
+
+    banner.textContent = '';
+    const textSpan = document.createElement('span');
+    textSpan.style.flex = '1';
+
+    if (isOnline) {
+      banner.style.backgroundColor = '#ECF6F0';
+      banner.style.color = '#1F5138';
+      banner.style.borderColor = '#B7DFC7';
+      textSpan.textContent = 'Conexión restablecida. Ya puedes continuar guardando tus cambios.';
+      this._connectivityTimer = setTimeout(() => {
+        if (banner && banner.parentNode) banner.remove();
+      }, 4500);
+    } else {
+      banner.style.backgroundColor = '#FEF6E7';
+      banner.style.color = '#6E470B';
+      banner.style.borderColor = '#F3D49B';
+      textSpan.textContent = 'Sin conexión a internet. Tu avance en pantalla sigue seguro; vuelve a intentar cuando regrese la señal.';
+    }
+
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.setAttribute('aria-label', 'Cerrar aviso de conexión');
+    closeBtn.textContent = '×';
+    closeBtn.style.cssText = 'background:transparent;border:none;color:inherit;font-size:1.25rem;line-height:1;cursor:pointer;padding:2px 6px;border-radius:6px;';
+    closeBtn.addEventListener('click', () => banner.remove());
+
+    banner.appendChild(textSpan);
+    banner.appendChild(closeBtn);
   },
 
   _refreshPromise: null,
@@ -213,8 +321,8 @@ const ApiClient = {
       return { ok: response.ok, status: response.status, data: json };
     } catch (err) {
       console.error(`[API Error] Error en llamada a ${url}:`, err);
-      if (typeof navigator !== 'undefined' && navigator.onLine === false && !options.suppressErrorRedirect) {
-        this.redirectToError('offline');
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+        this.showConnectivityBanner(false);
       }
       throw err;
     }
@@ -692,13 +800,20 @@ const ApiClient = {
   }
 };
 
-// Detección global de pérdida de conexión (offline) para activar error.html?code=offline igual que 403
+// Detección global no destructiva de pérdida/recuperación de conexión
+// Preserva el estado en memoria de los formularios y rutinas en curso
 if (typeof window !== 'undefined' && !window._teaOfflineListenerAttached) {
   window._teaOfflineListenerAttached = true;
   window.addEventListener('offline', () => {
     const path = window.location.pathname || '';
     if (!/^\/?(error|404)(\.html)?$/i.test(path)) {
-      ApiClient.redirectToError('offline');
+      ApiClient.showConnectivityBanner(false);
+    }
+  });
+  window.addEventListener('online', () => {
+    const path = window.location.pathname || '';
+    if (!/^\/?(error|404)(\.html)?$/i.test(path)) {
+      ApiClient.showConnectivityBanner(true);
     }
   });
 }

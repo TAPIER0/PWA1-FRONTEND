@@ -86,7 +86,15 @@ const Recovery = {
     }
     const d = res.data || {};
     const text = d.message || d.title || d.detail || 'No fue posible completar la solicitud. Inténtalo de nuevo.';
-    const details = Array.isArray(d.errors) ? d.errors.filter(e => e && e !== text) : [];
+    let rawErrors = [];
+    if (Array.isArray(d.errors)) {
+      rawErrors = d.errors;
+    } else if (d.errors && typeof d.errors === 'object') {
+      rawErrors = Object.values(d.errors).flat();
+    }
+    const details = rawErrors
+      .filter(e => typeof e === 'string' && e.trim() && e.trim() !== text)
+      .map(e => e.trim());
     return { text, details };
   }
 };

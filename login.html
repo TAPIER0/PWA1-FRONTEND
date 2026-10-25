@@ -332,12 +332,18 @@
     });
   } catch (e) {}
 
-  // Si ya existe sesión activa válida, redirigir automáticamente a la interfaz del usuario
+  // Si ya existe sesión activa válida con rol reconocido, redirigir automáticamente a la interfaz del usuario
   try {
     const existingToken = ApiClient.getToken();
     const existingUser = ApiClient.getUser();
     if (existingToken && existingUser) {
-      ApiClient.redirectToRoleHome(existingUser);
+      const validRoles = ['Estudiante', 'Acudiente', 'Docente', 'Profesor', 'Administrador'];
+      const userRoles = Array.isArray(existingUser.roles) ? existingUser.roles : [];
+      if (userRoles.some(r => validRoles.includes(r))) {
+        ApiClient.redirectToRoleHome(existingUser);
+      } else {
+        ApiClient.clearSession();
+      }
     }
   } catch (e) {}
 
@@ -448,9 +454,17 @@
         })
       });
 
-      const resData = await response.json();
+      const rawText = await response.text();
+      let resData = {};
+      if (rawText && rawText.trim().length > 0) {
+        try {
+          resData = JSON.parse(rawText);
+        } catch (parseErr) {
+          resData = { success: false, message: rawText };
+        }
+      }
 
-      if (response.ok && resData.success) {
+      if (response.ok && resData && resData.success && resData.data) {
         status.textContent = '¡Inicio de sesión exitoso! Redirigiendo...';
         ApiClient.saveSession(resData.data);
         setTimeout(() => {
@@ -458,7 +472,10 @@
         }, 500);
       } else {
         submitBtn.disabled = false;
-        const msg = resData.message || (resData.errors && resData.errors.join('. ')) || 'Credenciales incorrectas.';
+        const msg = ApiClient.extractErrorMessage(
+          { status: response.status, data: resData },
+          'Credenciales incorrectas.'
+        );
         status.textContent = msg;
       }
     } catch (err) {

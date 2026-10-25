@@ -548,13 +548,13 @@
 
       <div class="field" id="field-name">
         <label for="user-name">Nombre completo</label>
-        <input type="text" id="user-name" autocomplete="off">
+        <input type="text" id="user-name" maxlength="200" placeholder="Ej. Laura Gómez" autocomplete="off">
         <div class="field-error" id="error-name" role="alert"></div>
       </div>
 
       <div class="field" id="field-email">
         <label for="user-email">Correo electrónico</label>
-        <input type="email" id="user-email" autocomplete="off">
+        <input type="email" id="user-email" maxlength="256" autocomplete="off">
         <div class="field-error" id="error-email" role="alert"></div>
       </div>
 
@@ -579,7 +579,7 @@
       <div class="field" id="field-password">
         <label for="user-password">Contraseña inicial</label>
         <div class="password-row">
-          <input type="password" id="user-password" value="Usuario123!*" autocomplete="off">
+          <input type="password" id="user-password" maxlength="72" value="Usuario123!*" autocomplete="off">
           <button type="button" class="toggle-visibility" id="toggle-user-pw" aria-label="Mostrar contraseña" aria-pressed="false">Mostrar</button>
         </div>
         <div class="field-error" id="error-password" role="alert"></div>
@@ -1031,33 +1031,56 @@
     e.preventDefault();
     let valid = true;
 
-    if(nameInput.value.trim() === ''){
+    const rawName = nameInput.value.trim();
+    const parts = rawName ? rawName.split(/\s+/) : [];
+    const nombres = parts.length > 1 ? parts.slice(0, -1).join(' ') : '';
+    const apellidos = parts.length > 1 ? parts.slice(-1).join(' ') : '';
+
+    if(rawName === ''){
       setFieldError('field-name', 'error-name', 'El nombre completo es obligatorio.');
+      valid = false;
+    } else if(parts.length < 2){
+      setFieldError('field-name', 'error-name', 'Ingresa al menos nombre y apellido (ej. Laura Gómez).');
+      valid = false;
+    } else if(nombres.length > 100 || apellidos.length > 100){
+      setFieldError('field-name', 'error-name', 'Los nombres y apellidos no deben superar 100 caracteres cada uno.');
       valid = false;
     } else {
       clearFieldError('field-name', 'error-name');
     }
 
-    if(!userIdInput.value){
-      if(emailInput.value.trim() === '' || !emailInput.value.includes('@')){
-        setFieldError('field-email', 'error-email', 'Escribe un correo electrónico válido, con el símbolo @.');
+    const trimmedEmail = emailInput.value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if(trimmedEmail === '' || !emailRegex.test(trimmedEmail) || trimmedEmail.length > 256){
+      setFieldError('field-email', 'error-email', 'Escribe un correo electrónico válido (ej. nombre@dominio.com).');
+      valid = false;
+    } else {
+      const duplicate = users.find(u =>
+        u.email.toLowerCase() === trimmedEmail.toLowerCase() &&
+        String(u.id) !== String(userIdInput.value || '')
+      );
+      if(duplicate){
+        setFieldError('field-email', 'error-email', 'Ya existe un usuario registrado con este correo.');
         valid = false;
       } else {
-        const duplicate = users.find(u => u.email.toLowerCase() === emailInput.value.trim().toLowerCase());
-        if(duplicate){
-          setFieldError('field-email', 'error-email', 'Ya existe un usuario registrado con este correo.');
-          valid = false;
-        } else {
-          clearFieldError('field-email', 'error-email');
-        }
+        clearFieldError('field-email', 'error-email');
       }
+    }
 
-      if(!passwordInput.value || passwordInput.value.length < 6){
-        setFieldError('field-password', 'error-password', 'La contraseña debe tener al menos 6 caracteres.');
+    if(!userIdInput.value){
+      const pw = passwordInput.value || '';
+      const pwBytes = new TextEncoder().encode(pw).length;
+      if(pw.length < 6 || !/\d/.test(pw)){
+        setFieldError('field-password', 'error-password', 'La contraseña debe tener al menos 6 caracteres e incluir al menos un número.');
+        valid = false;
+      } else if(pwBytes > 72){
+        setFieldError('field-password', 'error-password', 'La contraseña no puede superar los 72 caracteres.');
         valid = false;
       } else {
         clearFieldError('field-password', 'error-password');
       }
+    } else {
+      clearFieldError('field-password', 'error-password');
     }
 
     let selectedStudentIds = [];
@@ -1075,22 +1098,20 @@
 
     if(!valid) return;
 
-    const rawName = nameInput.value.trim();
-    const parts = rawName.split(/\s+/);
-    const nombres = parts.length > 1 ? parts.slice(0, -1).join(' ') : parts[0];
-    const apellidos = parts.length > 1 ? parts.slice(-1).join(' ') : parts[0];
     const rol = (roleInput.value === 'Profesor' ? 'Docente' : roleInput.value);
     const isActive = statusInput.value === 'Activo';
+    const btnSaveUser = document.getElementById('btn-save-user');
+    if (btnSaveUser) btnSaveUser.disabled = true;
 
-    if(userIdInput.value){
-      try {
+    try {
+      if(userIdInput.value){
         setStatus('Actualizando datos de usuario en la base de datos SQL Server...', '');
         const res = await ApiClient.request(`/users/${userIdInput.value}`, {
           method: 'PUT',
           body: {
             nombres,
             apellidos,
-            email: emailInput.value.trim(),
+            email: trimmedEmail,
             isActive,
             roles: [rol]
           }
@@ -1113,20 +1134,15 @@
           closeUserModal();
           await loadUsersFromBackend();
         } else {
-          const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al actualizar usuario.';
+          const msg = ApiClient.extractErrorMessage(res, 'Error al actualizar usuario.');
           setStatus(msg, 'error');
         }
-      } catch(err){
-        console.error('Error al actualizar usuario:', err);
-        setStatus('Error de conexión al actualizar usuario.', 'error');
-      }
-    } else {
-      try {
+      } else {
         setStatus('Creando usuario en la base de datos SQL Server...', '');
         const registerPayload = {
           nombres,
           apellidos,
-          email: emailInput.value.trim(),
+          email: trimmedEmail,
           password: passwordInput.value,
           rol
         };
@@ -1141,18 +1157,27 @@
         });
 
         if(res.ok && res.data && res.data.success){
+          const createdUserId = res.data.data && res.data.data.user ? res.data.data.user.id : null;
+          if (!isActive && createdUserId) {
+            await ApiClient.request(`/users/${createdUserId}`, {
+              method: 'PUT',
+              body: { nombres, apellidos, email: trimmedEmail, isActive: false, roles: [rol] }
+            });
+          }
           setStatus(`Usuario "${rawName}" creado exitosamente en la base de datos.`, 'ok');
           closeUserModal();
           await loadUsersFromBackend();
         } else {
-          const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al crear usuario.';
+          const msg = ApiClient.extractErrorMessage(res, 'Error al crear usuario.');
           setFieldError('field-email', 'error-email', msg);
           setStatus(msg, 'error');
         }
-      } catch(err){
-        console.error('Error al crear usuario:', err);
-        setStatus('Error de conexión al crear usuario.', 'error');
       }
+    } catch(err){
+      console.error('Error al guardar usuario:', err);
+      setStatus('Error de conexión al guardar usuario.', 'error');
+    } finally {
+      if (btnSaveUser) btnSaveUser.disabled = false;
     }
   });
 
@@ -1194,7 +1219,7 @@
         closeDeleteModal();
         await loadUsersFromBackend();
       } else {
-        const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al eliminar usuario.';
+        const msg = ApiClient.extractErrorMessage(res, 'Error al eliminar usuario.');
         setStatus(msg, 'error');
         closeDeleteModal();
       }
@@ -1439,9 +1464,11 @@
     const descripcion = categoriaDescripcionInput.value.trim();
     const color = categoriaColorInput.value;
     const isActive = categoriaStatusInput.value === 'Activo';
+    const btnSaveCat = document.getElementById('btn-save-categoria');
+    if (btnSaveCat) btnSaveCat.disabled = true;
 
-    if(categoriaIdInput.value){
-      try {
+    try {
+      if(categoriaIdInput.value){
         setStatus('Actualizando categoría en la base de datos SQL Server...', '');
         const res = await ApiClient.request(`/categories/${categoriaIdInput.value}`, {
           method: 'PUT',
@@ -1459,15 +1486,10 @@
           await loadCategoriasFromBackend();
           await loadModulesFromBackend();
         } else {
-          const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al actualizar categoría.';
+          const msg = ApiClient.extractErrorMessage(res, 'Error al actualizar categoría.');
           setStatus(msg, 'error');
         }
-      } catch(err){
-        console.error('Error al actualizar categoría:', err);
-        setStatus('Error de conexión con el servidor al actualizar la categoría.', 'error');
-      }
-    } else {
-      try {
+      } else {
         setStatus('Guardando categoría en la base de datos SQL Server...', '');
         const res = await ApiClient.request('/categories', {
           method: 'POST',
@@ -1485,13 +1507,15 @@
           await loadCategoriasFromBackend();
           await loadModulesFromBackend();
         } else {
-          const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al crear la categoría.';
+          const msg = ApiClient.extractErrorMessage(res, 'Error al crear la categoría.');
           setStatus(msg, 'error');
         }
-      } catch(err){
-        console.error('Error al crear categoría:', err);
-        setStatus('Error de conexión con el servidor al crear la categoría.', 'error');
       }
+    } catch(err){
+      console.error('Error al guardar categoría:', err);
+      setStatus('Error de conexión con el servidor al guardar la categoría.', 'error');
+    } finally {
+      if (btnSaveCat) btnSaveCat.disabled = false;
     }
   });
 
@@ -1546,7 +1570,7 @@
         await loadCategoriasFromBackend();
         await loadModulesFromBackend();
       } else {
-        const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al eliminar categoría.';
+        const msg = ApiClient.extractErrorMessage(res, 'Error al eliminar categoría.');
         setStatus(msg, 'error');
         closeCategoriaDeleteModal();
       }
@@ -1809,9 +1833,11 @@
     const orden = modOrdenNum;
     const descripcion = moduloDescripcionInput.value.trim() || 'Módulo de aprendizaje';
     const isActive = moduloStatusInput.value === 'Activo';
+    const btnSaveMod = document.getElementById('btn-save-modulo');
+    if (btnSaveMod) btnSaveMod.disabled = true;
 
-    if(moduloIdInput.value){
-      try {
+    try {
+      if(moduloIdInput.value){
         setStatus('Actualizando módulo temático en la base de datos...', '');
         const res = await ApiClient.request(`/modules/${moduloIdInput.value}`, {
           method: 'PUT',
@@ -1830,15 +1856,10 @@
           await loadModulesFromBackend();
           await loadCategoriasFromBackend();
         } else {
-          const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al actualizar módulo.';
+          const msg = ApiClient.extractErrorMessage(res, 'Error al actualizar módulo.');
           setStatus(msg, 'error');
         }
-      } catch(err){
-        console.error('Error al actualizar módulo:', err);
-        setStatus('Error de conexión con el servidor al actualizar módulo.', 'error');
-      }
-    } else {
-      try {
+      } else {
         setStatus('Creando módulo temático en la base de datos...', '');
         const res = await ApiClient.request('/modules', {
           method: 'POST',
@@ -1851,18 +1872,34 @@
           }
         });
         if(res.ok && res.data && res.data.success){
+          const createdModId = res.data.data ? res.data.data.id : null;
+          if (!isActive && createdModId) {
+            await ApiClient.request(`/modules/${createdModId}`, {
+              method: 'PUT',
+              body: {
+                titulo: nombre,
+                descripcion: descripcion,
+                icono: 'modulo',
+                orden: orden,
+                categoriaId: categoriaId,
+                isActive: false
+              }
+            });
+          }
           setStatus(`Módulo "${nombre}" creado correctamente.`, 'ok');
           closeModuloModal();
           await loadModulesFromBackend();
           await loadCategoriasFromBackend();
         } else {
-          const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al crear módulo.';
+          const msg = ApiClient.extractErrorMessage(res, 'Error al crear módulo.');
           setStatus(msg, 'error');
         }
-      } catch(err){
-        console.error('Error al crear módulo:', err);
-        setStatus('Error de conexión con el servidor al crear módulo.', 'error');
       }
+    } catch(err){
+      console.error('Error al guardar módulo:', err);
+      setStatus('Error de conexión con el servidor al guardar módulo.', 'error');
+    } finally {
+      if (btnSaveMod) btnSaveMod.disabled = false;
     }
   });
 
@@ -1914,7 +1951,7 @@
         await loadModulesFromBackend();
         await loadCategoriasFromBackend();
       } else {
-        const msg = (res.data && (res.data.message || (res.data.errors && res.data.errors.join(', ')))) || 'Error al eliminar módulo.';
+        const msg = ApiClient.extractErrorMessage(res, 'Error al eliminar módulo.');
         setStatus(msg, 'error');
         closeModuloDeleteModal();
       }

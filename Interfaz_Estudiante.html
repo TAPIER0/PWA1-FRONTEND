@@ -511,8 +511,9 @@ de la vista y avisa si encuentra palabras competitivas.</pre>
   let warnTimeoutId = null;
  
   function statusFor(i){
-    if(i < currentIndex) return 'hecha';
+    if(activities[i] && activities[i].estado === 'Completada') return 'hecha';
     if(i === currentIndex) return 'actual';
+    if(i < currentIndex) return 'hecha';
     return 'pendiente';
   }
  
@@ -534,9 +535,10 @@ de la vista y avisa si encuentra palabras competitivas.</pre>
     const card = document.getElementById('progress-card');
     if(activities.length === 0){ card.hidden = true; return; }
     card.hidden = false;
-    const done = Math.min(currentIndex, activities.length);
+    const done = activities.filter((a, idx) => a.estado === 'Completada' || idx < currentIndex).length;
     const pct = Math.round((done / activities.length) * 100);
-    document.getElementById('progress-count').textContent = `Paso ${Math.min(currentIndex+1, activities.length)} de ${activities.length}`;
+    const stepDisplay = currentIndex >= activities.length ? activities.length : Math.min(done + 1, activities.length);
+    document.getElementById('progress-count').textContent = `Paso ${stepDisplay} de ${activities.length}`;
     document.getElementById('progress-fill').style.width = pct + '%';
     document.getElementById('progress-track').setAttribute('aria-valuenow', String(pct));
   }
@@ -565,6 +567,13 @@ de la vista y avisa si encuentra palabras competitivas.</pre>
   function mapSensoryFromDto(sp){
     if (!sp) return null;
     const paletteMap = { 'PastelSuave': 'verde', 'NeutroCalmante': 'neutro', 'Lavanda': 'lavanda', 'Arena': 'arena' };
+    const validTimerModes = ['sin-temporizador', 'tiempo-extendido', 'estandar'];
+    const resolvedMode = validTimerModes.includes(sp.modoTemporizador)
+      ? sp.modoTemporizador
+      : (sp.ocultarTemporizadores ? 'sin-temporizador' : 'tiempo-extendido');
+    const resolvedWarn = (sp.segundosAvisoPrevio !== undefined && sp.segundosAvisoPrevio !== null)
+      ? Math.min(60, Math.max(0, Number(sp.segundosAvisoPrevio)))
+      : 15;
     return {
       studentId: sp.studentProfileId,
       palette: paletteMap[sp.paletaColor] || 'verde',
@@ -577,8 +586,98 @@ de la vista y avisa si encuentra palabras competitivas.</pre>
         textToSpeech: Boolean(sp.textoAVoz) 
       },
       reduceMotion: Boolean(sp.animacionesReducidas),
-      timers: { mode: sp.ocultarTemporizadores ? 'sin-temporizador' : 'tiempo-extendido', warningSeconds: 15 }
+      timers: { mode: resolvedMode, warningSeconds: resolvedWarn }
     };
+  }
+
+  const exerciseStateByActivity = {};
+
+  function parseExerciseConfig(configJson) {
+    if (!configJson) return null;
+    try {
+      const parsed = typeof configJson === 'string' ? JSON.parse(configJson) : configJson;
+      if (!parsed || typeof parsed !== 'object') return null;
+
+      const rawPairs = Array.isArray(parsed.parejas)
+        ? parsed.parejas
+        : (Array.isArray(parsed.pairs) ? parsed.pairs : (Array.isArray(parsed.pares) ? parsed.pares : null));
+      if (rawPairs && rawPairs.length > 0) {
+        const pairs = rawPairs
+          .map(p => ({
+            left: String((p && (p.leftLabel ?? p.emocion ?? p.elementoA ?? p.izquierda)) || '').trim(),
+            right: String((p && (p.rightLabel ?? p.pareja ?? p.elementoB ?? p.derecha ?? p.color)) || '').trim()
+          }))
+          .filter(p => p.left && p.right);
+        if (pairs.length > 0) {
+          return { kind: 'pairs', pairs };
+        }
+      }
+
+      const rawSteps = Array.isArray(parsed.pasos)
+        ? parsed.pasos
+        : (Array.isArray(parsed.steps)
+            ? parsed.steps
+            : (Array.isArray(parsed.escenas) ? parsed.escenas : (Array.isArray(parsed.emociones) ? parsed.emociones : null)));
+      if (rawSteps && rawSteps.length > 0) {
+        const steps = rawSteps
+          .map(s => String(typeof s === 'string' ? s : ((s && (s.label ?? s.texto ?? s.step ?? s.nombre)) || '')).trim())
+          .filter(Boolean);
+        if (steps.length > 0) {
+          return { kind: 'steps', steps };
+        }
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function getOrCreateExerciseState(actId, config) {
+    if (!config) return null;
+    const existing = exerciseStateByActivity[actId];
+    if (existing && existing.kind === config.kind) return existing;
+
+    if (config.kind === 'steps') {
+      const state = {
+        kind: 'steps',
+        total: config.steps.length,
+        nextIdx: 0,
+        aciertos: 0,
+        intentosFallidos: 0,
+        feedback: ''
+      };
+      exerciseStateByActivity[actId] = state;
+      return state;
+    }
+
+    if (config.kind === 'pairs') {
+      const rightOrder = config.pairs.map((_, idx) => idx);
+      if (rightOrder.length > 1) {
+        // Desplazamiento determinista para evitar que todas las parejas queden alineadas en la misma fila
+        const first = rightOrder.shift();
+        rightOrder.push(first);
+      }
+      const state = {
+        kind: 'pairs',
+        total: config.pairs.length,
+        matchedLeft: [],
+        matchedRight: [],
+        selectedLeft: null,
+        selectedRight: null,
+        rightOrder,
+        aciertos: 0,
+        intentosFallidos: 0,
+        feedback: ''
+      };
+      exerciseStateByActivity[actId] = state;
+      return state;
+    }
+    return null;
+  }
+
+  function formatCardLabelHtml(label) {
+    if (/^#[0-9a-f]{6}$/i.test(label)) {
+      return `<span style="display:inline-flex;align-items:center;gap:8px;"><span style="width:18px;height:18px;border-radius:50%;background:${escapeHtml(label)};border:1px solid rgba(0,0,0,0.2);display:inline-block;" aria-hidden="true"></span><span>Color ${escapeHtml(label.toUpperCase())}</span></span>`;
+    }
+    return escapeHtml(label);
   }
 
   let currentActivityStartTime = Date.now();
@@ -659,35 +758,53 @@ de la vista y avisa si encuentra palabras competitivas.</pre>
 
       let configHtml = '';
       if (status === 'actual' && act.configJson) {
-        try {
-          const parsed = typeof act.configJson === 'string' ? JSON.parse(act.configJson) : act.configJson;
-          if (parsed && parsed.pasos && Array.isArray(parsed.pasos) && parsed.pasos.length > 0) {
-            configHtml = `
-              <div style="margin: 12px 0; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid var(--border);">
-                <div style="font-weight:700; font-size:13.5px; margin-bottom:8px;">Pasos de la actividad:</div>
-                <div style="display:flex; flex-direction:column; gap:6px;">
-                  ${parsed.pasos.map((p, idx) => `
-                    <div style="display:flex; align-items:center; gap:8px; font-size:14px;">
-                      <span style="background:var(--primary); color:#fff; border-radius:50%; width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:700; flex-shrink:0;">${idx + 1}</span>
-                      <span>${escapeHtml(p.label || p)}</span>
-                    </div>
-                  `).join('')}
-                </div>
-              </div>`;
-          } else if (parsed && parsed.parejas && Array.isArray(parsed.parejas) && parsed.parejas.length > 0) {
-            configHtml = `
-              <div style="margin: 12px 0; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid var(--border);">
-                <div style="font-weight:700; font-size:13.5px; margin-bottom:8px;">Empareja cada elemento:</div>
-                <div style="display:grid; grid-template-columns: 1fr auto 1fr; gap:8px; align-items:center;">
-                  ${parsed.parejas.map(p => `
-                    <div style="padding:6px 10px; background:var(--surface); border:1px solid var(--border); border-radius:6px; font-size:13.5px; text-align:center;">${escapeHtml(p.leftLabel || 'A')}</div>
-                    <span style="color:var(--primary); font-weight:bold;">↔</span>
-                    <div style="padding:6px 10px; background:var(--surface); border:1px solid var(--border); border-radius:6px; font-size:13.5px; text-align:center;">${escapeHtml(p.rightLabel || 'B')}</div>
-                  `).join('')}
-                </div>
-              </div>`;
-          }
-        } catch (e) {}
+        const exConfig = parseExerciseConfig(act.configJson);
+        const exState = getOrCreateExerciseState(act.id, exConfig);
+        if (exConfig && exState && exConfig.kind === 'steps') {
+          configHtml = `
+            <div style="margin: 12px 0; padding: 14px; background: var(--bg); border-radius: 10px; border: 1px solid var(--border);" data-exercise="steps">
+              <div style="font-weight:700; font-size:14px; margin-bottom:8px;">Marca cada paso en orden conforme lo realices (${exState.nextIdx} de ${exState.total}):</div>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                ${exConfig.steps.map((stepText, idx) => {
+                  const isDone = idx < exState.nextIdx;
+                  const isCurrentStep = idx === exState.nextIdx;
+                  return `
+                    <button type="button" data-step-idx="${idx}" aria-pressed="${isDone}"
+                      style="display:flex; align-items:center; gap:10px; width:100%; text-align:left; padding:10px 12px; border-radius:8px; font-family:inherit; font-size:14.5px; cursor:${isDone ? 'default' : 'pointer'}; background:${isDone ? 'var(--primary-soft, rgba(47,110,92,0.12))' : 'var(--surface)'}; border:2px solid ${isCurrentStep ? 'var(--primary)' : 'var(--border)'}; color:var(--text);">
+                      <span style="background:${isDone ? 'var(--primary)' : 'var(--surface)'}; color:${isDone ? '#fff' : 'var(--text)'}; border:1.5px solid var(--primary); border-radius:50%; width:26px; height:26px; display:inline-flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:700; flex-shrink:0;">${isDone ? '✓' : idx + 1}</span>
+                      <span style="flex:1;">${escapeHtml(stepText)}</span>
+                    </button>`;
+                }).join('')}
+              </div>
+              <p id="exercise-feedback" role="status" aria-live="polite" style="margin:8px 0 0; font-size:13.5px; color:var(--muted, var(--text)); min-height:1.2em;">${escapeHtml(exState.feedback || '')}</p>
+            </div>`;
+        } else if (exConfig && exState && exConfig.kind === 'pairs') {
+          configHtml = `
+            <div style="margin: 12px 0; padding: 14px; background: var(--bg); border-radius: 10px; border: 1px solid var(--border);" data-exercise="pairs">
+              <div style="font-weight:700; font-size:14px; margin-bottom:8px;">Une cada tarjeta de la izquierda con su pareja de la derecha (${exState.matchedLeft.length} de ${exState.total}):</div>
+              <div style="display:grid; grid-template-columns: 1fr auto 1fr; gap:8px; align-items:center;">
+                ${exConfig.pairs.map((p, rowIdx) => {
+                  const rightOrigIdx = exState.rightOrder[rowIdx];
+                  const rightPair = exConfig.pairs[rightOrigIdx];
+                  const leftMatched = exState.matchedLeft.includes(rowIdx);
+                  const rightMatched = exState.matchedRight.includes(rightOrigIdx);
+                  const leftSelected = exState.selectedLeft === rowIdx;
+                  const rightSelected = exState.selectedRight === rightOrigIdx;
+                  return `
+                    <button type="button" data-pair-left="${rowIdx}" ${leftMatched ? 'disabled' : ''} aria-pressed="${leftSelected || leftMatched}"
+                      style="padding:10px 12px; background:${leftMatched ? 'var(--primary-soft, rgba(47,110,92,0.12))' : 'var(--surface)'}; border:2px solid ${(leftSelected || leftMatched) ? 'var(--primary)' : 'var(--border)'}; border-radius:8px; font-family:inherit; font-size:14px; color:var(--text); cursor:${leftMatched ? 'default' : 'pointer'}; text-align:center;">
+                      ${leftMatched ? '✓ ' : ''}${formatCardLabelHtml(p.left)}
+                    </button>
+                    <span style="color:var(--primary); font-weight:bold;" aria-hidden="true">↔</span>
+                    <button type="button" data-pair-right="${rightOrigIdx}" ${rightMatched ? 'disabled' : ''} aria-pressed="${rightSelected || rightMatched}"
+                      style="padding:10px 12px; background:${rightMatched ? 'var(--primary-soft, rgba(47,110,92,0.12))' : 'var(--surface)'}; border:2px solid ${(rightSelected || rightMatched) ? 'var(--primary)' : 'var(--border)'}; border-radius:8px; font-family:inherit; font-size:14px; color:var(--text); cursor:${rightMatched ? 'default' : 'pointer'}; text-align:center;">
+                      ${rightMatched ? '✓ ' : ''}${formatCardLabelHtml(rightPair.right)}
+                    </button>`;
+                }).join('')}
+              </div>
+              <p id="exercise-feedback" role="status" aria-live="polite" style="margin:8px 0 0; font-size:13.5px; color:var(--muted, var(--text)); min-height:1.2em;">${escapeHtml(exState.feedback || '')}</p>
+            </div>`;
+        }
       }
  
       return `
@@ -718,45 +835,155 @@ de la vista y avisa si encuentra palabras competitivas.</pre>
       scheduleWarning(currentStepEl, current.durationMinutes);
       triggerStartActivity(current.id);
       announce(`Paso actual: ${current.title}, a las ${current.time}.`);
+
+      const activeConfig = parseExerciseConfig(current.configJson);
+      const activeState = getOrCreateExerciseState(current.id, activeConfig);
+
+      if (activeConfig && activeState && activeConfig.kind === 'steps') {
+        currentStepEl.querySelectorAll('[data-step-idx]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const idx = Number(btn.getAttribute('data-step-idx'));
+            if (idx < activeState.nextIdx) return;
+            if (idx === activeState.nextIdx) {
+              activeState.aciertos += 1;
+              activeState.nextIdx += 1;
+              activeState.feedback = activeState.nextIdx >= activeState.total
+                ? '¡Muy bien! Completaste todos los pasos. Ya puedes pulsar «Listo, siguiente».'
+                : `Paso ${idx + 1} listo. Continúa con el paso ${activeState.nextIdx + 1}.`;
+              renderMain();
+            } else {
+              activeState.intentosFallidos += 1;
+              activeState.feedback = `Vamos en orden: primero realiza el paso ${activeState.nextIdx + 1}.`;
+              const fb = currentStepEl.querySelector('#exercise-feedback');
+              if (fb) fb.textContent = activeState.feedback;
+            }
+          });
+        });
+      } else if (activeConfig && activeState && activeConfig.kind === 'pairs') {
+        const tryMatchPair = () => {
+          if (activeState.selectedLeft === null || activeState.selectedRight === null) return;
+          const leftPair = activeConfig.pairs[activeState.selectedLeft];
+          const rightPair = activeConfig.pairs[activeState.selectedRight];
+          const isMatch = activeState.selectedLeft === activeState.selectedRight ||
+            (leftPair && rightPair && leftPair.right === rightPair.right);
+
+          if (isMatch) {
+            activeState.matchedLeft.push(activeState.selectedLeft);
+            activeState.matchedRight.push(activeState.selectedRight);
+            activeState.aciertos += 1;
+            activeState.selectedLeft = null;
+            activeState.selectedRight = null;
+            activeState.feedback = activeState.matchedLeft.length >= activeState.total
+              ? '¡Excelente! Uniste todas las tarjetas. Ya puedes pulsar «Listo, siguiente».'
+              : '¡Muy bien! Pareja unida. Elige la siguiente tarjeta.';
+          } else {
+            activeState.intentosFallidos += 1;
+            activeState.selectedLeft = null;
+            activeState.selectedRight = null;
+            activeState.feedback = 'Prueba otra combinación con calma.';
+          }
+          renderMain();
+        };
+
+        currentStepEl.querySelectorAll('[data-pair-left]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const idx = Number(btn.getAttribute('data-pair-left'));
+            if (activeState.matchedLeft.includes(idx)) return;
+            activeState.selectedLeft = activeState.selectedLeft === idx ? null : idx;
+            activeState.feedback = '';
+            if (activeState.selectedLeft !== null && activeState.selectedRight !== null) {
+              tryMatchPair();
+            } else {
+              renderMain();
+            }
+          });
+        });
+
+        currentStepEl.querySelectorAll('[data-pair-right]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const idx = Number(btn.getAttribute('data-pair-right'));
+            if (activeState.matchedRight.includes(idx)) return;
+            activeState.selectedRight = activeState.selectedRight === idx ? null : idx;
+            activeState.feedback = '';
+            if (activeState.selectedLeft !== null && activeState.selectedRight !== null) {
+              tryMatchPair();
+            } else {
+              renderMain();
+            }
+          });
+        });
+      }
     }
  
     const completeBtn = main.querySelector('[data-complete]');
     if(completeBtn && current){
       completeBtn.addEventListener('click', async () => {
+        const activeConfig = parseExerciseConfig(current.configJson);
+        const activeState = getOrCreateExerciseState(current.id, activeConfig);
+        if (activeState) {
+          const completedCount = activeState.kind === 'steps'
+            ? activeState.nextIdx
+            : activeState.matchedLeft.length;
+          if (completedCount < activeState.total) {
+            activeState.feedback = activeState.kind === 'steps'
+              ? `Marca primero los pasos pendientes (${completedCount} de ${activeState.total}) antes de continuar.`
+              : `Une primero todas las tarjetas (${completedCount} de ${activeState.total}) antes de continuar.`;
+            const fb = main.querySelector('#exercise-feedback');
+            if (fb) fb.textContent = activeState.feedback;
+            announce(activeState.feedback);
+            return;
+          }
+        }
+
         completeBtn.disabled = true;
-        completeBtn.innerHTML = `Guardando progreso...`;
+        completeBtn.textContent = 'Guardando progreso...';
 
         const elapsedSeconds = Math.max(1, Math.round((Date.now() - currentActivityStartTime) / 1000));
         const isGuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(current.id);
-        
+        const realAciertos = activeState ? Math.max(1, activeState.aciertos) : 1;
+        const realFallidos = activeState ? Math.max(0, activeState.intentosFallidos) : 0;
+
         if (isGuid) {
           try {
-            // CONEXIÓN BACKEND: esta telemetría es la fuente del panel "Desempeño" del docente
-            // (Interfaz_Docente.html). Cada envío = 1 intento. El backend debe guardar estos
-            // campos junto con la fecha del registro para poder agruparlos por semana.
-            // ⚠ PENDIENTE: cantidadIntentosFallidos y cantidadAciertos están fijos (0 y 1),
-            // así que la tasa de aciertos siempre dará 100 %. Deben reemplazarse por los
-            // conteos reales del ejercicio (respuestas correctas / incorrectas del estudiante).
-            const submitRes = await ApiClient.request(`/activities/${current.id}/submit`, {
+            const submitRes = await ApiClient.request(`/activities/${encodeURIComponent(current.id)}/submit`, {
               method: 'POST',
-              body: JSON.stringify({
+              body: {
                 tiempoRespuestaSegundos: elapsedSeconds,
-                cantidadIntentosFallidos: 0,
-                cantidadAciertos: 1,
+                cantidadIntentosFallidos: realFallidos,
+                cantidadAciertos: realAciertos,
                 completadaExitosamente: true
-              })
+              }
             });
-            if (submitRes.ok && submitRes.data?.success) {
-              console.log('Telemetría HU-006 registrada con éxito:', submitRes.data);
+            if (!submitRes || !submitRes.ok || !submitRes.data || !submitRes.data.success) {
+              const errMsg = ApiClient.extractErrorMessage(
+                submitRes,
+                'No pudimos guardar tu avance en este momento. Inténtalo de nuevo.'
+              );
+              completeBtn.disabled = false;
+              completeBtn.textContent = 'Intentar guardar de nuevo';
+              announce(errMsg);
+              const fb = main.querySelector('#exercise-feedback');
+              if (fb) fb.textContent = errMsg;
+              return;
             }
           } catch (err) {
             console.warn('Error al registrar submit de actividad:', err);
+            const errMsg = 'Sin conexión con el servidor por ahora. Tu actividad sigue lista; pulsa nuevamente para guardar.';
+            completeBtn.disabled = false;
+            completeBtn.textContent = 'Intentar guardar de nuevo';
+            announce(errMsg);
+            const fb = main.querySelector('#exercise-feedback');
+            if (fb) fb.textContent = errMsg;
+            return;
           }
         }
 
         current.estado = 'Completada';
+        delete exerciseStateByActivity[current.id];
         startedAssignmentId = null;
-        currentIndex += 1;
+        const nextPending = activities.findIndex((a, idx) => idx > currentIndex && a.estado !== 'Completada');
+        const anyPending = activities.findIndex(a => a.estado !== 'Completada');
+        currentIndex = nextPending >= 0 ? nextPending : (anyPending >= 0 ? anyPending : activities.length);
         renderMain();
       });
     }
@@ -1040,25 +1267,23 @@ de la vista y avisa si encuentra palabras competitivas.</pre>
       // 3. Obtener rutina visual de actividades asignadas
       try {
         const routineRes = await ApiClient.request('/students/me/daily-routine');
-        if (routineRes.ok && routineRes.data.success && routineRes.data.data.length > 0) {
+        if (routineRes.ok && routineRes.data && routineRes.data.success && Array.isArray(routineRes.data.data)) {
           activities = routineRes.data.data.map((item, idx) => ({
             id: item.assignmentId,
             time: `Actividad ${item.ordenSecuencial || idx + 1}`,
             title: item.titulo,
-            description: item.descripcion || item.objetivoPedagogico,
+            description: item.descripcion || item.objetivoPedagogico || '',
             type: item.tipoActividad === 'EmparejamientoVisual' ? 'aprendizaje' : item.tipoActividad === 'SecuenciaLogica' ? 'socioemocional' : 'aprendizaje',
             durationMinutes: 15,
             estado: item.estado,
             configJson: item.configJson
           }));
         } else {
-          const fallbackData = await fetchStudentActivities(studentId || 101);
-          activities = fallbackData.activities;
+          activities = [];
         }
       } catch (err) {
-        console.warn('Error al cargar rutina del backend, usando datos de contingencia:', err);
-        const fallbackData = await fetchStudentActivities(studentId || 101);
-        activities = fallbackData.activities;
+        console.warn('Error al cargar rutina del backend:', err);
+        activities = [];
       }
 
       const firstPending = activities.findIndex(a => a.estado !== 'Completada');
