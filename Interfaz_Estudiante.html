@@ -227,9 +227,6 @@
     .mod-state{ grid-column:2; }
   }
 
-  details.dev-notes{ margin-top: 34px; font-size: 13px; color: var(--text-muted); }
-  details.dev-notes summary{ cursor:pointer; font-weight:700; }
-  details.dev-notes pre{ white-space:pre-wrap; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px; }
 </style>
 </head>
 <body>
@@ -311,98 +308,6 @@
     </div>
   </section>
 
-  <details class="dev-notes">
-    <summary>Notas técnicas (equipo de desarrollo)</summary>
-    <p><strong>Endpoint de consulta de actividades</strong></p>
-    <pre>GET /api/students/:studentId/activities?date=YYYY-MM-DD
- 
-200 OK
-{
-  "studentId": 101,
-  "date": "2026-09-14",
-  "activities": [
-    {
-      "id": "act-1",
-      "time": "08:00",
-      "title": "Rutina de la mañana",
-      "description": "Lavado de manos y guardar la mochila.",
-      "type": "cuidado-personal",
-      "durationMinutes": 10,
-      "status": "pendiente"
-    }
-  ]
-}
- 
-Si "activities" es un arreglo vacío, el tablero muestra el estado
-"Sin actividades asignadas aún." No es un error: es un estado válido
-(ej. día sin planeación docente todavía).</pre>
-    <p><strong>Checklist de validación de usabilidad (flujo predecible)</strong></p>
-    <pre>[ ] El estudiante siempre ve como máximo 1 paso "actual" resaltado
-[ ] Los pasos futuros están visualmente atenuados y no son interactuables
-[ ] No es posible saltar pasos sin completar el anterior (flujo lineal)
-[ ] El estado vacío no genera ansiedad (tono neutro, sin ícono de error)
-[ ] Con "Reducir animaciones" activo, no hay transiciones ni parpadeos
-[ ] El aviso de cambio de pantalla aparece con los segundos configurados
-    por el acudiente antes de que el temporizador termine
-[ ] Contraste de texto ≥ 4.5:1 en todas las paletas disponibles
-[ ] Toda la interfaz es operable solo con teclado (Tab / Enter)
-[ ] Los lectores de pantalla anuncian el cambio de paso (aria-live)</pre>
-    <p><strong>Endpoint de logros y módulos completados (vista "Mis logros")</strong></p>
-    <pre>GET /api/students/me/achievements
-(el estudiante se identifica con el token; no se envía su id)
-
-200 OK
-{
-  "success": true,
-  "data": {
-    "modulos": [
-      {
-        "moduloId": "guid",
-        "titulo": "Rutinas diarias",
-        "categoria": "Autonomía",
-        "orden": 1,                       // orden pedagógico del módulo (NO es una posición)
-        "actividadesTotales": 5,
-        "actividadesCompletadas": 5,
-        "completado": true,
-        "fechaCompletado": "2026-09-12"   // null si no está completo
-      }
-    ],
-    "logros": [
-      {
-        "id": "guid",
-        "tipo": "ModuloCompletado",       // o "ActividadCompletada" / "PrimeraActividad"
-        "descripcion": "Terminaste el módulo Rutinas diarias.",
-        "fecha": "2026-09-12T10:30:00"
-      }
-    ]
-  }
-}
-
-REGLAS PARA EL BACKEND (no competitivo):
-- Solo datos del propio estudiante. Nunca datos de otros estudiantes.
-- NO enviar: posición, ranking, puntos, promedio del grupo, percentil,
-  rachas, "mejor/peor", ni tiempos comparados.
-- Aunque el API enviara esos campos, la interfaz no los muestra: solo
-  lee los campos listados arriba (lista blanca en mapAchievements).</pre>
-    <p><strong>Checklist: visualización sin elementos competitivos</strong></p>
-    <pre>[ ] No hay rankings, tablas de posiciones ni "puesto #"
-[ ] No hay puntos, monedas, niveles ni medallas acumulables
-[ ] No hay comparaciones con compañeros ni con el promedio del grupo
-[ ] No hay rachas ("días seguidos") que generen presión por no fallar
-[ ] No hay temporizadores ni récords de tiempo en esta vista
-[ ] Los módulos sin empezar se nombran en tono neutro ("Por empezar"),
-    nunca como "atrasado", "pendiente" en rojo o "fallido"
-[ ] El avance se muestra contra el propio camino del estudiante
-    (círculos llenos / total del módulo), no contra otros
-[ ] Sin animaciones de celebración (confeti, parpadeos, sonidos fuertes)
-[ ] Con "Reducir animaciones" no hay ningún movimiento
-[ ] Los colores salen de la paleta elegida por el acudiente
-[ ] Cada indicador gráfico tiene texto equivalente (lector de pantalla)
-
-Verificación automática: en la consola (F12), con "Mis logros" abierto,
-ejecutar  validarSinElementosCompetitivos()  → revisa el texto visible
-de la vista y avisa si encuentra palabras competitivas.</pre>
-  </details>
  
 </div>
  
