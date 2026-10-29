@@ -1573,7 +1573,7 @@
         method: 'DELETE'
       });
       if(res.ok && res.data && res.data.success){
-        setStatus('Actividad eliminada correctamente.', 'error');
+        setStatus('Actividad eliminada correctamente.', 'ok');
         closeDeleteModal();
         await loadActivitiesFromBackend();
       } else {
