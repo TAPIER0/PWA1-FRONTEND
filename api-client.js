@@ -153,6 +153,15 @@ const ApiClient = {
     return rawMsg || data.detail || data.title || fallback;
   },
 
+  parseUtcDate(dateStr) {
+    if (!dateStr) return null;
+    const s = String(dateStr).trim();
+    if (!s) return null;
+    const iso = (s.endsWith('Z') || /[+-]\d{2}(:\d{2})?$/.test(s)) ? s : s + 'Z';
+    const d = new Date(iso);
+    return isNaN(d.getTime()) ? new Date(s) : d;
+  },
+
   _connectivityTimer: null,
 
   showConnectivityBanner(isOnline) {

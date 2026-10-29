@@ -1248,10 +1248,11 @@
         users = res.data.data.map(u => {
           let activityStr = 'Sin actividad aún';
           if (u.ultimaActividadAt) {
-            const actDate = new Date(u.ultimaActividadAt);
-            activityStr = actDate.toLocaleDateString('es-CO') + ' ' + actDate.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+            const actDate = (ApiClient && ApiClient.parseUtcDate) ? ApiClient.parseUtcDate(u.ultimaActividadAt) : new Date(u.ultimaActividadAt);
+            activityStr = actDate ? (actDate.toLocaleDateString('es-CO') + ' ' + actDate.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })) : 'Sin actividad aún';
           } else if (u.createdAt) {
-            activityStr = new Date(u.createdAt).toLocaleDateString('es-CO');
+            const createDate = (ApiClient && ApiClient.parseUtcDate) ? ApiClient.parseUtcDate(u.createdAt) : new Date(u.createdAt);
+            activityStr = createDate ? createDate.toLocaleDateString('es-CO') : 'Sin actividad aún';
           }
           const rawRole = (u.roles && u.roles.length > 0) ? u.roles[0] : 'Sin rol';
           return {
