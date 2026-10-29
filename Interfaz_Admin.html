@@ -1947,7 +1947,7 @@
       btnConfirmDeleteModulo.disabled = false;
 
       if(res.ok && res.data && res.data.success){
-        setStatus('Módulo temático eliminado correctamente.', 'error');
+        setStatus('Módulo temático eliminado correctamente.', 'ok');
         closeModuloDeleteModal();
         await loadModulesFromBackend();
         await loadCategoriasFromBackend();
